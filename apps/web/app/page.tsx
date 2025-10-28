@@ -117,12 +117,18 @@ export default function HomePage() {
 								Create Account
 							</Button>
 						</Link>
+            <Link href="/project">
+              <Button type="button" variant="outline">
+                View Project
+              </Button>
+            </Link>
 						<Button type="submit" disabled={loading}>
 							{loading ? "Logging in..." : "Log In"}
 						</Button>
 					</Field>
 				</FieldGroup>
 			</form>
+
 		</div>
 	);
 }
