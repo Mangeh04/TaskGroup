@@ -1,0 +1,11 @@
+{
+	"name": "@repo/schemas",
+	"version": "1.0.0",
+	"main": "index.ts",
+	"exports": {
+		".": "./index.ts"
+	},
+	"dependencies": {
+		"zod": "^4.1.12"
+	}
+}
