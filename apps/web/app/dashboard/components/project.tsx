@@ -20,13 +20,13 @@ export function ProjectCard({ title, numTasks, numUsers }: ProjectCardProps) {
         <div className="flex items-center gap-2">
           <CheckCircle2 className="w-4 h-4 text-primary" />
           <span className="font-medium text-foreground">{numTasks}</span>
-          <Badge variant="secondary">Tasks</Badge>
+          <Badge variant="destructive">Tasks</Badge>
         </div>
 
         <div className="flex items-center gap-2">
           <Users className="w-4 h-4 text-primary" />
           <span className="font-medium text-foreground">{numUsers}</span>
-          <Badge variant="secondary">Users</Badge>
+          <Badge variant="blue">Users</Badge>
         </div>
       </div>
     </Card>
