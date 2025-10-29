@@ -97,6 +97,11 @@ export default function CardDemo() {
 						>
 							{loading ? "Logging in..." : "Log In"}
 						</Button>
+						<Link href="/dashboard" className="w-full">
+							<Button variant="outline" className="w-full">
+								Project Page
+							</Button>
+						</Link>
 					</CardFooter>
 				</Card>
 			</form>
