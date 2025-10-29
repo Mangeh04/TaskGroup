@@ -116,7 +116,7 @@ export function SignupForm({
 							</Field>
 							<FieldDescription className="text-center">
 								Already have an account?{" "}
-								<Link href="#">Sign in</Link>
+								<Link href="login">Sign in</Link>
 							</FieldDescription>
 						</FieldGroup>
 					</form>
