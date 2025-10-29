@@ -14,8 +14,8 @@ export type FormHandlerResult<T> = FormHandlerSuccess<T> | FormHandlerError;
 
 /**
  * Validates a FormData object against a Zod schema.
- * @param data - The data from the form.
- * @param schema - The Zod schema to validate against.
+ * @param {FormData} [data] - The data from the form.
+ * @param {z.ZodTypeAny} [schema] - The Zod schema to validate against.
  * @returns An object indicating success with parsed data or failure with validation errors.
  */
 export function handleFormValidation<T extends z.ZodTypeAny>(
