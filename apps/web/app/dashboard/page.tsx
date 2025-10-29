@@ -21,7 +21,6 @@ export default function DashboardPage({
 	return (
 		<SidebarProvider>
 			<AppSidebar />
-
 			<SidebarInset className="flex min-h-dvh flex-1 flex-col">
 				<header className="flex h-14 shrink-0 items-center gap-2 px-4">
 					<SidebarTrigger />
