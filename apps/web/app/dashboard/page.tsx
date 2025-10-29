@@ -19,27 +19,31 @@ export default function DashboardPage({
 	const hasProjects = false;
 
 	return (
-		<SidebarProvider>
-			<AppSidebar />
-			<SidebarInset className="flex min-h-dvh flex-1 flex-col">
-				<header className="flex h-14 shrink-0 items-center gap-2 px-4">
-					<SidebarTrigger />
-					<h1 className="text-lg font-semibold">Task Group</h1>
-				</header>
+		<div className="flex h-dvh overflow-hidden">
+			<SidebarProvider>
+				<AppSidebar />
+				<SidebarInset className="flex h-[98%] flex-1 flex-col">
+					<header className="flex h-14 shrink-0 items-center gap-2 px-4">
+						<SidebarTrigger />
+						<h1 className="text-lg font-semibold">Task Group</h1>
+					</header>
 
-				{hasProjects ? (
-					<div className="px-4 py-6">{children}</div>
-				) : (
-					<div className="flex flex-1 items-center justify-center p-6">
-						<EmptyPage
-							title="You don't have any projects yet"
-							buttonString="Create Project"
-							imageSrc={emptyImage}
-							imageAlt="Empty projects illustration"
-						/>
-					</div>
-				)}
-			</SidebarInset>
-		</SidebarProvider>
+					{hasProjects ? (
+						<div className="flex-1 px-4 py-6 overflow-auto">
+							{children}
+						</div>
+					) : (
+						<div className="flex flex-1 items-center justify-center p-6 overflow-hidden">
+							<EmptyPage
+								title="You don't have any projects yet"
+								buttonString="Create Project"
+								imageSrc={emptyImage}
+								imageAlt="Empty projects illustration"
+							/>
+						</div>
+					)}
+				</SidebarInset>
+			</SidebarProvider>
+		</div>
 	);
 }
