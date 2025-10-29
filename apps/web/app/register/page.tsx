@@ -60,6 +60,19 @@ export default function RegisterPage() {
 					<CardContent>
 						<div className="flex flex-col gap-6">
 							<div className="grid gap-2">
+								<Label htmlFor="user_username_label">
+									Username
+								</Label>
+								<Input
+									id="user_username_input"
+									name="username"
+									type="text"
+									placeholder="Mangeh04"
+									required
+								/>
+							</div>
+
+							<div className="grid gap-2">
 								<Label htmlFor="user_email_label">Email</Label>
 								<Input
 									id="user_email_input"
