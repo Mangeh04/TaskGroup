@@ -1,81 +1,97 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import {
-	Field,
-	FieldDescription,
-	FieldGroup,
-	FieldLabel,
-	FieldLegend,
-	FieldSeparator,
-	FieldSet,
-} from "@/components/ui/field";
+	Card,
+	CardAction,
+	CardContent,
+	CardDescription,
+	CardFooter,
+	CardHeader,
+	CardTitle,
+} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { UserLoginSchema } from "@repo/schemas";
+
+import { toast } from "sonner";
+import { useState } from "react";
 import Link from "next/link";
+import { handleFormValidation } from "../_utils/formHandler";
 
 export default function RegisterPage() {
+	const [loading, setLoading] = useState(false);
+
+	async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+		e.preventDefault();
+		setLoading(true);
+
+		const formData = new FormData(e.currentTarget);
+
+		const parsed = handleFormValidation(formData, UserLoginSchema);
+
+		if (!parsed.success) {
+			parsed.errors.forEach((issue) => {
+				toast.error(issue.message);
+			});
+			return setLoading(false);
+		}
+
+		setLoading(false);
+	}
 	return (
 		<div className="flex items-center justify-center min-h-screen bg-muted/20">
-			<form className="w-full max-w-md rounded-xl border bg-background shadow-sm p-6 md:p-8 space-y-6">
-				<FieldGroup>
-					<FieldSet>
-						<FieldLegend className="text-lg font-semibold">
-							Register
-						</FieldLegend>
-						<FieldDescription className="text-muted-foreground">
-							Complete the following fields to create your
-							account.
-						</FieldDescription>
-
-						<div className="mt-6 space-y-6">
-							<Field>
-								<FieldLabel htmlFor="user_email">
-									Email
-								</FieldLabel>
+			<form
+				onSubmit={handleSubmit}
+				className="w-full max-w-md rounded-xl p-6 md:p-8 space-y-6"
+			>
+				<Card className="w-full max-w-sm">
+					<CardHeader>
+						<CardTitle>Register</CardTitle>
+						<CardDescription>
+							Enter your email below to register your account
+						</CardDescription>
+						<CardAction>
+							<Link href="/">
+								<Button variant="link">Log In</Button>
+							</Link>
+						</CardAction>
+					</CardHeader>
+					<CardContent>
+						<div className="flex flex-col gap-6">
+							<div className="grid gap-2">
+								<Label htmlFor="user_email_label">Email</Label>
 								<Input
-									id="user_email"
-									placeholder="Introduce your email"
+									id="user_email_input"
+									name="email"
+									type="email"
+									placeholder="m@example.com"
 									required
 								/>
-							</Field>
-
-							<Field>
-								<FieldLabel htmlFor="user_username">
-									Username
-								</FieldLabel>
+							</div>
+							<div className="grid gap-2">
+								<div className="flex items-center">
+									<Label htmlFor="password">Password</Label>
+								</div>
 								<Input
-									id="user_username"
-									placeholder="Introduce your username"
-									required
-								/>
-							</Field>
-
-							<Field>
-								<FieldLabel htmlFor="user_password">
-									Password
-								</FieldLabel>
-								<Input
-									id="user_password"
+									id="user_password_input"
+									name="password"
 									type="password"
-									placeholder="Introduce your password"
 									required
 								/>
-							</Field>
+							</div>
 						</div>
-					</FieldSet>
-
-					<FieldSeparator className="my-6" />
-
-					<Field
-						orientation="horizontal"
-						className="justify-between gap-2 mt-2"
-					>
-						<Link href="/">
-							<Button type="button" variant="outline">
-								Log in
-							</Button>
-						</Link>
-						<Button type="submit">Submit</Button>
-					</Field>
-				</FieldGroup>
+					</CardContent>
+					<CardFooter className="flex-col gap-2">
+						<Button
+							type="submit"
+							disabled={loading}
+							className="w-full"
+						>
+							{loading ? "Registering..." : "Register"}
+						</Button>
+					</CardFooter>
+				</Card>
 			</form>
 		</div>
 	);
