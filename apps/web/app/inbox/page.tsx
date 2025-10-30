@@ -11,6 +11,10 @@ import AppSidebar from "@/components/custom/sideBar";
 import { EmptyPage } from "@/components/custom/empty";
 import { Loader2 } from "lucide-react";
 
+
+import { ScrollArea } from "@/components/ui/scroll-area"
+import { Separator } from "@/components/ui/separator"
+
 import emptyInboxImage from "@/public/images/empty-inbox.webp";
 
 import {
@@ -40,8 +44,8 @@ export default function InboxPage() {
     },
     {
       user: "alejandropxrez",
-      project: "Mobile App",
-      type: "Invitation",
+      project: "TaskGroup",
+      type: "AddedTask",
     },
     {
       user: "mangeh04",
@@ -54,7 +58,7 @@ export default function InboxPage() {
       type: "Invitation",
     },
     {
-      user: "alejandropxrez",
+      user: "axiur",
       project: "Mobile App",
       type: "Invitation",
     },
@@ -100,15 +104,15 @@ export default function InboxPage() {
           </header>
 
           {hasNotifications ? (
-            <div className="flex-1 overflow-y-auto p-4 lg:p-6">
+            <div className="flex-1 overflow-hidden">
               {isLoading ? (
-                <div className="flex flex-col gap-4">
+                <div className="flex flex-col p-4 lg:p-6">
                   {Array.from({ length: 4 }).map((_, i) => (
                     <SkeletonNotificationCard key={`skeleton_${i}`} />
                   ))}
                 </div>
               ) : (
-                <div className="flex flex-col gap-4">
+                <ScrollArea className="h-full p-4 lg:p-6">
                   {data.map((item, index) => (
                     <NotificationCard
                       key={index}
@@ -119,7 +123,7 @@ export default function InboxPage() {
                       onReject={handleReject}
                     />
                   ))}
-                </div>
+                </ScrollArea>
               )}
             </div>
           ) : (
