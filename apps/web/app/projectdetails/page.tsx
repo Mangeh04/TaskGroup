@@ -41,6 +41,15 @@ import {
 } from "@/app/projectdetails/components/task";
 import { Progress } from "@/components/ui/progress";
 
+import {
+  Breadcrumb,
+  BreadcrumbItem,
+  BreadcrumbLink,
+  BreadcrumbList,
+  BreadcrumbPage,
+  BreadcrumbSeparator,
+} from "@/components/ui/breadcrumb"
+
 // TODO: change the loading effect only for the first time the data is downloaded.
 // TODO: cleanup code
 

@@ -16,7 +16,7 @@ export type EmptyPageProps = {
   buttonString: string;
   imageSrc: StaticImageData;
   imageAlt: string;
-  customDialog: {
+  customDialog?: {
     title: string;
     subtitle: string;
   };
@@ -46,16 +46,19 @@ export function EmptyPage({
         </EmptyTitle>
       </EmptyHeader>
 
-      <EmptyContent className="flex justify-center">
-        <CustomDialog
-          buttonString={buttonString}
-          title={customDialog.title}
-          subtitle={customDialog.subtitle}
-          confirmIcon={<PlusIcon />}
-        >
-          {children}
-        </CustomDialog>
-      </EmptyContent>
+      {customDialog && (
+        <EmptyContent className="flex justify-center">
+
+          <CustomDialog
+            buttonString={buttonString}
+            title={customDialog.title}
+            subtitle={customDialog.subtitle}
+            confirmIcon={<PlusIcon />}
+          >
+            {children}
+          </CustomDialog>
+        </EmptyContent>
+      )}
     </Empty>
   );
 }

@@ -28,7 +28,7 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 import Link from "next/link";
-import { cn } from "@/lib/utils"; // --> Añadido 'cn' para las clases
+import { cn } from "@/lib/utils";
 
 // --> Array de estados
 const statusOptions = [

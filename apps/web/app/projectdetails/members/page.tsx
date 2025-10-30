@@ -11,7 +11,7 @@ import {
   MemberCard,
   MemberCardProps,
   MemberStatus,
-} from "@/app/projectdetails/members/components/merber";
+} from "@/app/projectdetails/members/components/member";
 
 type UserData = MemberCardProps & { status: MemberStatus };
 

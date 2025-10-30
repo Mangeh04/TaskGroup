@@ -1,83 +1,92 @@
-import { Card, CardContent, CardFooter, CardHeader } from "@/components/ui/card";
-import { CalendarDays, User, Check, X} from "lucide-react"
-
-
-import { Skeleton } from "@/components/ui/skeleton";
-import { ConfirmationDialog } from "@/components/custom/confirmation";
-import { CustomDialog } from "@/components/custom/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-
+import { Card } from "@/components/ui/card";
+import { Check, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export type NotificationCardProps = {
-  title: string
-  description: string
-  user: string
-  project: string
-  date: Date
-  type: "Invitation" | "AddedTask"
-  onConfirm?: () => void
-  onReject?: () => void
-}
+  user: string;
+  project: string;
+  type: "Invitation" | "AddedTask";
+  onConfirm?: () => void;
+  onReject?: () => void;
+};
 
 export function NotificationCard(props: NotificationCardProps) {
+
+  const { user, project, type, onConfirm, onReject } = props;
   const isInvitation = type === "Invitation";
 
-  return(
-      <Card className="w-full max-w-sm">
+  return (
+    <Card className="w-full mb-4">
+      <div className="flex items-center justify-between px-4 py-0">
+        <div className="flex items-start gap-4">
+          <div className="flex-shrink-0 size-8 rounded-full bg-black flex items-center justify-center text-white font-semibold">
+            {project[0]}
+          </div>
+
+          <div className="flex flex-col gap-1">
+            <h3 className="font-semibold text-foreground tracking-tight">
+              {isInvitation ? "New invitation" : "New assigned task"}
+            </h3>
+            <p className="text-sm text-muted-foreground">
+              {isInvitation
+                ? `You have been invited by ${user} to join ${project}`
+                : `You have a new assignment posted by ${user} in ${project}`}
+            </p>
+          </div>
+        </div>
+
         {isInvitation ? (
-          <div>
+          <div className="flex gap-2">
             <Button
-              className=""
+              onClick={onConfirm}
+              variant="outline"
+              size="icon"
+              className="text-green-600 hover:text-green-600 border-green-600/40 hover:bg-green-50"
             >
-              <Check/>
+              <Check className="size-4" />
             </Button>
             <Button
-              className=""
+              onClick={onReject}
+              variant="outline"
+              size="icon"
+              className="text-red-600 hover:text-red-600 border-red-600/40 hover:bg-red-50"
             >
-              <X/>
+              <X className="size-4" />
             </Button>
           </div>
+        ) :
+          (
+            <Button
+              onClick={onReject}
+              variant="outline"
+              size="icon"
+              className="text-red-600 hover:text-red-600 border-red-600/40 hover:bg-red-50"
+            >
+              <X className="size-4" />
+            </Button>
+          )}
+      </div>
+    </Card>
+  );
+}
 
-        ) : (
-          
-        )}
-
-          <div className="flex items-start gap-4">
-            <div className="flex-shrink-0 size-8 rounded-full bg-black flex items-center justify-center text-white font-semibold">
-              {project[0]}
-            </div>
-
-            <div className="flex flex-col gap-1">
-              <h3 className="text-shadow-md font-semibold text-foreground tracking-tight">{title}</h3>
-              <p className="text-sm text-muted-foreground">{description}</p>
-
-              <div className="flex items-center text-xs text-muted-foreground mt-1">
-                <CalendarDays className="size-3.5 mr-1" />
-                <span>Created on {date.toDateString()}</span>
-              </div>
-
-              <div className="flex items-center text-xs text-muted-foreground mt-1">
-                <User className="size-3.5 mr-1" />
-                <span>{user}</span>
-              </div>
-            </div>
+export function SkeletonNotificationCard() {
+  return (
+    <Card className="w-full mb-4">
+      <div className="flex items-center justify-between px-4 py-0">
+        <div className="flex items-start gap-4">
+          <Skeleton className="size-8 rounded-full bg-neutral-300/80 animate-pulse flex-shrink-0" />
+          <div className="flex flex-col gap-2">
+            <Skeleton className="h-5 w-32 rounded-md bg-neutral-300/80 animate-pulse" />
+            <Skeleton className="h-4 w-64 rounded-md bg-neutral-300/80 animate-pulse" />
           </div>
-        <CardFooter className="flex-col gap-2">
-          <Button type="submit" className="w-full">
-            Login
-          </Button>
-          <Button variant="outline" className="w-full">
-            Login with Google
-          </Button>
-      </Card>
-)
+        </div>
+        <div className="flex gap-2">
+          <Skeleton className="h-9 w-9 rounded-md bg-neutral-300/80 animate-pulse" />
+          <Skeleton className="h-9 w-9 rounded-md bg-neutral-300/80 animate-pulse" />
+        </div>
+      </div>
+    </Card>
+  );
 }
