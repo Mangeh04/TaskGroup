@@ -1,37 +1,35 @@
 // --> AÑADIDO: Indica que es un Componente de Cliente
 "use client";
 
-// --> AÑADIDO: Importar useState para manejar el estado de la página
-import { useState } from "react";
-import type { MouseEvent } from "react"; // Para tipar los eventos de clic
+import { useState, useEffect, useRef, type MouseEvent } from "react";
 import {
   SidebarProvider,
   SidebarTrigger,
   SidebarInset,
 } from "@/components/ui/sidebar";
+
 import {
   Pagination,
   PaginationContent,
-  // PaginationEllipsis, // No la usaremos en este ejemplo simple
   PaginationItem,
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination"
+
 import AppSidebar from "@/components/custom/sideBar";
 import { EmptyPage } from "@/components/custom/empty";
-import emptyImage from "@/public/images/empty-folder.webp";
 import { ProjectCard } from "@/app/dashboard/components/project"
-import { PlusIcon } from "lucide-react";
 import { CustomDialog } from "@/components/custom/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 
+import emptyImage from "@/public/images/empty-folder.webp";
+import { PlusIcon } from "lucide-react";
 
-const ITEMS_PER_PAGE = 7;
+const PROJECT_CARD_WITH_GAP_HEIGHT = 96;
 
 export default function DashboardPage() {
-  // He reemplazado los títulos ofensivos por ejemplos genéricos
   const data: Array<{
     title: string;
     numTasks: number;
@@ -45,26 +43,51 @@ export default function DashboardPage() {
     { title: "Proyecto Foxtrot", numTasks: 3, numUsers: 1 },
     { title: "Proyecto Golf", numTasks: 3, numUsers: 1 },
     { title: "Proyecto Hotel", numTasks: 3, numUsers: 1 },
-    { title: "Proyecto Golf", numTasks: 3, numUsers: 1 },
-    { title: "Proyecto Hotel", numTasks: 3, numUsers: 1 },
-    { title: "Proyecto Golf", numTasks: 3, numUsers: 1 },
-    { title: "Proyecto Hotel", numTasks: 3, numUsers: 1 },
-    { title: "Proyecto Golf", numTasks: 3, numUsers: 1 },
-    { title: "Proyecto Hotel", numTasks: 3, numUsers: 1 },
-    { title: "Proyecto Golf", numTasks: 3, numUsers: 1 },
-    { title: "Proyecto Hotel", numTasks: 3, numUsers: 1 },
+    { title: "Proyecto India", numTasks: 3, numUsers: 1 },
+    { title: "Proyecto Juliet", numTasks: 3, numUsers: 1 },
   ];
   const hasProjects = data.length > 0;
 
   const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(6);
 
-  const totalPages = Math.ceil(data.length / ITEMS_PER_PAGE);
-  const startIndex = (currentPage - 1) * ITEMS_PER_PAGE;
-  const currentData = data.slice(startIndex, startIndex + ITEMS_PER_PAGE);
+  const listContainerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const updateItemsPerPage = () => {
+      if (listContainerRef.current) {
+        const availableHeight = listContainerRef.current.clientHeight;
+        const count = Math.max(
+          1,
+          Math.floor(availableHeight / PROJECT_CARD_WITH_GAP_HEIGHT)
+        );
+        setItemsPerPage(count);
+      }
+    };
+
+    updateItemsPerPage();
+    window.addEventListener("resize", updateItemsPerPage);
+    return () => window.removeEventListener("resize", updateItemsPerPage);
+  }, []);
+
+
+  const totalPages = Math.ceil(data.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const currentData = data.slice(startIndex, startIndex + itemsPerPage);
+
+  useEffect(() => {
+    if (totalPages > 0 && currentPage > totalPages) {
+      setCurrentPage(totalPages);
+    }
+    if (currentPage < 1 && totalPages > 0) {
+      setCurrentPage(1);
+    }
+  }, [totalPages, currentPage]);
+
 
   const handlePrevious = (e: MouseEvent<HTMLAnchorElement>) => {
     e.preventDefault();
-    setCurrentPage((prev) => Math.max(prev - 1, 1)); // No ir por debajo de 1
+    setCurrentPage((prev) => Math.max(prev - 1, 1));
   };
 
   const handleNext = (e: MouseEvent<HTMLAnchorElement>) => {
@@ -82,65 +105,72 @@ export default function DashboardPage() {
     <div className="flex h-dvh overflow-hidden">
       <SidebarProvider>
         <AppSidebar />
-        <SidebarInset className="flex h-[98%] flex-1 flex-col">
-          <header className="flex h-14 shrink-0 items-center gap-2 px-4">
+        <SidebarInset className="flex flex-1 min-h-0 flex-col">
+        <header className="flex h-14 shrink-0 items-center gap-2 px-4">
             <SidebarTrigger />
             <h1 className="text-lg font-semibold">Projects</h1>
           </header>
 
           {hasProjects ? (
-            <div className="flex flex-col gap-4 flex-1 px-4 py-6">
-              <CustomDialog
-                buttonString="Create Project"
-                title="Create a new Project"
-                subtitle="Create your new projects here. Click save when you're done"
-                confirmIcon={<PlusIcon />}
-              >
-                <Label htmlFor="project-name">Project Name</Label>
-                <Input id="project-name" name="Project Name" placeholder="Incredible Project" />
-              </CustomDialog>
+            <div className="flex flex-col gap-4 flex-1 min-h-0 px-4 py-6 overflow-hidden">
+              <div className="shrink-0">
+                <CustomDialog
+                  buttonString="Create Project"
+                  title="Create a new Project"
+                  subtitle="Create your new projects here. Click save when you're done"
+                  confirmIcon={<PlusIcon />}
+                >
+                  <Label htmlFor="project-name">Project Name</Label>
+                  <Input id="project-name" name="Project Name" placeholder="Incredible Project" />
+                </CustomDialog>
+              </div>
 
-              {currentData.map((item, index) => (
-                <ProjectCard
-                  key={startIndex + index}
-                  title={item.title}
-                  numTasks={item.numTasks}
-                  numUsers={item.numUsers} />
-              ))}
-
-              <Pagination>
-                <PaginationContent>
-                  <PaginationItem>
-                    <PaginationPrevious
-                      href="#"
-                      onClick={handlePrevious}
-                      aria-disabled={currentPage === 1}
-                      className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
-                    />
-                  </PaginationItem>
-
-                  {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
-                    <PaginationItem key={page}>
-                      <PaginationLink
-                        href="#"
-                        onClick={(e) => handlePageClick(e, page)}
-                        isActive={currentPage === page}
-                      >
-                        {page}
-                      </PaginationLink>
-                    </PaginationItem>
+              <div ref={listContainerRef} className="flex-1 overflow-y-auto">
+                <div className="flex flex-col gap-4">
+                  {currentData.map((item, index) => (
+                    <ProjectCard
+                      key={startIndex + index}
+                      title={item.title}
+                      numTasks={item.numTasks}
+                      numUsers={item.numUsers} />
                   ))}
+                </div>
+              </div>
 
-                  <PaginationItem>
-                    <PaginationNext
-                      href="#"
-                      onClick={handleNext}
-                      aria-disabled={currentPage === totalPages}
-                      className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
-                    />
-                  </PaginationItem>
-                </PaginationContent>
-              </Pagination>
+              <div className="shrink-0">
+                <Pagination>
+                  <PaginationContent>
+                    <PaginationItem>
+                      <PaginationPrevious
+                        href="#"
+                        onClick={handlePrevious}
+                        aria-disabled={currentPage === 1}
+                        className={currentPage === 1 ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                    {totalPages > 0 && Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
+                      <PaginationItem key={page}>
+                        <PaginationLink
+                          href="#"
+                          onClick={(e) => handlePageClick(e, page)}
+                          isActive={currentPage === page}
+                        >
+                          {page}
+                        </PaginationLink>
+                      </PaginationItem>
+                    ))}
+
+                    <PaginationItem>
+                      <PaginationNext
+                        href="#"
+                        onClick={handleNext}
+                        aria-disabled={currentPage === totalPages}
+                        className={currentPage === totalPages ? "pointer-events-none opacity-50" : ""}
+                      />
+                    </PaginationItem>
+                  </PaginationContent>
+                </Pagination>
+              </div>
             </div>
           ) : (
             <div className="flex flex-1 items-center justify-center p-6 overflow-hidden">
