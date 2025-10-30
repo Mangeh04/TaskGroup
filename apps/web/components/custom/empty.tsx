@@ -11,12 +11,16 @@ import { Input } from "@/components/ui/input";
 import Image, { StaticImageData } from "next/image";
 import { PlusIcon } from "lucide-react";
 
-
 export type EmptyPageProps = {
   title: string;
   buttonString: string;
   imageSrc: StaticImageData;
   imageAlt: string;
+  customDialog: {
+    title: string;
+    subtitle: string;
+  };
+  children?: React.ReactNode;
 };
 
 export function EmptyPage({
@@ -24,6 +28,8 @@ export function EmptyPage({
   buttonString,
   imageSrc,
   imageAlt,
+  customDialog,
+  children
 }: EmptyPageProps) {
   return (
     <Empty className="flex flex-col items-center justify-center text-center gap-6">
@@ -43,12 +49,11 @@ export function EmptyPage({
       <EmptyContent className="flex justify-center">
         <CustomDialog
           buttonString={buttonString}
-          title="Create a new Project"
-          subtitle="Create your new projects here. Click save when you're done"
+          title={customDialog.title}
+          subtitle={customDialog.subtitle}
           confirmIcon={<PlusIcon />}
         >
-          <Label htmlFor="project-name">Project Name</Label>
-          <Input id="project-name" name="Project Name" placeholder="Incredible Project" />
+          {children}
         </CustomDialog>
       </EmptyContent>
     </Empty>

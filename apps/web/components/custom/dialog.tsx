@@ -10,13 +10,15 @@ import {
 } from "@/components/ui/dialog";
 
 import { JSX, ReactNode } from "react";
+import { PlusIcon } from "lucide-react";
 
 export type CustomDialog = {
   buttonString: string;
   title: string;
   subtitle: string;
   children: ReactNode;
-  confirmIcon: JSX.Element
+  confirmIcon: JSX.Element,
+  onSubmit?: () => void;
 };
 
 export function CustomDialog({
@@ -24,13 +26,14 @@ export function CustomDialog({
   title,
   subtitle,
   children,
-  confirmIcon
+  confirmIcon,
+  onSubmit
 }: CustomDialog) {
   return (
     <Dialog>
-      <form>
+      <form onSubmit={onSubmit}>
         <DialogTrigger asChild>
-          <Button >{buttonString}</Button>
+          <Button > {confirmIcon} {buttonString} </Button>
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>
