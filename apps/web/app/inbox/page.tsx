@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef, type MouseEvent } from "react";
+import { useState, useEffect, useRef } from "react";
 import {
   SidebarProvider,
   SidebarTrigger,
@@ -8,18 +8,60 @@ import {
 } from "@/components/ui/sidebar";
 
 import AppSidebar from "@/components/custom/sideBar";
-
+import { EmptyPage } from "@/components/custom/empty";
 import { Loader2 } from "lucide-react";
-import { SkeletonCard} from "@/app/projectdetails/components/task";
 
-export default function inboxPage() {
+import emptyInboxImage from "@/public/images/empty-inbox.webp";
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(6);
+import {
+  type NotificationCardProps,
+  NotificationCard,
+  SkeletonNotificationCard,
+} from "@/app/inbox/components/notification";
+
+export default function InboxPage() {
   const [isLoading, setIsLoading] = useState(true);
 
-  const listContainerRef = useRef<HTMLDivElement>(null);
-  const gridRef = useRef<HTMLDivElement>(null);
+  const data: Array<NotificationCardProps> = [
+    {
+      user: "mangeh04",
+      project: "TaskGroup",
+      type: "Invitation",
+    },
+    {
+      user: "axiur",
+      project: "Website Redesign",
+      type: "AddedTask",
+    },
+    {
+      user: "blackfox099",
+      project: "API Development",
+      type: "AddedTask",
+    },
+    {
+      user: "alejandropxrez",
+      project: "Mobile App",
+      type: "Invitation",
+    },
+    {
+      user: "mangeh04",
+      project: "Mobile App",
+      type: "Invitation",
+    },
+    {
+      user: "blackfox099",
+      project: "Mobile App",
+      type: "Invitation",
+    },
+    {
+      user: "alejandropxrez",
+      project: "Mobile App",
+      type: "Invitation",
+    },
+
+  ];
+
+  const hasNotifications = data.length > 0;
 
   const flashLoading = (minMs = 300) => {
     setIsLoading(true);
@@ -28,86 +70,69 @@ export default function inboxPage() {
   };
 
   useEffect(() => {
-    const updateItemsPerPage = () => {
-      if (!listContainerRef.current || !gridRef.current) return;
-      const availableHeight = listContainerRef.current.clientHeight;
-      const gridStyle = getComputedStyle(gridRef.current);
-      const gap = parseInt(gridStyle.gap || "16", 10) || 16;
-
-      let columns = 1;
-      const gtc = gridStyle.gridTemplateColumns;
-      if (gtc && gtc !== "none") {
-        columns = gtc.split(" ").length;
-      }
-
-      const DEFAULT_CARD_MIN_H = 160;
-      const sampleCard =
-        gridRef.current.querySelector<HTMLElement>("[data-task-card]");
-      const cardHeight = sampleCard?.offsetHeight ?? DEFAULT_CARD_MIN_H;
-
-      const rows = Math.max(
-        1,
-        Math.floor((availableHeight + gap) / (cardHeight + gap))
-      );
-      const count = rows * columns;
-      setItemsPerPage(count);
-    };
-
-    updateItemsPerPage();
-    window.addEventListener("resize", updateItemsPerPage);
-
-    const ro = new ResizeObserver(updateItemsPerPage);
-    if (listContainerRef.current) ro.observe(listContainerRef.current);
-    const sampleCardNode = gridRef.current?.querySelector("[data-task-card]");
-    if (sampleCardNode) ro.observe(sampleCardNode as HTMLElement);
-
-    const clear = flashLoading(350);
-    return () => {
-      window.removeEventListener("resize", updateItemsPerPage);
-      ro.disconnect();
-      clear?.();
-    };
+    const clear = flashLoading(500);
+    return () => clear?.();
   }, []);
 
-  const handlePrevious = (e: MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    if (currentPage === 1) return;
-    flashLoading(250);
-    setCurrentPage((prev) => Math.max(prev - 1, 1));
+  const handleConfirm = () => {
+    console.log("Invitation Confirmed");
   };
 
-  const handleNext = (e: MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    if (currentPage === 5) return;
-    flashLoading(250);
-    setCurrentPage((prev) => Math.min(prev + 1, 5));
-  };
-
-  const handlePageClick = (e: MouseEvent<HTMLAnchorElement>, page: number) => {
-    e.preventDefault();
-    if (page === currentPage) return;
-    flashLoading(250);
-    setCurrentPage(page);
+  const handleReject = () => {
+    console.log("Invitation Rejected");
   };
 
   return (
     <div className="flex h-dvh overflow-hidden bg-white">
       <SidebarProvider>
-        <AppSidebar/>
+        <AppSidebar />
         <SidebarInset className="flex flex-1 min-h-0 flex-col bg-white dark:bg-neutral-950">
           <header className="relative flex h-14 shrink-0 items-center gap-6 px-4 border-b">
             <SidebarTrigger />
             <h1 className="text-lg font-semibold">Inbox</h1>
 
-
             {isLoading && (
-              <div className="ml-4 flex items-center gap-2">
+              <div className="ml-auto flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/80" />
-                <span className="text-xs text-muted-foreground">Cargando…</span>
+                <span className="text-xs text-muted-foreground">Loading...</span>
               </div>
             )}
           </header>
-          </SidebarInset>
+
+          {hasNotifications ? (
+            <div className="flex-1 overflow-y-auto p-4 lg:p-6">
+              {isLoading ? (
+                <div className="flex flex-col gap-4">
+                  {Array.from({ length: 4 }).map((_, i) => (
+                    <SkeletonNotificationCard key={`skeleton_${i}`} />
+                  ))}
+                </div>
+              ) : (
+                <div className="flex flex-col gap-4">
+                  {data.map((item, index) => (
+                    <NotificationCard
+                      key={index}
+                      user={item.user}
+                      project={item.project}
+                      type={item.type}
+                      onConfirm={handleConfirm}
+                      onReject={handleReject}
+                    />
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="flex flex-1 items-center justify-center p-6 overflow-hidden">
+              <EmptyPage
+                title="Your inbox is empty"
+                buttonString="Refresh"
+                imageSrc={emptyInboxImage}
+                imageAlt="Empty inbox illustration"
+              />
+            </div>
+          )}
+        </SidebarInset>
       </SidebarProvider>
     </div>
   );
