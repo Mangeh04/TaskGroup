@@ -1,4 +1,3 @@
-// --> AÑADIDO: Indica que es un Componente de Cliente
 "use client";
 
 import { useState, useEffect, useRef, type MouseEvent } from "react";
