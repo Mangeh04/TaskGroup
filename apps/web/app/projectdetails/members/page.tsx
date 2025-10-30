@@ -12,6 +12,7 @@ import {
   MemberCardProps,
   MemberStatus,
 } from "@/app/projectdetails/members/components/member";
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 type UserData = MemberCardProps & { status: MemberStatus };
 
@@ -41,6 +42,79 @@ export default function MembersPage() {
       avatar: "https://github.com/shadcn.png",
       status: "offline",
     },
+    {
+      name: "mangeh04",
+      email: "mapsantamaria@esei.uvigo.es",
+      avatar: "https://github.com/shadcn.png",
+      status: "online",
+    },
+    {
+      name: "blackfox099",
+      email: "urgonzalez@esei.uvigo.es",
+      avatar: "https://github.com/shadcn.png",
+      status: "away",
+    },
+    {
+      name: "axiur",
+      email: "axiur@esei.uvigo.es",
+      avatar: "https://github.com/shadcn.png",
+      status: "do not disturb",
+    },
+    {
+      name: "alejandropxrez",
+      email: "apmosquera@esei.uvigo.es",
+      avatar: "https://github.com/shadcn.png",
+      status: "offline",
+    },
+    {
+      name: "mangeh04",
+      email: "mapsantamaria@esei.uvigo.es",
+      avatar: "https://github.com/shadcn.png",
+      status: "online",
+    },
+    {
+      name: "blackfox099",
+      email: "urgonzalez@esei.uvigo.es",
+      avatar: "https://github.com/shadcn.png",
+      status: "away",
+    },
+    {
+      name: "axiur",
+      email: "axiur@esei.uvigo.es",
+      avatar: "https://github.com/shadcn.png",
+      status: "do not disturb",
+    },
+    {
+      name: "alejandropxrez",
+      email: "apmosquera@esei.uvigo.es",
+      avatar: "https://github.com/shadcn.png",
+      status: "offline",
+    },
+    {
+      name: "mangeh04",
+      email: "mapsantamaria@esei.uvigo.es",
+      avatar: "https://github.com/shadcn.png",
+      status: "online",
+    },
+    {
+      name: "blackfox099",
+      email: "urgonzalez@esei.uvigo.es",
+      avatar: "https://github.com/shadcn.png",
+      status: "away",
+    },
+    {
+      name: "axiur",
+      email: "axiur@esei.uvigo.es",
+      avatar: "https://github.com/shadcn.png",
+      status: "do not disturb",
+    },
+    {
+      name: "alejandropxrez",
+      email: "apmosquera@esei.uvigo.es",
+      avatar: "https://github.com/shadcn.png",
+      status: "offline",
+    },
+
   ];
 
   const hasMembers = users.length > 0;
@@ -59,18 +133,19 @@ export default function MembersPage() {
           </header>
 
           {hasMembers ? (
-            <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {users.map((user, index) => (
-                <MemberCard
-                  key={index}
-                  name={ user.name}
-                  email={ user.email}
-                  avatar={ user.avatar}
-                  status={ user.status}
-                />
-              ))}
-
-            </div>
+            <ScrollArea className="flex-1 min-h-0">
+              <div className="p-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                {users.map((user, index) => (
+                  <MemberCard
+                    key={index}
+                    name={ user.name}
+                    email={ user.email}
+                    avatar={ user.avatar}
+                    status={ user.status}
+                  />
+                ))}
+              </div>
+            </ScrollArea>
           ) : (
             <EmptyUser/>
           )}

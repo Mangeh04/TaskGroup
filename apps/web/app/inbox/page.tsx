@@ -13,7 +13,6 @@ import { Loader2 } from "lucide-react";
 
 
 import { ScrollArea } from "@/components/ui/scroll-area"
-import { Separator } from "@/components/ui/separator"
 
 import emptyInboxImage from "@/public/images/empty-inbox.webp";
 
