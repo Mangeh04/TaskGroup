@@ -88,7 +88,7 @@ export default function AppSidebar({
           hasMembers ? (
             <NavSecondary items={[{
               title: "Members",
-              url: "/members",
+              url: "/projectdetails/members",
               icon: PersonStandingIcon
             }]} className="mt-auto" />
           ) : (
