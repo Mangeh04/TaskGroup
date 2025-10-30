@@ -1,10 +1,13 @@
 "use client";
 
 import * as React from "react";
-import { Settings2, InboxIcon, Home, Command } from "lucide-react";
+import { Settings2, InboxIcon, Home, Command, PersonStandingIcon} from "lucide-react";
 
 import { NavProjects } from "@/components/nav/nav-projects";
 import { NavUser } from "@/components/nav/nav-user";
+import { NavSecondary } from "@/components/nav/nav-secondary";
+import { EmptyUser } from "@/components/nav/empty-users";
+
 import {
 	Sidebar,
 	SidebarContent,
@@ -16,6 +19,7 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 
+
 const data = {
 	user: {
 		name: "Mangeh04",
@@ -26,27 +30,35 @@ const data = {
 	projects: [
 		{
 			name: "Main",
-			url: "dashboard",
+			url: "/dashboard",
 			icon: Home,
 		},
 		{
 			name: "Inbox",
-			url: "inbox",
+			url: "/inbox",
 			icon: InboxIcon,
 		},
 		{
 			name: "Settings",
-			url: "settings",
+			url: "/settings",
 			icon: Settings2,
 		},
+
 	],
 };
 
+export type SidebarProps = {
+  isProject?: boolean;
+  hasMembers?: boolean;
+}
+
 export default function AppSidebar({
-	...props
-}: React.ComponentProps<typeof Sidebar>) {
+  isProject,
+  hasMembers,
+	children
+}: React.ComponentProps<typeof Sidebar> & SidebarProps)  {
 	return (
-		<Sidebar variant="inset" {...props}>
+		<Sidebar variant="inset">
 			<SidebarHeader>
 				<SidebarMenu>
 					<SidebarMenuItem>
@@ -72,6 +84,19 @@ export default function AppSidebar({
 				<NavProjects projects={data.projects} />
 			</SidebarContent>
 			<SidebarFooter>
+        {isProject ? (
+          hasMembers ? (
+            <NavSecondary items={[{
+              title: "Members",
+              url: "/members",
+              icon: PersonStandingIcon
+            }]} className="mt-auto" />
+          ) : (
+            <EmptyUser/>
+          )
+        ) : (
+          <div></div>
+        )}
 				<NavUser user={data.user} />
 			</SidebarFooter>
 		</Sidebar>

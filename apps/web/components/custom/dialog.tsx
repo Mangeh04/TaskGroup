@@ -13,11 +13,12 @@ import { JSX, ReactNode } from "react";
 import { PlusIcon } from "lucide-react";
 
 export type CustomDialog = {
-  buttonString: string;
+  buttonString?: string;
   title: string;
   subtitle: string;
   children: ReactNode;
   confirmIcon: JSX.Element,
+  isIcon?: boolean;
   onSubmit?: () => void;
 };
 
@@ -27,13 +28,18 @@ export function CustomDialog({
   subtitle,
   children,
   confirmIcon,
-  onSubmit
+  onSubmit,
+  isIcon
 }: CustomDialog) {
   return (
     <Dialog>
       <form onSubmit={onSubmit}>
         <DialogTrigger asChild>
-          <Button > {confirmIcon} {buttonString} </Button>
+          {isIcon ?
+            <Button size="icon" variant="outline" className="h-8 w-8"> {confirmIcon} {buttonString} </Button>
+            :
+            <Button> {confirmIcon} {buttonString} </Button>
+          }
         </DialogTrigger>
         <DialogContent className="sm:max-w-[425px]">
           <DialogHeader>

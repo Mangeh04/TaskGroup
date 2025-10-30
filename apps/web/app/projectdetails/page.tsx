@@ -41,7 +41,11 @@ import {
 } from "@/app/projectdetails/components/task";
 import { Progress } from "@/components/ui/progress";
 
+// TODO: change the loading effect only for the first time the data is downloaded.
+// TODO: cleanup code
+
 export default function ProjectPage() {
+
   const users: Array<string> = [
     "mangeh04",
     "blackfox099",
@@ -242,7 +246,11 @@ export default function ProjectPage() {
   return (
     <div className="flex h-dvh overflow-hidden bg-white">
       <SidebarProvider>
-        <AppSidebar />
+        <AppSidebar
+          isProject={true}
+          hasMembers={users.length > 0}
+        >
+        </AppSidebar>
         <SidebarInset className="flex flex-1 min-h-0 flex-col bg-white dark:bg-neutral-950">
           <header className="relative flex h-14 shrink-0 items-center gap-6 px-4 border-b">
             <SidebarTrigger />
@@ -282,10 +290,29 @@ export default function ProjectPage() {
                 subtitle="Create your new tasks here. Click save when you're done"
                 confirmIcon={<PlusIcon />}
               >
-                <Label htmlFor="task-name">Task Name</Label>
+                <Label htmlFor="task-name">Task name</Label>
                 <Input id="task-name" name="Task Name" placeholder="Incredible Task" />
-                <Label htmlFor="task-description">Description</Label>
-                <Input id="task-description" name="Task Description" placeholder="Description of the task" />
+                <Label htmlFor="task-description">Task description</Label>
+                <Input id="task-description" name="Task Description" placeholder="Description of the Task" />
+                <Label htmlFor="task-user">Assigned User</Label>
+                <div className="w-full flex flex-row items-center justify-between">
+                  <Select>
+                    <SelectTrigger className="w-[180px]">
+                      <SelectValue placeholder="Assigned User" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {users.map((user, index) => (
+                        <SelectItem key={`user_${index}`} value={`user_${index}`}>
+                          {user}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                  <div className="flex items-center space-x-2">
+                    <Label htmlFor="task-state">State</Label>
+                    <Switch id="task-state" />
+                  </div>
+                </div>
               </CustomDialog>
             </div>
             <div className="flex-1 max-w-sm">

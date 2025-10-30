@@ -1,9 +1,20 @@
 import { Card } from "@/components/ui/card"
-import { CalendarDays, User, Edit, Trash2 } from "lucide-react"
+import { CalendarDays, User, Edit} from "lucide-react"
 import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
 
 import { Skeleton } from "@/components/ui/skeleton";
+import { ConfirmationDialog } from "@/components/custom/confirmation";
+import { CustomDialog } from "@/components/custom/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { Switch } from "@/components/ui/switch";
 
 export type TaskCardProps = {
   title: string
@@ -17,6 +28,13 @@ export type TaskCardProps = {
 
 export function TaskCard({ title, description, user, state, date, onEdit, onDelete }: TaskCardProps) {
   const badgeVariant = state === "Done" ? "green" : "destructive"
+
+  const users: Array<string> = [
+    "mangeh04",
+    "blackfox099",
+    "axiur",
+    "alejandropxrez",
+  ];
 
   return (
     <Card className="relative p-5 rounded-2xl border border-border/40 bg-card shadow-sm hover:shadow-md transition-all duration-300">
@@ -49,23 +67,45 @@ export function TaskCard({ title, description, user, state, date, onEdit, onDele
       </div>
 
       <div className="absolute bottom-3 right-3 flex items-center gap-2">
-        <Button
-          size="icon"
-          variant="outline"
-          className="h-8 w-8"
-          onClick={onEdit}
+        <CustomDialog
+          title={`Editing task "${title}"`}
+          subtitle={"Fill out only the values you want to change. If a field is left empty, it will not be changed."}
+          confirmIcon={
+            <Edit/>
+          }
+          isIcon={true}
         >
-          <Edit className="size-4" />
-        </Button>
+          <Label htmlFor="task-name">Task name</Label>
+          <Input id="task-name" name="Task Name" placeholder="Incredible Task" />
+          <Label htmlFor="task-description">Task description</Label>
+          <Input id="task-description" name="Task Description" placeholder="Description of the Task" />
+          <Label htmlFor="task-user">Assigned User</Label>
+          <div className="w-full flex flex-row items-center justify-between">
+            <Select>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Assigned User" />
+              </SelectTrigger>
+              <SelectContent>
+                {users.map((user, index) => (
+                  <SelectItem key={`user_${index}`} value={`user_${index}`}>
+                    {user}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+            <div className="flex items-center space-x-2">
+              <Label htmlFor="task-state">State</Label>
+              <Switch id="task-state" />
+            </div>
+          </div>
+        </CustomDialog>
 
-        <Button
-          size="icon"
-          variant="outline"
-          className="h-8 w-8 text-destructive hover:text-destructive"
-          onClick={onDelete}
+        <ConfirmationDialog
+          dialogAction="delete"
+          text={`The task "${title}" will be deleted permanently!`}
+          objective={"task"}
         >
-          <Trash2 className="size-4" />
-        </Button>
+        </ConfirmationDialog>
       </div>
     </Card>
   )

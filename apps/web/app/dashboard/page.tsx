@@ -97,20 +97,17 @@ export default function DashboardPage() {
 
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(6);
-  const [isLoading, setIsLoading] = useState(true); // ⬅️ estado de carga
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Contenedor con scroll y lista con gap (flex-col)
   const listContainerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  // pequeño helper para simular/forzar carga mínima (mejor UX al paginar)
   const flashLoading = (minMs = 300) => {
     setIsLoading(true);
     const id = setTimeout(() => setIsLoading(false), minMs);
     return () => clearTimeout(id);
   };
 
-  // Medir alto real de card + gap vertical (rowGap) => items por página
   useEffect(() => {
     const updateItemsPerPage = () => {
       if (!listContainerRef.current || !listRef.current) return;
@@ -118,15 +115,12 @@ export default function DashboardPage() {
       const availableHeight = listContainerRef.current.clientHeight;
 
       const style = getComputedStyle(listRef.current);
-      // rowGap para eje vertical en flex/grid; fallback a gap o 16
       const gap = parseInt(style.rowGap || style.gap || "16", 10) || 16;
 
-      // Tomamos una card de muestra
       const sampleCard =
         listRef.current.querySelector<HTMLElement>("[data-project-card]");
-      const cardHeight = sampleCard?.offsetHeight ?? 120; // fallback seguro
+      const cardHeight = sampleCard?.offsetHeight ?? 120;
 
-      // Cuántas filas (cards) caben verticalmente
       const rows = Math.max(
         1,
         Math.floor((availableHeight + gap) / (cardHeight + gap))
@@ -135,11 +129,9 @@ export default function DashboardPage() {
       setItemsPerPage(rows);
     };
 
-    // Ejecutar al montar y en resize
     updateItemsPerPage();
     window.addEventListener("resize", updateItemsPerPage);
 
-    // Observar cambios de tamaño del contenedor y una card (por cambios de contenido)
     const ro = new ResizeObserver(updateItemsPerPage);
     if (listContainerRef.current) ro.observe(listContainerRef.current);
 
@@ -149,7 +141,6 @@ export default function DashboardPage() {
       if (sampleNode) ro.observe(sampleNode as HTMLElement);
     }
 
-    // Mostrar esqueleto un instante al cargar
     const clear = flashLoading(350);
 
     return () => {
@@ -196,7 +187,7 @@ export default function DashboardPage() {
   return (
     <div className="flex h-dvh overflow-hidden">
       <SidebarProvider>
-        <AppSidebar />
+        <AppSidebar/>
         <SidebarInset className="flex flex-1 min-h-0 flex-col">
           <header className="flex h-14 shrink-0 items-center gap-2 px-4">
             <SidebarTrigger />
@@ -227,13 +218,10 @@ export default function DashboardPage() {
                 </CustomDialog>
               </div>
 
-              {/* Contenedor con scroll */}
               <div ref={listContainerRef} className="flex-1 overflow-y-auto">
-                {/* Lista vertical con gap medible */}
                 <div ref={listRef} className="flex flex-col gap-4">
                   {isLoading
                     ? Array.from({ length: visibleCount }).map((_, i) => (
-                      // wrapper con data-project-card y altura consistente
                       <div
                         key={`project_skeleton_${i}`}
                         data-project-card
@@ -243,7 +231,6 @@ export default function DashboardPage() {
                       </div>
                     ))
                     : currentData.map((item, index) => (
-                      // wrapper para medir una card
                       <div
                         key={startIndex + index}
                         data-project-card
