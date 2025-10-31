@@ -49,6 +49,8 @@ import {
   BreadcrumbPage,
   BreadcrumbSeparator,
 } from "@/components/ui/breadcrumb"
+import { BreadCrumbCustom } from "@/components/custom/breadCrumbCustom";
+import * as React from "react";
 
 // TODO: change the loading effect only for the first time the data is downloaded.
 // TODO: cleanup code
@@ -226,6 +228,10 @@ export default function ProjectPage() {
   const remaining = Math.max(0, data.length - startIndex);
   const visibleCount = Math.min(itemsPerPage, remaining);
 
+  const breadcrumbItems = [
+    { label: "Home", href: "/dashboard" },
+  ];
+
   useEffect(() => {
     if (totalPages > 0 && currentPage > totalPages) setCurrentPage(totalPages);
     if (currentPage < 1 && totalPages > 0) setCurrentPage(1);
@@ -263,7 +269,10 @@ export default function ProjectPage() {
         <SidebarInset className="flex flex-1 min-h-0 flex-col bg-white dark:bg-neutral-950">
           <header className="relative flex h-14 shrink-0 items-center gap-6 px-4 border-b">
             <SidebarTrigger />
-            <h1 className="text-lg font-semibold">Tasks</h1>
+            <BreadCrumbCustom
+              items={breadcrumbItems}
+              currentPage="Project"
+            />
 
             <div className="ml-auto flex items-center gap-6">
               <div className="flex items-baseline gap-1">

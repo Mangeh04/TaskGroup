@@ -191,7 +191,7 @@ export default function DashboardPage() {
         <SidebarInset className="flex flex-1 min-h-0 flex-col">
           <header className="flex h-14 shrink-0 items-center gap-2 px-4">
             <SidebarTrigger />
-            <h1 className="text-lg font-semibold">Projects</h1>
+            <h1 className="text-lg font-semibold">Home</h1>
           </header>
 
           {hasProjects ? (

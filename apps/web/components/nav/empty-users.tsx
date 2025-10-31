@@ -28,22 +28,16 @@ export function EmptyUser() {
         <EmptyMedia>
           <div className="*:data-[slot=avatar]:ring-background flex -space-x-2 *:data-[slot=avatar]:size-12 *:data-[slot=avatar]:ring-2 *:data-[slot=avatar]:grayscale">
             <Avatar>
-              <AvatarImage src="https://github.com/shadcn.png" alt="@shadcn" />
-              <AvatarFallback>CN</AvatarFallback>
+              <AvatarImage src="https://raw.githubusercontent.com/Mangeh04/Storage/main/perro.jpeg" alt="@shadcn"/>
+              <AvatarFallback>M</AvatarFallback>
             </Avatar>
             <Avatar>
-              <AvatarImage
-                src="https://github.com/maxleiter.png"
-                alt="@maxleiter"
-              />
-              <AvatarFallback>LR</AvatarFallback>
+              <AvatarImage src="https://raw.githubusercontent.com/Mangeh04/Storage/main/speed.webp" alt="@maxleiter"/>
+              <AvatarFallback>U</AvatarFallback>
             </Avatar>
             <Avatar>
-              <AvatarImage
-                src="https://github.com/evilrabbit.png"
-                alt="@evilrabbit"
-              />
-              <AvatarFallback>ER</AvatarFallback>
+              <AvatarImage src="https://raw.githubusercontent.com/Mangeh04/Storage/main/mike.jpg" alt="@evilrabbit"/>
+              <AvatarFallback>A</AvatarFallback>
             </Avatar>
           </div>
         </EmptyMedia>

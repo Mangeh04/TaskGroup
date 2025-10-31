@@ -37,7 +37,7 @@ export function MemberCard({ name, email, avatar, status }: MemberCardProps) {
         <div className="flex items-start gap-4">
           <Avatar className="h-8 w-8 rounded-full">
             <AvatarImage src={avatar} alt={name} />
-            <AvatarFallback className="rounded-full">CN</AvatarFallback>
+            <AvatarFallback className="rounded-full">{name.charAt(0).toLocaleUpperCase()}</AvatarFallback>
           </Avatar>
           <div className="grid flex-1 text-left text-sm leading-tight">
             <span className="truncate font-medium">{name}</span>

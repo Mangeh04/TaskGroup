@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { Settings2, InboxIcon, Home, Command, PersonStandingIcon} from "lucide-react";
+import Image from "next/image";
 
 import { NavProjects } from "@/components/nav/nav-projects";
 import { NavUser } from "@/components/nav/nav-user";
@@ -24,7 +25,7 @@ const data = {
 	user: {
 		name: "Mangeh04",
 		email: "mapsantamaria@esei.uvigo.es",
-		avatar: "/avatars/shadcn.jpg",
+		avatar: "https://raw.githubusercontent.com/Mangeh04/Storage/main/dragonite.jpeg",
 	},
 
 	projects: [
@@ -63,10 +64,14 @@ export default function AppSidebar({
 				<SidebarMenu>
 					<SidebarMenuItem>
 						<SidebarMenuButton size="lg" asChild>
-							<Link href="#">
-								<div className="bg-sidebar-primary text-sidebar-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
-									<Command className="size-4" />
-								</div>
+							<Link href="/group-information">
+                <Image
+                  src="/images/logoTM.png"
+                  alt="Logo"
+                  width={32}
+                  height={32}
+                  className="rounded-lg"
+                />
 								<div className="grid flex-1 text-left text-sm leading-tight">
 									<span className="truncate font-medium">
 										Task Group
