@@ -222,6 +222,7 @@ export default function ProjectPage() {
             <SidebarTrigger />
             <BreadCrumbCustom items={breadcrumbItems} currentPage="Project" />
 
+            {hasTasks && (
             <div className="ml-auto flex items-center gap-6">
               <div className="flex items-baseline gap-1">
                 <span className="text-2xl font-bold">{totalTasks}</span>
@@ -250,6 +251,7 @@ export default function ProjectPage() {
                 </span>
               </div>
             </div>
+            )}
 
             {(isLoading) && (
               <div className="ml-4 flex items-center gap-2">
@@ -258,6 +260,8 @@ export default function ProjectPage() {
               </div>
             )}
           </header>
+
+          {hasTasks && (
           <div className="flex items-center justify-between gap-4 px-4 py-4 border-b">
             <div className="shrink-0">
               <CustomDialog
@@ -279,6 +283,8 @@ export default function ProjectPage() {
               <Progress value={progressPercentage} className="w-full" />
             </div>
           </div>
+            )
+          }
 
           {hasTasks ? (
             <div className="flex flex-col gap-4 flex-1 min-h-0 px-4 py-6 overflow-hidden">

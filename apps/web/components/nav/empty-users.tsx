@@ -52,7 +52,13 @@ export function EmptyUser() {
           title="Invite a new User"
           subtitle="Invite a person here. Introduce his email to invite."
           confirmIcon={
-            <Image src={buttonIcon} width={15} height={15} alt={"Add new members to the project"}/>
+            <Image
+              src={buttonIcon}
+              width={15}
+              height={15}
+              alt="Add new members to the project"
+              className="dark:invert dark:brightness-100"
+            />
           }
         >
           <Label htmlFor="user-email-inv">Task Name</Label>

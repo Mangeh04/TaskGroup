@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Settings2, InboxIcon, Home, Command, PersonStandingIcon} from "lucide-react";
+import { Settings2, InboxIcon, Home, PersonStandingIcon} from "lucide-react";
 import Image from "next/image";
 
 import { NavProjects } from "@/components/nav/nav-projects";
@@ -26,6 +26,7 @@ const data = {
 		name: "Mangeh04",
 		email: "mapsantamaria@esei.uvigo.es",
 		avatar: "https://raw.githubusercontent.com/Mangeh04/Storage/main/dragonite.jpeg",
+    status: "online"
 	},
 
 	projects: [
@@ -44,7 +45,6 @@ const data = {
 			url: "/settings",
 			icon: Settings2,
 		},
-
 	],
 };
 

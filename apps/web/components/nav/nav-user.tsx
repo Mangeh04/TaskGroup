@@ -39,6 +39,13 @@ const statusOptions = [
   { value: "offline", label: "Offline", color: "bg-destructive" },
 ];
 
+const statusStyles: Record<MemberStatus, { color: string; text: string }> = {
+  online: { color: "bg-green-500", text: "Online" },
+  offline: { color: "bg-destructive", text: "Offline" },
+  away: { color: "bg-yellow-500", text: "Away" },
+  "do not disturb": { color: "bg-gray-500", text: "Do not disturb" },
+};
+
 export function NavUser({
     user,
   }: {
@@ -50,6 +57,7 @@ export function NavUser({
   };
 }) {
   const { isMobile } = useSidebar();
+  const currentStatus = statusStyles[user.status];
 
   return (
     <SidebarMenu>
@@ -74,6 +82,17 @@ export function NavUser({
                 <span className="truncate text-xs">
 									{user.email}
 								</span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span
+                  className={cn(
+                    "flex h-2 w-2 rounded-full",
+                    currentStatus.color
+                  )}
+                />
+                        <span className="text-xs text-muted-foreground">
+                  {currentStatus.text}
+                </span>
               </div>
               <ChevronsUpDown className="ml-auto size-4" />
             </SidebarMenuButton>
