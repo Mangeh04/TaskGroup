@@ -1,4 +1,3 @@
-// src/hooks/usePaginatedView.ts
 "use client";
 
 import {

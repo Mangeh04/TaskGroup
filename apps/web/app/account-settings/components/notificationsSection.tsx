@@ -28,7 +28,7 @@ export function NotificationsSection() {
                     <div className="space-y-4">
                         <h3 className="font-medium">Enable unread notification badge</h3>
 
-                        <RadioGroup defaultValue="mentions" className="space-y-4">
+                        <RadioGroup defaultValue="all" className="space-y-4">
                             <div className="flex items-start space-x-3">
                                 <RadioGroupItem value="all" id="all" className="mt-1" />
                                 <div>
@@ -47,7 +47,7 @@ export function NotificationsSection() {
                                     <Label htmlFor="nothing" className="font-medium">
                                         Nothing
                                     </Label>
-                                    <p className="text-muted-foreground text-sm">Don't notify me anything</p>
+                                    <p className="text-muted-foreground text-sm">Don&#39;t notify me anything</p>
                                 </div>
                             </div>
                         </RadioGroup>
