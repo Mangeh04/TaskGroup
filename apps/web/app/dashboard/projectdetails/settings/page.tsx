@@ -49,7 +49,7 @@ export default function SettingsPage() {
             <SidebarTrigger />
             <BreadCrumbCustom
               items={breadcrumbItems}
-              currentPage="Project Settings"
+              currentPage="Settings"
             />
 
             <div className="ml-auto flex items-center gap-4">
