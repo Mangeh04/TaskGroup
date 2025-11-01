@@ -6,19 +6,21 @@ import {
 
 import AppSidebar from "@/components/custom/sideBar";
 import { EmptyUser } from "@/components/nav/empty-users";
-import * as React from "react";
-import {
-  MemberCard,
-  MemberCardProps,
-  MemberStatus,
-} from "@/app/projectdetails/members/components/member";
-import { ScrollArea } from "@/components/ui/scroll-area";
-import Image from "next/image";
-import buttonIcon from "@/public/images/add-member.webp";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { CustomDialog } from "@/components/custom/dialog";
 import { BreadCrumbCustom } from "@/components/custom/breadCrumbCustom";
+
+import { ScrollArea } from "@/components/ui/scroll-area";
+
+import Image from "next/image";
+import buttonIcon from "@/public/images/add-member.webp";
+
+import {
+  MemberCard,
+  MemberCardProps,
+  MemberStatus,
+} from "./components/member";
 
 type UserData = MemberCardProps & { status: MemberStatus };
 
@@ -53,7 +55,7 @@ export default function MembersPage() {
   const hasMembers = users.length > 0;
   const breadcrumbItems = [
     { label: "Home", href: "/dashboard" },
-    { label: "Project", href: "/projectdetails" }
+    { label: "Project", href: "/dashboard/projectdetails" }
   ];
 
   return (
