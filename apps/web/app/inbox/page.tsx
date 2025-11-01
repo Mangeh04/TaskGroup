@@ -1,6 +1,11 @@
 "use client";
 
-import { useState, useEffect, Fragment } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useMemo, // Import hooks
+} from "react";
 import {
   SidebarProvider,
   SidebarTrigger,
@@ -11,8 +16,7 @@ import AppSidebar from "@/components/custom/sideBar";
 import { EmptyPage } from "@/components/custom/empty";
 import { Loader2 } from "lucide-react";
 
-
-import { ScrollArea } from "@/components/ui/scroll-area"
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 import emptyInboxImage from "@/public/images/empty-inbox.webp";
 
@@ -22,68 +26,69 @@ import {
   SkeletonNotificationCard,
 } from "@/app/inbox/components/notification";
 
+const data: Array<NotificationCardProps> = [
+  {
+    user: "mangeh04",
+    project: "TaskGroup",
+    type: "Invitation",
+  },
+  {
+    user: "axiur",
+    project: "Website Redesign",
+    type: "AddedTask",
+  },
+  {
+    user: "blackfox099",
+    project: "API Development",
+    type: "AddedTask",
+  },
+  {
+    user: "alejandropxrez",
+    project: "TaskGroup",
+    type: "AddedTask",
+  },
+  {
+    user: "mangeh04",
+    project: "Mobile App",
+    type: "Invitation",
+  },
+  {
+    user: "blackfox099",
+    project: "Mobile App",
+    type: "Invitation",
+  },
+  {
+    user: "axiur",
+    project: "Mobile App",
+    type: "Invitation",
+  },
+];
+
 export default function InboxPage() {
   const [isLoading, setIsLoading] = useState(true);
 
-  const data: Array<NotificationCardProps> = [
-    {
-      user: "mangeh04",
-      project: "TaskGroup",
-      type: "Invitation",
-    },
-    {
-      user: "axiur",
-      project: "Website Redesign",
-      type: "AddedTask",
-    },
-    {
-      user: "blackfox099",
-      project: "API Development",
-      type: "AddedTask",
-    },
-    {
-      user: "alejandropxrez",
-      project: "TaskGroup",
-      type: "AddedTask",
-    },
-    {
-      user: "mangeh04",
-      project: "Mobile App",
-      type: "Invitation",
-    },
-    {
-      user: "blackfox099",
-      project: "Mobile App",
-      type: "Invitation",
-    },
-    {
-      user: "axiur",
-      project: "Mobile App",
-      type: "Invitation",
-    },
+  // This value is now calculated only once.
+  const hasNotifications = useMemo(() => data.length > 0, []);
 
-  ];
-
-  const hasNotifications = data.length > 0;
-
-  const flashLoading = (minMs = 300) => {
-    setIsLoading(true);
-    const id = setTimeout(() => setIsLoading(false), minMs);
-    return () => clearTimeout(id);
-  };
-
+  // Simplified logic: just run a timer on mount.
   useEffect(() => {
-    const clear = flashLoading(500);
-    return () => clear?.();
+    const timer = setTimeout(() => {
+      setIsLoading(false);
+    }, 500); // Set loading to false after 500ms
+
+    // Cleanup function to clear the timer
+    return () => clearTimeout(timer);
+  }, []); // Empty dependency array means this runs only once on mount.
+
+  // Wrapped in useCallback so they are not recreated on each render.
+  // This prevents unnecessary re-renders of NotificationCard components.
+  const handleConfirm = useCallback(() => {
+    console.log("Invitation Confirmed");
   }, []);
 
-  const handleConfirm = () => {
-    console.log("Invitation Confirmed");
-  };
-
-  const handleReject = () => {
+  const handleReject = useCallback(() => {
     console.log("Invitation Rejected");
-  };
+  }, []);
 
   return (
     <div className="flex h-dvh overflow-hidden bg-white">
@@ -105,12 +110,14 @@ export default function InboxPage() {
           {hasNotifications ? (
             <div className="flex-1 overflow-hidden">
               {isLoading ? (
+                // Show skeletons while loading
                 <div className="flex flex-col p-4 lg:p-6">
                   {Array.from({ length: 4 }).map((_, i) => (
                     <SkeletonNotificationCard key={`skeleton_${i}`} />
                   ))}
                 </div>
               ) : (
+                // Show data once loaded
                 <ScrollArea className="h-full p-4 lg:p-6">
                   {data.map((item, index) => (
                     <NotificationCard

@@ -12,7 +12,7 @@ import {
 import { Input } from "@/components/ui/input";
 
 import placeholder from "@/public/images/placeholder.svg";
-import { handleFormValidation } from "@/app/_utils/formHandler";
+import { handleFormValidation } from "@/lib/formHandler";
 import { UserLoginSchema } from "@repo/zod-schemas";
 
 import { toast } from "sonner";

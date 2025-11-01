@@ -1,6 +1,11 @@
 "use client";
 
-import { useState, useEffect, useRef, type MouseEvent } from "react";
+import {
+  useRef,
+  useMemo,
+  useCallback,
+  useEffect,
+} from "react";
 import {
   SidebarProvider,
   SidebarTrigger,
@@ -21,177 +26,157 @@ import { EmptyPage } from "@/components/custom/empty";
 import {
   ProjectCard,
   type ProjectCardProps,
-  SkeletonCard, // ⬅️ importamos SkeletonCard desde el archivo de componentes
-} from "@/app/dashboard/components/project";
+  SkeletonCard,
+} from "./components/project";
 import { CustomDialog } from "@/components/custom/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
 
 import emptyImage from "@/public/images/empty-folder.webp";
-import { PlusIcon } from "lucide-react";
+import { PlusIcon, Loader2 } from "lucide-react";
+
+import { usePaginatedView } from "@/hooks/usePaginatedView";
+import { ProjectForm } from "./components/projectForm";
+
+const data: Array<ProjectCardProps> = [
+  {
+    title: "Proyecto Fénix",
+    description: "Refactorización completa del backend monolítico.",
+    numTasks: 45,
+    numUsers: 8,
+  },
+  {
+    title: "E-commerce Relaunch",
+    description: "Rediseño y migración de la tienda online (Shopify a Next.js).",
+    numTasks: 28,
+    numUsers: 5,
+  },
+  {
+    title: "Portal de Onboarding (RRHH)",
+    description: "Crear una herramienta interna para los nuevos empleados.",
+    numTasks: 12,
+    numUsers: 3,
+  },
+  {
+    title: "App Móvil v2.0",
+    description: "Desarrollo de la nueva app nativa (iOS y Android).",
+    numTasks: 35,
+    numUsers: 6,
+  },
+  {
+    title: "Optimización SEO (Marketing)",
+    description: "Mejorar Core Web Vitals y estrategia de keywords.",
+    numTasks: 9,
+    numUsers: 2,
+  },
+  {
+    title: "Integración API (Cliente Acme)",
+    description: "Conectar nuestro sistema con el ERP del cliente Acme.",
+    numTasks: 14,
+    numUsers: 4,
+  },
+  {
+    title: "Dashboard de Analíticas",
+    description: "Implementación de Metabase para Business Intelligence.",
+    numTasks: 11,
+    numUsers: 3,
+  },
+  {
+    title: "Iniciativa Titán",
+    description: "Expansión de la plataforma a mercados de LATAM.",
+    numTasks: 5,
+    numUsers: 4,
+  },
+  {
+    title: "Sprint Deuda Técnica (Q4)",
+    description: "Resolución de bugs críticos y mejora de performance.",
+    numTasks: 52,
+    numUsers: 10,
+  },
+  {
+    title: "Sistema de Notificaciones",
+    description: "Crear el microservicio de alertas y emails.",
+    numTasks: 17,
+    numUsers: 3,
+  },
+];
+
+
 
 export default function DashboardPage() {
-  const data: Array<ProjectCardProps> = [
-    {
-      title: "Proyecto Fénix",
-      description: "Refactorización completa del backend monolítico.",
-      numTasks: 45,
-      numUsers: 8,
-    },
-    {
-      title: "E-commerce Relaunch",
-      description: "Rediseño y migración de la tienda online (Shopify a Next.js).",
-      numTasks: 28,
-      numUsers: 5,
-    },
-    {
-      title: "Portal de Onboarding (RRHH)",
-      description: "Crear una herramienta interna para los nuevos empleados.",
-      numTasks: 12,
-      numUsers: 3,
-    },
-    {
-      title: "App Móvil v2.0",
-      description: "Desarrollo de la nueva app nativa (iOS y Android).",
-      numTasks: 35,
-      numUsers: 6,
-    },
-    {
-      title: "Optimización SEO (Marketing)",
-      description: "Mejorar Core Web Vitals y estrategia de keywords.",
-      numTasks: 9,
-      numUsers: 2,
-    },
-    {
-      title: "Integración API (Cliente Acme)",
-      description: "Conectar nuestro sistema con el ERP del cliente Acme.",
-      numTasks: 14,
-      numUsers: 4,
-    },
-    {
-      title: "Dashboard de Analíticas",
-      description: "Implementación de Metabase para Business Intelligence.",
-      numTasks: 11,
-      numUsers: 3,
-    },
-    {
-      title: "Iniciativa Titán",
-      description: "Expansión de la plataforma a mercados de LATAM.",
-      numTasks: 5,
-      numUsers: 4,
-    },
-    {
-      title: "Sprint Deuda Técnica (Q4)",
-      description: "Resolución de bugs críticos y mejora de performance.",
-      numTasks: 52,
-      numUsers: 10,
-    },
-    {
-      title: "Sistema de Notificaciones",
-      description: "Crear el microservicio de alertas y emails.",
-      numTasks: 17,
-      numUsers: 3,
-    },
-  ];
-  const hasProjects = data.length > 0;
-
-  const [currentPage, setCurrentPage] = useState(1);
-  const [itemsPerPage, setItemsPerPage] = useState(6);
-  const [isLoading, setIsLoading] = useState(true);
-
   const listContainerRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
 
-  const flashLoading = (minMs = 300) => {
-    setIsLoading(true);
-    const id = setTimeout(() => setIsLoading(false), minMs);
-    return () => clearTimeout(id);
-  };
+  const hasProjects = useMemo(() => data.length > 0, []);
 
+  const {
+    currentPage,
+    totalPages,
+    currentData,
+    visibleCount,
+    isLoading, // For initial skeleton load
+    isPaginating, // For page-change spinner
+    setItemsPerPage, // We get the setter from the hook
+    handlePrevious,
+    handleNext,
+    handlePageClick,
+  } = usePaginatedView(data, 6, 350); // Pass in the data
+
+  const updateItemsPerPage = useCallback(() => {
+    if (!listContainerRef.current || !listRef.current) return;
+
+    const availableHeight = listContainerRef.current.clientHeight;
+
+    const style = getComputedStyle(listRef.current);
+    const gap = parseInt(style.rowGap || style.gap || "16", 10) || 16;
+
+    const sampleCard =
+      listRef.current.querySelector<HTMLElement>("[data-project-card]");
+    const cardHeight = sampleCard?.offsetHeight ?? 120; // Default height
+
+    const rows = Math.max(
+      1,
+      Math.floor((availableHeight + gap) / (cardHeight + gap))
+    );
+
+    // Call the setter from our hook
+    setItemsPerPage(rows);
+  }, [setItemsPerPage]); // Dependency is stable
+
+  // This effect observes layout changes specific to this component
   useEffect(() => {
-    const updateItemsPerPage = () => {
-      if (!listContainerRef.current || !listRef.current) return;
-
-      const availableHeight = listContainerRef.current.clientHeight;
-
-      const style = getComputedStyle(listRef.current);
-      const gap = parseInt(style.rowGap || style.gap || "16", 10) || 16;
-
-      const sampleCard =
-        listRef.current.querySelector<HTMLElement>("[data-project-card]");
-      const cardHeight = sampleCard?.offsetHeight ?? 120;
-
-      const rows = Math.max(
-        1,
-        Math.floor((availableHeight + gap) / (cardHeight + gap))
-      );
-
-      setItemsPerPage(rows);
-    };
-
     updateItemsPerPage();
     window.addEventListener("resize", updateItemsPerPage);
 
     const ro = new ResizeObserver(updateItemsPerPage);
-    if (listContainerRef.current) ro.observe(listContainerRef.current);
-
-    let sampleNode: Element | null = null;
-    if (listRef.current) {
-      sampleNode = listRef.current.querySelector("[data-project-card]");
-      if (sampleNode) ro.observe(sampleNode as HTMLElement);
+    if (listContainerRef.current) {
+      ro.observe(listContainerRef.current);
     }
-
-    const clear = flashLoading(350);
+    if (listRef.current) {
+      ro.observe(listRef.current); // Observes the list
+    }
 
     return () => {
       window.removeEventListener("resize", updateItemsPerPage);
       ro.disconnect();
-      clear?.();
     };
-  }, []);
-
-  const totalPages = Math.ceil(data.length / itemsPerPage) || 1;
-  const startIndex = (currentPage - 1) * itemsPerPage;
-  const currentData = data.slice(startIndex, startIndex + itemsPerPage);
-
-  // número exacto de skeletons visibles en la página actual
-  const remaining = Math.max(0, data.length - startIndex);
-  const visibleCount = Math.min(itemsPerPage, remaining);
-
-  useEffect(() => {
-    if (totalPages > 0 && currentPage > totalPages) setCurrentPage(totalPages);
-    if (currentPage < 1 && totalPages > 0) setCurrentPage(1);
-  }, [totalPages, currentPage]);
-
-  const handlePrevious = (e: MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    if (currentPage === 1) return;
-    flashLoading(250);
-    setCurrentPage((prev) => Math.max(prev - 1, 1));
-  };
-
-  const handleNext = (e: MouseEvent<HTMLAnchorElement>) => {
-    e.preventDefault();
-    if (currentPage === totalPages) return;
-    flashLoading(250);
-    setCurrentPage((prev) => Math.min(prev + 1, totalPages));
-  };
-
-  const handlePageClick = (e: MouseEvent<HTMLAnchorElement>, page: number) => {
-    e.preventDefault();
-    if (page === currentPage) return;
-    flashLoading(250);
-    setCurrentPage(page);
-  };
+  }, [updateItemsPerPage]); // Runs when the memoized function changes
 
   return (
     <div className="flex h-dvh overflow-hidden">
       <SidebarProvider>
-        <AppSidebar/>
+        <AppSidebar />
         <SidebarInset className="flex flex-1 min-h-0 flex-col">
           <header className="flex h-14 shrink-0 items-center gap-2 px-4">
             <SidebarTrigger />
             <h1 className="text-lg font-semibold">Home</h1>
+
+            {(isLoading) && (
+              <div className="ml-auto flex items-center gap-2">
+                <Loader2 className="h-4 w-4 animate-spin text-muted-foreground/80" />
+                <span className="text-xs text-muted-foreground">
+                  Loading…
+                </span>
+              </div>
+            )}
           </header>
 
           {hasProjects ? (
@@ -203,22 +188,18 @@ export default function DashboardPage() {
                   subtitle="Create your new projects here. Click save when you're done"
                   confirmIcon={<PlusIcon />}
                 >
-                  <Label htmlFor="project-name">Project Name</Label>
-                  <Input
-                    id="project-name"
-                    name="Project Name"
-                    placeholder="Incredible Project"
-                  />
-                  <Label htmlFor="project-description">Description</Label>
-                  <Input
-                    id="project-description"
-                    name="Project Description"
-                    placeholder="Description of the project"
-                  />
+                  <ProjectForm />
                 </CustomDialog>
               </div>
 
-              <div ref={listContainerRef} className="flex-1 overflow-y-auto">
+              <div
+                ref={listContainerRef}
+                className="relative flex-1 overflow-y-auto"
+              >
+                {isPaginating && (
+                  <div className="pointer-events-none absolute inset-0 z-10" />
+                )}
+
                 <div ref={listRef} className="flex flex-col gap-4">
                   {isLoading
                     ? Array.from({ length: visibleCount }).map((_, i) => (
@@ -230,9 +211,10 @@ export default function DashboardPage() {
                         <SkeletonCard />
                       </div>
                     ))
-                    : currentData.map((item, index) => (
+                    :
+                    currentData.map((item, index) => (
                       <div
-                        key={startIndex + index}
+                        key={index}
                         data-project-card
                         className="min-h-[88px]"
                       >
@@ -306,18 +288,7 @@ export default function DashboardPage() {
                     "Create your new projects here. Click save when you're done",
                 }}
               >
-                <Label htmlFor="project-name">Project Name</Label>
-                <Input
-                  id="project-name"
-                  name="Project Name"
-                  placeholder="Incredible Project"
-                />
-                <Label htmlFor="project-description">Description</Label>
-                <Input
-                  id="project-description"
-                  name="Project Description"
-                  placeholder="Description of the project"
-                />
+                <ProjectForm />
               </EmptyPage>
             </div>
           )}

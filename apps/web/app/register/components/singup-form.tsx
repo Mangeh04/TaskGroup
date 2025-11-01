@@ -16,7 +16,7 @@ import placeholder from "@/public/images/placeholder.svg";
 import Image from "next/image";
 import Link from "next/link";
 import { UserRegisterSchema } from "@repo/zod-schemas";
-import { handleFormValidation } from "@/app/_utils/formHandler";
+import { handleFormValidation } from "@/lib/formHandler";
 import { toast } from "sonner";
 import { useState } from "react";
 
