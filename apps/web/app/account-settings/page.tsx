@@ -30,7 +30,7 @@ export default function SettingsPage() {
 
   const baseParams = useMemo(
     () => new URLSearchParams(Array.from(searchParams.entries())),
-    [pathname, searchParams.toString()]
+    [searchParams]
   );
 
   const setSection = (id: SectionId) => {
@@ -46,7 +46,7 @@ export default function SettingsPage() {
     if (urlSection !== activeSection) {
       setActiveSection(urlSection);
     }
-  }, [searchParams]);
+  }, [activeSection, searchParams]);
 
   const renderContent = () => {
     switch (activeSection) {
