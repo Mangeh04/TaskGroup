@@ -21,6 +21,7 @@ import {
 import Link from "next/link";
 
 import { MemberStatus } from "@/app/dashboard/projectdetails/members/components/member";
+import { NavConfiguration } from "@/components/nav/nav-configuration";
 
 const data = {
 	user: {
@@ -41,12 +42,20 @@ const data = {
 			url: "/inbox",
 			icon: InboxIcon,
 		},
-		{
-			name: "Settings",
-			url: "/settings",
-			icon: Settings2,
-		},
 	],
+
+  Configuration: [
+    {
+      name: "Settings",
+      url: "/dashboard/projectdetails/settings",
+      icon: Settings2,
+    },
+    {
+      name: "Members",
+      url: "/dashboard/projectdetails/members",
+      icon: PersonStandingIcon
+    },
+  ],
 };
 
 export type SidebarProps = {
@@ -87,20 +96,18 @@ export default function AppSidebar({
 			</SidebarHeader>
 			<SidebarContent>
 				<NavProjects projects={data.projects} />
+        {isProject && (
+          (hasMembers) ? (
+            <NavConfiguration config={data.Configuration}/>
+          ):(
+            <NavConfiguration config={data.Configuration.slice(0,1)}/>
+        ))}
 			</SidebarContent>
 			<SidebarFooter>
-        {isProject ? (
-          hasMembers ? (
-            <NavSecondary items={[{
-              title: "Members",
-              url: "/dashboard/projectdetails/members",
-              icon: PersonStandingIcon
-            }]} className="mt-auto" />
-          ) : (
+        {isProject && (
+          (!hasMembers) && (
             <EmptyUser/>
           )
-        ) : (
-          <div></div>
         )}
 				<NavUser user={data.user} />
 			</SidebarFooter>
