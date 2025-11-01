@@ -35,6 +35,7 @@ import { PlusIcon, Loader2 } from "lucide-react";
 
 import { usePaginatedView } from "@/hooks/usePaginatedView";
 import { ProjectForm } from "./components/projectForm";
+import Link from "next/link";
 
 const data: Array<ProjectCardProps> = [
   {
@@ -98,8 +99,6 @@ const data: Array<ProjectCardProps> = [
     numUsers: 3,
   },
 ];
-
-
 
 export default function DashboardPage() {
   const listContainerRef = useRef<HTMLDivElement>(null);
@@ -218,12 +217,14 @@ export default function DashboardPage() {
                         data-project-card
                         className="min-h-[88px]"
                       >
-                        <ProjectCard
-                          title={item.title}
-                          description={item.description}
-                          numTasks={item.numTasks}
-                          numUsers={item.numUsers}
-                        />
+                        <Link  href="/dashboard/projectdetails">
+                          <ProjectCard
+                            title={item.title}
+                            description={item.description}
+                            numTasks={item.numTasks}
+                            numUsers={item.numUsers}
+                          />
+                        </Link>
                       </div>
                     ))}
                 </div>
