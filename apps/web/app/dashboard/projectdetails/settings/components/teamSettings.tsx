@@ -20,7 +20,7 @@ export function TeamSettings({
     id: string;
     username: string;
     role: "Owner" | "Admin" | "Member";
-  }>
+  }>;
 }) {
   const [members, setMembers] = useState(users);
 
@@ -43,14 +43,7 @@ export function TeamSettings({
           <div className="text-sm text-muted-foreground">
             Manage roles and invitations.
           </div>
-          <InviteMemberDialog
-            onInvite={(username) => {
-              setMembers((prev) => [
-                ...prev,
-                { id: crypto.randomUUID(), username, role: "Member" },
-              ]);
-            }}
-          />
+          <InviteMemberDialog />
         </div>
         <Separator />
 
@@ -85,7 +78,7 @@ export function TeamSettings({
                 </Select>
               </div>
               <div className="md:col-span-3 md:ml-auto flex md:justify-end gap-2">
-                { /* @ts-expect-error ConfirmationDialog does not have its type properly defined  */ }
+                {/* @ts-expect-error ConfirmationDialog does not have its type properly defined  */}
                 <ConfirmationDialog
                   dialogAction="remove"
                   objective="member"
