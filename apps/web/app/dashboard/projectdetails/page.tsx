@@ -4,7 +4,7 @@ import {
   useRef,
   useMemo,
   useCallback,
-  useEffect, // Still needed for layout
+  useEffect,
 } from "react";
 import {
   SidebarProvider,
