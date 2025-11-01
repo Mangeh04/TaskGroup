@@ -1,101 +1,87 @@
-# Turborepo starter
+# TaskGroup - Project Management Platform
 
-This Turborepo starter is maintained by the Turborepo core team.
+A modern project management platform built with Next.js and NestJS, using a monorepo architecture with Turborepo.
 
-## Using this example
+## Project Overview
 
-Run the following command:
+TaskGroup is a comprehensive project management solution that allows teams to collaborate, manage tasks, and communicate effectively. The platform features user authentication, project management, and real-time messaging capabilities.
 
-```sh
-npx create-turbo@latest
+## Technology Stack
+
+This project is built using modern technologies and follows a monorepo structure:
+
+### Apps
+
+- `web`: A Next.js application that serves as the frontend, featuring:
+    - User authentication (login/register)
+    - Dashboard for project management
+    - Account settings
+    - Inbox for communications
+    - Responsive design with custom components
+
+- `api`: A NestJS application that serves as the backend API
+
+### Packages
+
+- `database`: Prisma ORM setup and database schema
+- `ui`: Shared React component library
+- `eslint-config`: Shared ESLint configurations
+- `typescript-config`: Shared TypeScript configurations
+- `schemas`: Shared data validation schemas
+
+## Development Stack
+
+- **Frontend**: Next.js with TypeScript
+- **Backend**: NestJS
+- **Database**: PostgreSQL with Prisma ORM
+- **UI Components**: Custom components with Radix UI
+- **Styling**: Tailwind CSS
+- **Package Management**: npm
+- **Build Tool**: Turborepo
+
+## Getting Started
+
+1. Clone the repository:
+
+```bash
+git clone https://github.com/Mangeh04/TSW.git
+cd taskgroup
 ```
 
-## What's inside?
+2. Install dependencies:
 
-This Turborepo includes the following packages/apps:
-
-### Apps and Packages
-
-- `docs`: a [Next.js](https://nextjs.org/) app
-- `web`: another [Next.js](https://nextjs.org/) app
-- `@repo/ui`: a stub React component library shared by both `web` and `docs` applications
-- `@repo/eslint-config`: `eslint` configurations (includes `eslint-config-next` and `eslint-config-prettier`)
-- `@repo/typescript-config`: `tsconfig.json`s used throughout the monorepo
-
-Each package/app is 100% [TypeScript](https://www.typescriptlang.org/).
-
-### Utilities
-
-This Turborepo has some additional tools already setup for you:
-
-- [TypeScript](https://www.typescriptlang.org/) for static type checking
-- [ESLint](https://eslint.org/) for code linting
-- [Prettier](https://prettier.io) for code formatting
-
-### Build
-
-To build all apps and packages, run the following command:
-
-```
-cd my-turborepo
-
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build
-yarn dlx turbo build
-pnpm exec turbo build
+```bash
+npm install
 ```
 
-You can build a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
+3. Set up your environment variables (check .env.example in each app)
 
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo build --filter=docs
+4. Start the development servers:
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo build --filter=docs
-yarn exec turbo build --filter=docs
-pnpm exec turbo build --filter=docs
+```bash
+npm run dev
 ```
 
-### Develop
+This will start both the frontend and backend applications in development mode.
 
-To develop all apps and packages, run the following command:
+## Project Structure
 
-```
-cd my-turborepo
+- `/apps`
+    - `/web` - Next.js frontend application
+    - `/api` - NestJS backend application
+- `/packages`
+    - `/database` - Prisma schema and database utilities
+    - `/ui` - Shared UI components
+    - `/schemas` - Shared validation schemas
+    - `/eslint-config` - Shared ESLint configurations
+    - `/typescript-config` - Shared TypeScript configurations
 
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev
+## Scripts
 
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev
-yarn exec turbo dev
-pnpm exec turbo dev
-```
-
-You can develop a specific package by using a [filter](https://turborepo.com/docs/crafting-your-repository/running-tasks#using-filters):
-
-```
-# With [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation) installed (recommended)
-turbo dev --filter=web
-
-# Without [global `turbo`](https://turborepo.com/docs/getting-started/installation#global-installation), use your package manager
-npx turbo dev --filter=web
-yarn exec turbo dev --filter=web
-pnpm exec turbo dev --filter=web
-```
-
-### Remote Caching
-
-> [!TIP]
-> Vercel Remote Cache is free for all plans. Get started today at [vercel.com](https://vercel.com/signup?/signup?utm_source=remote-cache-sdk&utm_campaign=free_remote_cache).
-
-Turborepo can use a technique known as [Remote Caching](https://turborepo.com/docs/core-concepts/remote-caching) to share cache artifacts across machines, enabling you to share build caches with your team and CI/CD pipelines.
-
-By default, Turborepo will cache locally. To enable Remote Caching you will need an account with Vercel. If you don't have an account you can [create one](https://vercel.com/signup?utm_source=turborepo-examples), then enter the following commands:
+- `npm run dev` - Start all applications in development mode
+- `npm run build` - Build all applications and packages
+- `npm run lint` - Run ESLint across the entire monorepo
+- `npm run test` - Run tests across the entire monorepo
 
 ```
 cd my-turborepo
