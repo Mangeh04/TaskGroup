@@ -1,3 +1,5 @@
+"use client";
+
 import {
   SidebarProvider,
   SidebarTrigger,
@@ -10,7 +12,6 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { CustomDialog } from "@/components/custom/dialog";
 import { BreadCrumbCustom } from "@/components/custom/breadCrumbCustom";
-
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 import Image from "next/image";
@@ -29,25 +30,29 @@ export default function MembersPage() {
     {
       name: "mangeh04",
       email: "mapsantamaria@esei.uvigo.es",
-      avatar: "https://raw.githubusercontent.com/Mangeh04/Storage/main/dragonite.jpeg",
+      avatar:
+        "https://raw.githubusercontent.com/Mangeh04/Storage/main/dragonite.jpeg",
       status: "online",
     },
     {
       name: "blackfox099",
       email: "urgonzalez@esei.uvigo.es",
-      avatar: "https://raw.githubusercontent.com/Mangeh04/Storage/main/mike.jpg",
+      avatar:
+        "https://raw.githubusercontent.com/Mangeh04/Storage/main/mike.jpg",
       status: "away",
     },
     {
       name: "axiur",
       email: "axiur@esei.uvigo.es",
-      avatar: "https://raw.githubusercontent.com/Mangeh04/Storage/main/speed.webp",
+      avatar:
+        "https://raw.githubusercontent.com/Mangeh04/Storage/main/speed.webp",
       status: "do not disturb",
     },
     {
       name: "alejandropxrez",
       email: "apmosquera@esei.uvigo.es",
-      avatar: "https://raw.githubusercontent.com/Mangeh04/Storage/main/miketyson.jpg",
+      avatar:
+        "https://raw.githubusercontent.com/Mangeh04/Storage/main/miketyson.jpg",
       status: "offline",
     },
   ];
@@ -55,18 +60,16 @@ export default function MembersPage() {
   const hasMembers = users.length > 0;
   const breadcrumbItems = [
     { label: "Home", href: "/dashboard" },
-    { label: "Project", href: "/dashboard/projectdetails" }
+    { label: "Project", href: "/dashboard/projectdetails" },
   ];
 
   return (
-    <div className="flex h-dvh overflow-hidden bg-white">
+    <div className="flex h-dvh overflow-hidden bg-background text-foreground">
       <SidebarProvider>
-        <AppSidebar
-          isProject={true}
-          hasMembers={true}
-        />
-        <SidebarInset className="flex flex-1 min-h-0 flex-col bg-white dark:bg-neutral-950">
-          <header className="relative flex h-14 shrink-0 items-center gap-6 px-4 border-b">
+        <AppSidebar isProject={true} hasMembers={true} />
+
+        <SidebarInset className="flex flex-1 min-h-0 flex-col bg-background">
+          <header className="relative flex h-14 shrink-0 items-center gap-6 px-4 border-b border-border">
             <SidebarTrigger />
             <BreadCrumbCustom
               items={breadcrumbItems}
@@ -76,18 +79,28 @@ export default function MembersPage() {
 
           {hasMembers ? (
             <ScrollArea className="flex-1 min-h-0">
-              <div className="p-4">
-                <div className="mb-4">
+              <div className="p-4 space-y-4">
+                <div>
                   <CustomDialog
                     buttonString="Invite Members"
                     title="Invite a new User"
-                    subtitle="Invite a person here. Introduce his email to invite."
+                    subtitle="Invite a person here. Enter their email to send an invite."
                     confirmIcon={
-                      <Image src={buttonIcon} width={15} height={15} alt={"Add new members to the project"}/>
+                      <Image
+                        src={buttonIcon}
+                        width={15}
+                        height={15}
+                        alt="Add new members to the project"
+                        className="dark:invert dark:brightness-100"
+                      />
                     }
                   >
-                    <Label htmlFor="user-email-inv">Task Name</Label>
-                    <Input id="user-email-inv" name="User Email Invitation" placeholder="a@example.com" />
+                    <Label htmlFor="user-email-inv">User Email</Label>
+                    <Input
+                      id="user-email-inv"
+                      name="User Email Invitation"
+                      placeholder="a@example.com"
+                    />
                   </CustomDialog>
                 </div>
 
@@ -95,18 +108,17 @@ export default function MembersPage() {
                   {users.map((user, index) => (
                     <MemberCard
                       key={index}
-                      name={ user.name}
-                      email={ user.email}
-                      avatar={ user.avatar}
-                      status={ user.status}
+                      name={user.name}
+                      email={user.email}
+                      avatar={user.avatar}
+                      status={user.status}
                     />
                   ))}
                 </div>
-
               </div>
             </ScrollArea>
           ) : (
-            <EmptyUser/>
+            <EmptyUser />
           )}
         </SidebarInset>
       </SidebarProvider>

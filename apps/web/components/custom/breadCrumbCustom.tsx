@@ -1,4 +1,3 @@
-// --> AÑADIDO: Importar los componentes necesarios
 import * as React from "react";
 import Link from "next/link";
 import {

@@ -3,21 +3,23 @@
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 
-import { User, Shield, Bell, Menu, X, LayoutDashboard } from "lucide-react";
+import { User, Shield, Bell, Menu, X, LayoutDashboard, Palette } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { SecuritySection } from "./components/securitySection";
 import { ProfileSection } from "./components/profileSection";
 import { NotificationsSection } from "./components/notificationsSection";
+import { AppearanceSection } from "./components/appearanceSection";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
-type SectionId = "profile" | "security" | "notifications";
+type SectionId = "profile" | "security" | "notifications" | "appearance";
 
 const sidebarItems: Array<{ id: SectionId; label: string; icon: any }> = [
   { id: "profile", label: "Profile", icon: User },
   { id: "security", label: "Security", icon: Shield },
   { id: "notifications", label: "Notification", icon: Bell },
+  { id: "appearance", label: "Appearance", icon: Palette },
 ];
 
 export default function SettingsPage() {
@@ -57,6 +59,8 @@ export default function SettingsPage() {
         return <SecuritySection />;
       case "notifications":
         return <NotificationsSection />;
+      case "appearance":
+        return <AppearanceSection />;
       default:
         return <ProfileSection />;
     }

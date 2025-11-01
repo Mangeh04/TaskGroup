@@ -8,22 +8,19 @@ a {
 	text-decoration: none;
 }
 
-.imgDark {
-	display: none;
+:root {
+    color-scheme: light;
 }
 
-@media (prefers-color-scheme: dark) {
-	html {
-		color-scheme: dark;
-	}
-
-	.imgLight {
-		display: none;
-	}
-	.imgDark {
-		display: unset;
-	}
+.dark {
+    color-scheme: dark;
 }
+
+.imgLight { display: inline; }
+.imgDark  { display: none; }
+
+.dark .imgLight { display: none; }
+.dark .imgDark  { display: inline; }
 
 @theme inline {
 	--radius-sm: calc(var(--radius) - 4px);

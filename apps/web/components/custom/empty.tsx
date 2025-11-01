@@ -24,13 +24,13 @@ export type EmptyPageProps = {
 };
 
 export function EmptyPage({
-  title,
-  buttonString,
-  imageSrc,
-  imageAlt,
-  customDialog,
-  children
-}: EmptyPageProps) {
+                            title,
+                            buttonString,
+                            imageSrc,
+                            imageAlt,
+                            customDialog,
+                            children
+                          }: EmptyPageProps) {
   return (
     <Empty className="flex flex-col items-center justify-center text-center gap-6">
       <EmptyHeader className="flex flex-col items-center gap-4">
@@ -39,16 +39,15 @@ export function EmptyPage({
           alt={imageAlt}
           height={120}
           width={120}
-          className="opacity-80"
+          className="dark:invert dark:brightness-100"
         />
-        <EmptyTitle className="text-2xl font-semibold text-gray-800">
+        <EmptyTitle className="text-2xl font-semibold text-foreground">
           {title}
         </EmptyTitle>
       </EmptyHeader>
 
       {customDialog && (
         <EmptyContent className="flex justify-center">
-
           <CustomDialog
             buttonString={buttonString}
             title={customDialog.title}
@@ -62,3 +61,4 @@ export function EmptyPage({
     </Empty>
   );
 }
+
