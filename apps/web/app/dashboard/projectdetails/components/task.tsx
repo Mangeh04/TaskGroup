@@ -26,7 +26,7 @@ export type TaskCardProps = {
   onDelete?: () => void
 }
 
-export function TaskCard({ title, description, user, state, date, onEdit, onDelete }: TaskCardProps) {
+export function TaskCard({ title, description, user, state, date }: TaskCardProps) {
   const badgeVariant = state === "Done" ? "green" : "destructive"
 
   const users: Array<string> = [

@@ -20,13 +20,14 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 
+import { MemberStatus } from "@/app/dashboard/projectdetails/members/components/member";
 
 const data = {
 	user: {
 		name: "Mangeh04",
 		email: "mapsantamaria@esei.uvigo.es",
 		avatar: "https://raw.githubusercontent.com/Mangeh04/Storage/main/dragonite.jpeg",
-    status: "online"
+    status: "online" as MemberStatus
 	},
 
 	projects: [
@@ -55,8 +56,7 @@ export type SidebarProps = {
 
 export default function AppSidebar({
   isProject,
-  hasMembers,
-	children
+  hasMembers
 }: React.ComponentProps<typeof Sidebar> & SidebarProps)  {
 	return (
 		<Sidebar variant="inset">

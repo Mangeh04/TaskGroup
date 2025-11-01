@@ -90,7 +90,7 @@ export function NavUser({
                     currentStatus.color
                   )}
                 />
-                        <span className="text-xs text-muted-foreground">
+                <span className="text-xs text-muted-foreground">
                   {currentStatus.text}
                 </span>
               </div>
