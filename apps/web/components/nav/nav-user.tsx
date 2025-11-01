@@ -29,6 +29,7 @@ import {
 } from "@/components/ui/sidebar";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
+import { MemberStatus } from "@/app/dashboard/projectdetails/members/components/member";
 
 // --> Array de estados
 const statusOptions = [
@@ -45,6 +46,7 @@ export function NavUser({
     name: string;
     email: string;
     avatar: string;
+    status: MemberStatus;
   };
 }) {
   const { isMobile } = useSidebar();

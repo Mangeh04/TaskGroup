@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
-import { User, Shield, Bell, Menu, X } from "lucide-react";
+
+import { User, Shield, Bell, Menu, X, LayoutDashboard } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 import { SecuritySection } from "./components/securitySection";
@@ -81,6 +82,19 @@ export default function SettingsPage() {
       >
         <div className="p-6">
           <nav className="space-y-2">
+            <button
+              onClick={() => router.push("/dashboard")}
+              className={cn(
+                "flex w-full items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+              )}
+            >
+              <LayoutDashboard className="h-4 w-4" />
+              Dashboard
+            </button>
+
+            <hr className="my-2 border-border" />
+
             {sidebarItems.map((item) => {
               const Icon = item.icon;
               const isActive = activeSection === item.id;
