@@ -13,7 +13,7 @@ import { Input } from "@/components/ui/input";
 
 import placeholder from "@/public/images/placeholder.svg";
 import { handleFormValidation } from "@/lib/formHandler";
-import { UserLoginSchema } from "@repo/zod-schemas";
+import { UserLoginSchema } from "@repo/schemas";
 
 import { toast } from "sonner";
 import { useState } from "react";

@@ -28,7 +28,7 @@ const users: Array<{
   { id: "4", username: "alejandropxrez", role: "Member" },
 ];
 
-export default function SettingsPage() {
+export default function ProjectSettingsPage() {
   const breadcrumbItems = [
     { label: "Home", href: "/dashboard" },
     { label: "Project", href: "/dashboard/projectdetails" },

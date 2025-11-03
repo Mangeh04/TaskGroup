@@ -29,7 +29,7 @@
 		"@radix-ui/react-tooltip": "^1.2.8",
 		"@repo/database": "*",
 		"@repo/ui": "*",
-		"@repo/zod-schemas": "*",
+		"@repo/schemas": "*",
 		"@tabler/icons-react": "^3.35.0",
 		"@tailwindcss/postcss": "^4.1.16",
 		"class-variance-authority": "^0.7.1",
