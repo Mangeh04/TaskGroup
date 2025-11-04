@@ -1,5 +1,5 @@
-import { Injectable, Inject, ConflictException, InternalServerErrorException, NotFoundException } from '@nestjs/common';
-import { PrismaClient, Prisma, User } from '@repo/database';
+import { Injectable, Inject } from '@nestjs/common';
+import { PrismaClient, type User } from '@repo/database';
 
 import { IUserService } from '../interfaces/user.interface';
 import { SERVICES } from 'src/utils/constants';
