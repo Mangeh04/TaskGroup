@@ -25,7 +25,7 @@ export default function GroupInformationPage() {
     {
       name: "Uxío Raluy González",
       email: "urgonzalez@esei.uvigo.es",
-      avatar: "https://raw.githubusercontent.com/Mangeh04/Storage/main/mike.jpg",
+      avatar: "https://raw.githubusercontent.com/Mangeh04/Storage/main/binchilling.png",
       status: "online",
     },
     {

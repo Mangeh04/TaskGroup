@@ -1,0 +1,5 @@
+export enum SERVICES {
+  AUTH = 'AUTH_SERVICE',
+  PRISMA = 'PRISMA_SERVICE',
+  USER = 'USER_SERVICE'
+}
