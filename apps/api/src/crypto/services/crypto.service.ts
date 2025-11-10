@@ -14,7 +14,9 @@ import {
 import { ConfigService } from '@nestjs/config';
 import { promisify } from 'node:util';
 
-const saltRounds = 10;
+const SALLT_ROUNDS = 10;
+const IV_LENGTH = 16;
+const KEY_LENGTH = 32;
 
 @Injectable()
 export class CryptoService implements ICryptoService {
@@ -29,13 +31,17 @@ export class CryptoService implements ICryptoService {
   private async getKey(): Promise<Buffer> {
     if (this.cachedKey) return this.cachedKey;
     const password = this.configService.get<string>('ENCRYPT_SECRET')!;
-    this.cachedKey = (await promisify(scrypt)(password, 'salt', 32)) as Buffer;
+    this.cachedKey = (await promisify(scrypt)(
+      password,
+      'salt',
+      KEY_LENGTH,
+    )) as Buffer;
     return this.cachedKey;
   }
 
   public async encrypt(data: string): Promise<EncryptedField> {
     const key = await this.getKey();
-    const iv = randomBytes(16);
+    const iv = randomBytes(IV_LENGTH);
     const cipher = createCipheriv('aes-256-ctr', key, iv);
     const encryptedText = Buffer.concat([cipher.update(data), cipher.final()]);
     return {
@@ -56,7 +62,7 @@ export class CryptoService implements ICryptoService {
   }
 
   public async hash(password: string): Promise<string> {
-    return bcrypt.hash(password, saltRounds);
+    return bcrypt.hash(password, SALLT_ROUNDS);
   }
 
   public blindIndexEmail(email: string): string {
