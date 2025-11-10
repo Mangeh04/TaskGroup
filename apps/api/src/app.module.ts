@@ -1,30 +1,34 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
+import { ConfigModule } from '@nestjs/config';
 
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
-import { AuthService } from './auth/auth.service';
-import { PrismaService } from './prisma/services/prisma.service';
-import { UserService } from './user/services/user.service';
 import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { PrismaExceptionFilter } from './prisma-exception/prisma-exception.filter';
-import { CryptoService } from './crypto/services/crypto.service';
 import { CryptoModule } from './crypto/crypto.module';
+import { AuthModule } from './auth/auth.module';
+import { envSchema } from './config/env.schema';
 
 @Module({
-  imports: [UserModule, PrismaModule, CryptoModule],
+  imports: [
+    UserModule,
+    PrismaModule,
+    CryptoModule,
+    AuthModule,
+    ConfigModule.forRoot({
+      cache: true,
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
+      validationSchema: envSchema,
+      isGlobal: true,
+    }),
+  ],
   controllers: [AppController],
   providers: [
-    AppService,
-    AuthService,
-    PrismaService,
-    UserService,
     {
       provide: APP_FILTER,
       useClass: PrismaExceptionFilter,
     },
-    CryptoService,
   ],
 })
 export class AppModule {}

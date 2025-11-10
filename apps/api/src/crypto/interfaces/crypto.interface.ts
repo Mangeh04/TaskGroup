@@ -1,5 +1,10 @@
-import type { User } from '@repo/database';
+export type EncryptedField = {
+  ciphertext: string; // hex
+  iv: string; // hex
+};
 
 export interface ICryptoService {
-  hashUserData(data: User): Promise<User>;
+  encrypt(data: string): Promise<EncryptedField>;
+  decrypt(data: EncryptedField): Promise<string>;
+  hash(password: string): Promise<string>;
 }

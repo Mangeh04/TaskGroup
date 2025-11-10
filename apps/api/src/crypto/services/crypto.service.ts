@@ -1,50 +1,60 @@
 import { Injectable } from '@nestjs/common';
-import type { User } from '@repo/database';
 
-import { ICryptoService } from '../interfaces/crypto.interface';
+import {
+  type EncryptedField,
+  ICryptoService,
+} from '../interfaces/crypto.interface';
 import * as bcrypt from 'bcrypt';
-import { createCipheriv, randomBytes, scrypt } from 'node:crypto';
+import {
+  createCipheriv,
+  createDecipheriv,
+  randomBytes,
+  scrypt,
+} from 'node:crypto';
+import { ConfigService } from '@nestjs/config';
 import { promisify } from 'node:util';
 
-type ExtendedUser = User & {
-  emailIv: string;
-  aliasIv: string;
-};
+const saltRounds = 10;
 
 @Injectable()
 export class CryptoService implements ICryptoService {
-  async hashUserData(data: User): Promise<User> {
-    const { alias, email, password } = data;
-    const [hashedPassword, [encryptedAlias, encryptedEmail]] =
-      await Promise.all([
-        this.hashPassword(password),
-        this.encryptData(alias, email),
-      ]);
+  constructor(private readonly configService: ConfigService) {}
 
-    data.password = hashedPassword;
-    data.email = encryptedEmail;
-    data.alias = encryptedAlias;
-    return data;
-  }
+  public async encrypt(data: string): Promise<EncryptedField> {
+    const password = this.configService.get('ENCRYPT_SECRET') as string;
 
-  private async hashPassword(password: string): Promise<string> {
-    const saltRounds = 10;
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
-    return hashedPassword;
-  }
-
-  private async encryptData(...data): Promise<Array<string>> {
     const iv = randomBytes(16);
-    const password = 'test'; // Create the appconfig service to get the encryption password
     const key = (await promisify(scrypt)(password, 'salt', 32)) as Buffer;
-    const cipher = createCipheriv('aes-256-ctr', key, iv);
 
-    const textToEncrypt = 'Nest';
+    const cipherAlias = createCipheriv('aes-256-ctr', key, iv);
+
     const encryptedText = Buffer.concat([
-      cipher.update(textToEncrypt),
-      cipher.final(),
+      cipherAlias.update(data),
+      cipherAlias.final(),
     ]);
 
-    return [];
+    return {
+      ciphertext: encryptedText.toString('hex'),
+      iv: iv.toString('hex'),
+    };
+  }
+
+  public async decrypt(data: EncryptedField): Promise<string> {
+    const password = this.configService.get('ENCRYPT_SECRET') as string;
+
+    const iv = Buffer.from(data.iv, 'hex');
+    const key = (await promisify(scrypt)(password, 'salt', 32)) as Buffer;
+    const decipher = createDecipheriv('aes-256-ctr', key, iv);
+
+    const decryptedText = Buffer.concat([
+      decipher.update(Buffer.from(data.ciphertext, 'hex')),
+      decipher.final(),
+    ]);
+
+    return decryptedText.toString();
+  }
+
+  public async hash(password: string): Promise<string> {
+    return bcrypt.hash(password, saltRounds);
   }
 }
