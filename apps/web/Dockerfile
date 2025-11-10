@@ -1,5 +1,5 @@
 # Base image: official Bun image
-FROM oven/bun:1.3.1-alpine AS base
+FROM oven/bun:1.3.2-alpine AS base
 
 # -----------------------------
 # Builder stage

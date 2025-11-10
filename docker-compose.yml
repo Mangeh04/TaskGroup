@@ -1,17 +1,88 @@
-version: "3"
+version: "3.9"
 
 services:
-  web:
-    container_name: web
-    build:
-      context: .
-      dockerfile: ./apps/web/Dockerfile
-    restart: always
-    ports:
-      - "3000:3000"
-    networks:
-      - app_network
+    db:
+        image: mysql:8.4
+        container_name: db
+        command: --default-authentication-plugin=mysql_native_password
+        environment:
+            MYSQL_DATABASE: app_db
+            MYSQL_USER: app_user
+            MYSQL_PASSWORD: app_password
+            MYSQL_ROOT_PASSWORD: root_password
+        volumes:
+            - db_data:/var/lib/mysql
+        ports:
+            - "3306:3306"
+        healthcheck:
+            test:
+                [
+                    "CMD-SHELL",
+                    "mysqladmin ping -h 127.0.0.1 -u root -p$${MYSQL_ROOT_PASSWORD} --silent",
+                ]
+            interval: 5s
+            timeout: 3s
+            retries: 20
+        restart: always
+        networks:
+            - app_network
+
+    migrate:
+        container_name: prisma-migrate
+        build:
+            context: .
+            dockerfile: ./apps/api/Dockerfile
+            target: runner
+        depends_on:
+            db:
+                condition: service_healthy
+        environment:
+            DATABASE_URL: mysql://app_user:app_password@db:3306/app_db
+        entrypoint: ["bun", "x", "prisma", "migrate", "deploy"]
+        restart: "no"
+        networks:
+            - app_network
+
+    api:
+        container_name: api
+        build:
+            context: .
+            dockerfile: ./apps/api/Dockerfile
+        environment:
+            PORT: "3001"
+            DATABASE_URL: mysql://app_user:app_password@db:3306/app_db
+            NODE_ENV: production
+        depends_on:
+            db:
+                condition: service_healthy
+            migrate:
+                condition: service_completed_successfully
+        ports:
+            - "3001:3001"
+        restart: always
+        networks:
+            - app_network
+
+    web:
+        container_name: web
+        build:
+            context: .
+            dockerfile: ./apps/web/Dockerfile
+        environment:
+            NEXT_PUBLIC_API_URL: http://api:3001
+            NODE_ENV: production
+        depends_on:
+            api:
+                condition: service_started
+        ports:
+            - "3000:3000"
+        restart: always
+        networks:
+            - app_network
+
+volumes:
+    db_data:
 
 networks:
-  app_network:
-    external: true
+    app_network:
+        external: true

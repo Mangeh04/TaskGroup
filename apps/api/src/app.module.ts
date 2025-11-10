@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 
-import { AppController } from './app.controller';
 import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { PrismaExceptionFilter } from './prisma-exception/prisma-exception.filter';
@@ -19,11 +18,11 @@ import { JwtModule } from '@nestjs/jwt';
     AuthModule,
     ConfigModule.forRoot({
       cache: true,
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
       validationSchema: envSchema,
       isGlobal: true,
     }),
     JwtModule.registerAsync({
+      global: true,
       imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
@@ -34,7 +33,7 @@ import { JwtModule } from '@nestjs/jwt';
       inject: [ConfigService],
     }),
   ],
-  controllers: [AppController],
+  controllers: [],
   providers: [
     {
       provide: APP_FILTER,

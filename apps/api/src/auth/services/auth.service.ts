@@ -26,7 +26,7 @@ export class AuthService implements IAuthService {
 
     const payload = { sub: user.id, alias: user.alias };
     return {
-      access_token: await this.jwtService.signAsync(payload),
+      access_token: `Bearer ${await this.jwtService.signAsync(payload)}`,
     };
   }
 }

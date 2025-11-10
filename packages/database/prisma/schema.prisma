@@ -1,6 +1,5 @@
 generator client {
   provider = "prisma-client-js"
-  output   = "../generated/prisma"
 }
 
 datasource db {
@@ -10,13 +9,13 @@ datasource db {
 
 model User {
   id        String      @id @default(uuid())
-  alias     String
+  alias     String      @unique
   email     String      @unique
   password  String
 
-  aliasIv       String   
-  emailIv       String   
-  emailBi       String     @unique @db.VarChar(64) // hex HMAC-SHA256 used as blind index
+  aliasIv   String   
+  emailIv   String   
+  emailBi   String      @unique @db.VarChar(64) // hex HMAC-SHA256 used as blind index
 
   projects  Project[]   @relation("UserProjects")
   tasks     Task[]      @relation("UserTasks")
