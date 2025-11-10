@@ -13,13 +13,6 @@ export class UserService implements IUserService {
     @Inject(SERVICES.CRYPTO) private readonly cryptoService: CryptoService,
   ) {}
 
-  public async createUser(user: User) {
-    const data = await this.prepareDataForSaving(user);
-    await this.prismaService.user.create({ data });
-
-    return true;
-  }
-
   private async prepareDataForSaving(user: User): Promise<User> {
     const promises = [
       this.cryptoService.encrypt(user.alias),
@@ -36,6 +29,13 @@ export class UserService implements IUserService {
     user.password = hashedPassword as string;
 
     return user;
+  }
+
+  public async createUser(user: User) {
+    const data = await this.prepareDataForSaving(user);
+    await this.prismaService.user.create({ data });
+
+    return true;
   }
 
   public async findUser(userId: string) {
