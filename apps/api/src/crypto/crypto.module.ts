@@ -6,14 +6,14 @@ import { SERVICES } from 'src/utils/constants';
   providers: [
     {
       provide: SERVICES.CRYPTO,
-      useClass: CryptoService
-    }
+      useClass: CryptoService,
+    },
   ],
   exports: [
     {
       provide: SERVICES.CRYPTO,
-      useClass: CryptoService
-    }
-  ]
+      useClass: CryptoService,
+    },
+  ],
 })
 export class CryptoModule {}

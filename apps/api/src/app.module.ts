@@ -22,9 +22,9 @@ import { CryptoModule } from './crypto/crypto.module';
     UserService,
     {
       provide: APP_FILTER,
-      useClass: PrismaExceptionFilter
+      useClass: PrismaExceptionFilter,
     },
-    CryptoService
+    CryptoService,
   ],
 })
-export class AppModule { }
+export class AppModule {}

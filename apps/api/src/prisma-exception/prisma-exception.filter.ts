@@ -9,7 +9,9 @@ export class PrismaExceptionFilter implements ExceptionFilter {
 
     switch (exception.code) {
       case 'P2002':
-        return response.status(409).json({ message: 'This registery already exists' });
+        return response
+          .status(409)
+          .json({ message: 'This registery already exists' });
       case 'P2025':
         return response.status(404).json({ message: 'Registery not found' });
       default:

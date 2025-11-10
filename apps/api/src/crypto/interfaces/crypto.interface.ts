@@ -1,5 +1,5 @@
-import type { User } from "@repo/database";
+import type { User } from '@repo/database';
 
 export interface ICryptoService {
-    hashUserData(data: User): Promise<User>;
+  hashUserData(data: User): Promise<User>;
 }
