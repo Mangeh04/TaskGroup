@@ -38,6 +38,12 @@ export const envSchema: joi.ObjectSchema = joi.object({
   JWT_SECRET: joi.string().required(),
 
   /**
+   * The pepper value used in blind indexing of emails.
+   * @type {string}
+   */
+  EMAIL_BI_PEPPER: joi.string().required(),
+
+  /**
    * The host address for Redis.
    * @type {string}
    */
