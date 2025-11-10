@@ -7,4 +7,5 @@ export interface ICryptoService {
   encrypt(data: string): Promise<EncryptedField>;
   decrypt(data: EncryptedField): Promise<string>;
   hash(password: string): Promise<string>;
+  compareHash(password: string, hash: string): Promise<boolean>;
 }

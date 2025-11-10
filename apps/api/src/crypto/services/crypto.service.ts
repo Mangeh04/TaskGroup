@@ -64,6 +64,9 @@ export class CryptoService implements ICryptoService {
   public async hash(password: string): Promise<string> {
     return bcrypt.hash(password, SALLT_ROUNDS);
   }
+  public async compareHash(password: string, hash: string): Promise<boolean> {
+    return bcrypt.compare(password, hash);
+  }
 
   public blindIndexEmail(email: string): string {
     const pepper = this.configService.get<string>('EMAIL_BI_PEPPER')!;

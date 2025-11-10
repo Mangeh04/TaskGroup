@@ -2,6 +2,7 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ConfigService } from '@nestjs/config';
 import helmet from 'helmet';
+import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -9,6 +10,13 @@ async function bootstrap() {
 
   app.setGlobalPrefix('api');
   app.use(helmet());
+
+  app.use(
+    new ValidationPipe({
+      transform: true,
+      stopAtFirstError: true,
+    }),
+  );
 
   const PORT = configService.get('PORT') as number;
   await app.listen(PORT);
