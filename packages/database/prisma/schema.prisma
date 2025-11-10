@@ -16,6 +16,7 @@ model User {
 
   aliasIv       String   
   emailIv       String   
+  emailBi       String     @unique @db.VarChar(64) // hex HMAC-SHA256 used as blind index
 
   projects  Project[]   @relation("UserProjects")
   tasks     Task[]      @relation("UserTasks")

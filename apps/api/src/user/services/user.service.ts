@@ -4,7 +4,6 @@ import { PrismaClient, type User } from '@repo/database';
 import { IUserService } from '../interfaces/user.interface';
 import { SERVICES } from 'src/utils/constants';
 import { CryptoService } from 'src/crypto/services/crypto.service';
-import { EncryptedField } from 'src/crypto/interfaces/crypto.interface';
 
 @Injectable()
 export class UserService implements IUserService {
@@ -14,19 +13,21 @@ export class UserService implements IUserService {
   ) {}
 
   private async prepareDataForSaving(user: User): Promise<User> {
-    const promises = [
+    const emailBi = this.cryptoService.blindIndexEmail(user.email);
+
+    const [encryptedAlias, encryptedEmail, hashedPassword] = await Promise.all([
       this.cryptoService.encrypt(user.alias),
       this.cryptoService.encrypt(user.email),
       this.cryptoService.hash(user.password),
-    ];
-    const [encryptedAlias, encryptedEmail, hashedPassword] =
-      await Promise.all(promises);
+    ]);
 
-    user.email = (encryptedEmail as EncryptedField).ciphertext;
-    user.emailIv = (encryptedEmail as EncryptedField).iv;
-    user.alias = (encryptedAlias as EncryptedField).ciphertext;
-    user.aliasIv = (encryptedAlias as EncryptedField).iv;
-    user.password = hashedPassword as string;
+    user.email = encryptedEmail.ciphertext;
+    user.emailIv = encryptedEmail.iv;
+    user.emailBi = emailBi;
+
+    user.alias = encryptedAlias.ciphertext;
+    user.aliasIv = encryptedAlias.iv;
+    user.password = hashedPassword;
 
     return user;
   }
@@ -34,7 +35,6 @@ export class UserService implements IUserService {
   public async createUser(user: User) {
     const data = await this.prepareDataForSaving(user);
     await this.prismaService.user.create({ data });
-
     return true;
   }
 
@@ -51,11 +51,15 @@ export class UserService implements IUserService {
 
   public async updateUser(user: User) {
     const data = await this.prepareDataForSaving(user);
-
-    await this.prismaService.user.update({
-      where: { id: user.id },
-      data,
-    });
+    await this.prismaService.user.update({ where: { id: user.id }, data });
     return true;
+  }
+
+  public async findUserByEmail(emailPlain: string) {
+    const emailBi = this.cryptoService.blindIndexEmail(emailPlain);
+    const user = await this.prismaService.user.findUnique({
+      where: { emailBi },
+    });
+    return user as unknown as Promise<User>;
   }
 }
