@@ -4,7 +4,11 @@
 	"main": "./dist/prisma/index.js",
 	"types": "./dist/prisma/index.d.ts",
 	"exports": {
-		".": "./dist/prisma/index.js"
+		".": {
+			"types": "./dist/prisma/index.d.ts",
+			"require": "./dist/prisma/index.js",
+			"default": "./dist/prisma/index.js"
+		}
 	},
 	"scripts": {
 		"db:generate": "prisma generate",
@@ -14,8 +18,7 @@
 		"db:deploy": "prisma migrate deploy"
 	},
 	"dependencies": {
-		"@prisma/client": "6.18.0",
-		"dotenv": "^17.2.3"
+		"@prisma/client": "6.18.0"
 	},
 	"devDependencies": {
 		"@repo/typescript-config": "*",

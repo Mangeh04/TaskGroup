@@ -28,7 +28,11 @@ model User {
 
 model Project {
   id          String    @id @default(uuid())
-  name        String
+  name        String  
+  description String?
+
+  nameIv      String
+  descriptionIv String?
 
   users       User[]    @relation("UserProjects")
   tasks       Task[]
@@ -42,6 +46,9 @@ model Task {
 
   title       String
   description String?
+
+  titleIv     String
+  descriptionIv String?
 
   isCompleted Boolean   @default(false)
 

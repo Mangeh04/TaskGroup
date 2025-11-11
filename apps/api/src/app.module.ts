@@ -8,7 +8,10 @@ import { PrismaExceptionFilter } from './prisma-exception/prisma-exception.filte
 import { CryptoModule } from './crypto/crypto.module';
 import { AuthModule } from './auth/auth.module';
 import { envSchema } from './config/env.schema';
+import { ProjectModule } from './project/project.module';
+
 import { JwtModule } from '@nestjs/jwt';
+import { TaskModule } from './task/task.module';
 
 @Module({
   imports: [
@@ -32,6 +35,8 @@ import { JwtModule } from '@nestjs/jwt';
       }),
       inject: [ConfigService],
     }),
+    ProjectModule,
+    TaskModule,
   ],
   controllers: [],
   providers: [

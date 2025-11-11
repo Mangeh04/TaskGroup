@@ -1,12 +1,4 @@
-import { defineConfig, env } from "prisma/config";
-
-import * as dotenv from "dotenv";
-import { fileURLToPath } from "url";
-import { dirname, resolve } from "path";
-
-// @ts-ignore
-const __dirname = dirname(fileURLToPath(import.meta.url));
-dotenv.config({ path: resolve(__dirname, ".env") });
+import { defineConfig } from "prisma/config";
 
 export default defineConfig({
 	schema: "prisma/schema.prisma",
@@ -15,6 +7,6 @@ export default defineConfig({
 	},
 	engine: "classic",
 	datasource: {
-		url: env("DATABASE_URL"),
+		url: process.env.DATABASE_URL!,
 	},
 });

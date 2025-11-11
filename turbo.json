@@ -1,32 +1,37 @@
 {
 	"$schema": "https://turborepo.com/schema.json",
+	"globalEnv": [
+		"DATABASE_URL",
+		"NODE_ENV",
+		"NEXT_PUBLIC_API_URL",
+		"API_PORT",
+		"NEXT_PORT"
+	],
 	"ui": "tui",
 	"tasks": {
 		"build": {
-			"dependsOn": ["^db:generate", "^build"],
-			"inputs": ["$TURBO_DEFAULT$", ".env*"],
+			"dependsOn": ["^build"],
+			"inputs": ["$TURBO_DEFAULT$"],
 			"outputs": [
 				"dist/**",
 				"build/**",
 				"lib/**",
 				".next/**",
 				"!.next/cache/**"
-			],
-			"env": ["DATABASE_URL"]
+			]
 		},
-		"lint": {
-			"dependsOn": ["^lint"]
-		},
-		"check-types": {
-			"dependsOn": ["^check-types"]
-		},
+		"lint": { "dependsOn": ["^lint"] },
+		"check-types": { "dependsOn": ["^check-types"] },
 		"dev": {
-			"dependsOn": ["^db:generate", "^build"],
+			"dependsOn": ["^build"],
 			"cache": false,
 			"persistent": true
 		},
 		"db:generate": {
-			"cache": false
+			"cache": false,
+			"env": ["DATABASE_URL"],
+			"inputs": ["prisma/**", "package.json", "tsconfig.json", ".env*"],
+			"outputs": ["node_modules/.prisma/**", "prisma/generated/**"]
 		},
 		"db:migrate": {
 			"cache": false,

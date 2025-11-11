@@ -1,15 +1,15 @@
-version: "3.9"
-
 services:
+    # ----------------------------
+    # MySQL Database
+    # ----------------------------
     db:
         image: mysql:8.4
         container_name: db
-        command: --default-authentication-plugin=mysql_native_password
         environment:
-            MYSQL_DATABASE: app_db
-            MYSQL_USER: app_user
-            MYSQL_PASSWORD: app_password
-            MYSQL_ROOT_PASSWORD: root_password
+            MYSQL_DATABASE: ${MYSQL_DATABASE}
+            MYSQL_USER: ${MYSQL_USER}
+            MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+            MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
         volumes:
             - db_data:/var/lib/mysql
         ports:
@@ -26,60 +26,52 @@ services:
         restart: always
         networks:
             - app_network
-
-    migrate:
-        container_name: prisma-migrate
-        build:
-            context: .
-            dockerfile: ./apps/api/Dockerfile
-            target: runner
-        depends_on:
-            db:
-                condition: service_healthy
-        environment:
-            DATABASE_URL: mysql://app_user:app_password@db:3306/app_db
-        entrypoint: ["bun", "x", "prisma", "migrate", "deploy"]
-        restart: "no"
-        networks:
-            - app_network
-
+    # ----------------------------
+    # NestJS API (backend)
+    # ----------------------------
     api:
         container_name: api
         build:
             context: .
             dockerfile: ./apps/api/Dockerfile
+            args:
+                DATABASE_URL: ${DATABASE_URL}
         environment:
-            PORT: "3001"
-            DATABASE_URL: mysql://app_user:app_password@db:3306/app_db
-            NODE_ENV: production
+            PORT: ${API_PORT}
+            DATABASE_URL: ${DATABASE_URL}
+            NODE_ENV: ${NODE_ENV}
         depends_on:
             db:
                 condition: service_healthy
-            migrate:
-                condition: service_completed_successfully
         ports:
-            - "3001:3001"
+            - "${API_PORT}:${API_PORT}"
         restart: always
         networks:
             - app_network
 
+    # ----------------------------
+    # Next.js Frontend (web)
+    # ----------------------------
     web:
         container_name: web
         build:
             context: .
             dockerfile: ./apps/web/Dockerfile
         environment:
-            NEXT_PUBLIC_API_URL: http://api:3001
-            NODE_ENV: production
+            PORT: ${NEXT_PORT}
+            NODE_ENV: ${NODE_ENV}
         depends_on:
             api:
                 condition: service_started
         ports:
-            - "3000:3000"
+            - "${NEXT_PORT}:${NEXT_PORT}"
         restart: always
         networks:
             - app_network
 
+# ----------------------------
+# Volumes & Networks
+# ----------------------------
 volumes:
     db_data:
 
