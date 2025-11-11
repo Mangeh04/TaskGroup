@@ -23,7 +23,7 @@ COPY bun.lock bun.lock
 RUN bun install
 COPY --from=builder /app/out/full .
 
-RUN bunx turbo run build --filter=web...
+RUN bunx turbo run build --filter=web
 
 # -----------------------------
 # Runner stage

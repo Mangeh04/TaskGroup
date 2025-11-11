@@ -17,7 +17,7 @@ export const envSchema: joi.ObjectSchema = joi.object({
    * The port number on which the server listens.
    * @type {number}
    */
-  PORT: joi.number().required(),
+  API_PORT: joi.number().required(),
 
   /**
    * The secret key used for cookies.
