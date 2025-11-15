@@ -7,59 +7,85 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Role {
+  OWNER  // owner, can delete the project, change roles
+  ADMIN  // edit project, invite / kick members
+  MEMBER // view, create / edit tasks
+}
+
 model User {
-  id        String      @id @default(uuid())
-  alias     String      @unique
-  email     String      @unique
-  password  String
+  id       String   @id @default(uuid())
+  alias    String   @unique
+  email    String   @unique
+  password String
 
-  aliasIv   String   
-  emailIv   String   
-  emailBi   String      @unique @db.VarChar(64) // hex HMAC-SHA256 used as blind index
+  aliasIv String
+  emailIv String
+  emailBi String   @unique @db.VarChar(64)
 
-  projects  Project[]   @relation("UserProjects")
-  tasks     Task[]      @relation("UserTasks")
+  memberships ProjectMembership[]
 
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
+  assignments TaskAssignment[]
 
-  Task      Task[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
 }
 
 model Project {
   id          String    @id @default(uuid())
-  name        String  
+  name        String
   description String?
 
-  nameIv      String
+  nameIv        String
   descriptionIv String?
 
-  users       User[]    @relation("UserProjects")
-  tasks       Task[]
+  members ProjectMembership[]
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  tasks     Task[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ProjectMembership {
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
+  
+  role      Role     @default(MEMBER)
+
+  @@id([userId, projectId]) 
+}
+
+model TaskAssignment {
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id])
+
+  @@id([userId, taskId])
 }
 
 model Task {
-  id          String    @id @default(uuid())
-
+  id          String   @id @default(uuid())
   title       String
   description String?
 
-  titleIv     String
+  titleIv       String
   descriptionIv String?
 
-  isCompleted Boolean   @default(false)
+  isCompleted Boolean  @default(false)
 
-  userId      String
-  user        User      @relation(fields: [userId], references: [id])
+  projectId String
+  project   Project  @relation(fields: [projectId], references: [id])
 
-  projectId   String
-  project     Project   @relation(fields: [projectId], references: [id])
+  assignments TaskAssignment[]
 
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  User User[] @relation("UserTasks")
 }

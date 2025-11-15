@@ -14,12 +14,7 @@ import { TaskController } from './controllers/task.controller';
       useClass: TaskService,
     },
   ],
-  exports: [
-    {
-      provide: SERVICES.TASK,
-      useClass: TaskService,
-    },
-  ],
+  exports: [SERVICES.TASK],
   controllers: [TaskController],
 })
 export class TaskModule {}

@@ -8,4 +8,5 @@ export interface ICryptoService {
   decrypt(data: EncryptedField): Promise<string>;
   hash(password: string): Promise<string>;
   compareHash(password: string, hash: string): Promise<boolean>;
+  blindIndexEmail(email: string): string;
 }

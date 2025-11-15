@@ -3,13 +3,13 @@ import { PrismaClient, type User } from '@repo/database';
 
 import { IUserService } from '../interfaces/user.interface';
 import { SERVICES } from 'src/utils/constants';
-import { CryptoService } from 'src/crypto/services/crypto.service';
+import type { ICryptoService } from 'src/crypto/interfaces/crypto.interface';
 
 @Injectable()
 export class UserService implements IUserService {
   constructor(
     @Inject(SERVICES.PRISMA) private readonly prismaService: PrismaClient,
-    @Inject(SERVICES.CRYPTO) private readonly cryptoService: CryptoService,
+    @Inject(SERVICES.CRYPTO) private readonly cryptoService: ICryptoService,
   ) {}
 
   private async prepareDataForSaving(user: User): Promise<User> {
@@ -34,8 +34,7 @@ export class UserService implements IUserService {
 
   public async createUser(user: User) {
     const data = await this.prepareDataForSaving(user);
-    await this.prismaService.user.create({ data });
-    return true;
+    return await this.prismaService.user.create({ data });
   }
 
   public async findUser(userId: string) {

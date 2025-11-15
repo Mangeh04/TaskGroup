@@ -9,12 +9,6 @@ import { PrismaService } from './services/prisma.service';
       useClass: PrismaService,
     },
   ],
-
-  exports: [
-    {
-      provide: SERVICES.PRISMA,
-      useClass: PrismaService,
-    },
-  ],
+  exports: [SERVICES.PRISMA],
 })
 export class PrismaModule {}

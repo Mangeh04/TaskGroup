@@ -1,17 +1,14 @@
 {
 	"$schema": "https://turborepo.com/schema.json",
-	"globalEnv": [
-		"DATABASE_URL",
-		"NODE_ENV",
-		"NEXT_PUBLIC_API_URL",
-		"API_PORT",
-		"NEXT_PORT"
-	],
+
+	"globalEnv": ["NODE_ENV", "NEXT_PUBLIC_API_URL", "API_PORT", "NEXT_PORT"],
+
 	"ui": "tui",
+
 	"tasks": {
 		"build": {
 			"dependsOn": ["^build"],
-			"inputs": ["$TURBO_DEFAULT$"],
+			"inputs": ["$TURBO_DEFAULT$", "**/prisma/**"],
 			"outputs": [
 				"dist/**",
 				"build/**",
@@ -20,25 +17,43 @@
 				"!.next/cache/**"
 			]
 		},
-		"lint": { "dependsOn": ["^lint"] },
-		"check-types": { "dependsOn": ["^check-types"] },
+
+		"lint": {
+			"dependsOn": ["^lint"]
+		},
+
+		"check-types": {
+			"dependsOn": ["^check-types"]
+		},
+
 		"dev": {
 			"dependsOn": ["^build"],
 			"cache": false,
 			"persistent": true
 		},
+
 		"db:generate": {
 			"cache": false,
 			"env": ["DATABASE_URL"],
-			"inputs": ["prisma/**", "package.json", "tsconfig.json", ".env*"],
-			"outputs": ["node_modules/.prisma/**", "prisma/generated/**"]
+			"inputs": [
+				"**/prisma/**",
+				"package.json",
+				"tsconfig.json",
+				".env*"
+			],
+			"outputs": ["node_modules/.prisma/**", "**/prisma/generated/**"]
 		},
-		"db:migrate": {
-			"cache": false,
-			"persistent": true
-		},
+
 		"db:deploy": {
-			"cache": false
+			"cache": false,
+			"env": ["DATABASE_URL"],
+			"inputs": [
+				"**/prisma/**",
+				"package.json",
+				"tsconfig.json",
+				".env*"
+			],
+			"outputs": ["node_modules/.prisma/**", "**/prisma/generated/**"]
 		}
 	}
 }

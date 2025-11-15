@@ -16,24 +16,30 @@ export class TaskService implements ITaskService {
   ) {}
 
   private async mapDtoToCreateInput(
-    TaskDto: TaskDto,
+    taskDto: TaskDto,
   ): Promise<Prisma.TaskCreateInput> {
-    const encryptedName = await this.cryptoService.encrypt(TaskDto.title);
+    const encryptedName = await this.cryptoService.encrypt(taskDto.title);
+
+    const userAssignments = taskDto.userIds.map((id) => ({
+      user: {
+        connect: { id: id },
+      },
+    }));
 
     const data: Prisma.TaskCreateInput = {
       title: encryptedName.ciphertext,
       titleIv: encryptedName.iv,
-      user: {
-        connect: { id: TaskDto.userId },
-      },
       project: {
-        connect: { id: TaskDto.projectId },
+        connect: { id: taskDto.projectId },
+      },
+      assignments: {
+        create: userAssignments,
       },
     };
 
-    if (TaskDto.description) {
+    if (taskDto.description) {
       const encryptedDescription = await this.cryptoService.encrypt(
-        TaskDto.description,
+        taskDto.description,
       );
       data.description = encryptedDescription.ciphertext;
       data.descriptionIv = encryptedDescription.iv;
@@ -42,56 +48,69 @@ export class TaskService implements ITaskService {
     return data;
   }
 
-  private async mapDtoToUpdateInput(
-    TaskDto: TaskDto,
-  ): Promise<Prisma.TaskUpdateInput> {
-    const encryptedName = await this.cryptoService.encrypt(TaskDto.title);
-
-    const data: Prisma.TaskUpdateInput = {
-      title: encryptedName.ciphertext,
-      titleIv: encryptedName.iv,
-    };
-
-    if (TaskDto.description) {
-      const encryptedDescription = await this.cryptoService.encrypt(
-        TaskDto.description,
-      );
-      data.description = encryptedDescription.ciphertext;
-      data.descriptionIv = encryptedDescription.iv;
-    }
-
-    return data;
-  }
-
-  public async createTask(TaskDto: TaskDto) {
-    const data = await this.mapDtoToCreateInput(TaskDto);
+  public async createTask(taskDto: TaskDto) {
+    const data = await this.mapDtoToCreateInput(taskDto);
     await this.prismaService.task.create({ data });
     return true;
   }
 
-  public async updateTask(TaskDto: TaskDtoUpdate) {
-    const data = await this.mapDtoToUpdateInput(TaskDto);
+  public async updateTask(taskDto: TaskDtoUpdate) {
+    const dataToUpdate: Prisma.TaskUpdateInput = {};
+
+    if (taskDto.title) {
+      const encryptedName = await this.cryptoService.encrypt(taskDto.title);
+      dataToUpdate.title = encryptedName.ciphertext;
+      dataToUpdate.titleIv = encryptedName.iv;
+    }
+    if (taskDto.description) {
+      const encryptedDescription = await this.cryptoService.encrypt(
+        taskDto.description,
+      );
+      dataToUpdate.description = encryptedDescription.ciphertext;
+      dataToUpdate.descriptionIv = encryptedDescription.iv;
+    }
+
+    if (taskDto.userIds) {
+      dataToUpdate.assignments = {
+        create: taskDto.userIds.map((id) => ({
+          user: { connect: { id } },
+        })),
+      };
+    }
+
     await this.prismaService.task.update({
-      where: { id: TaskDto.id },
-      data,
+      where: { id: taskDto.id },
+      data: dataToUpdate,
     });
     return true;
   }
 
-  public async findTask(TaskId: string) {
+  public async findTask(taskId: string) {
     return (await this.prismaService.task.findUnique({
-      where: { id: TaskId },
+      where: { id: taskId },
     })) as unknown as Promise<Task>;
   }
 
-  public async deleteTask(TaskId: string) {
-    await this.prismaService.task.delete({ where: { id: TaskId } });
+  public async deleteTask(taskId: string) {
+    await this.prismaService.taskAssignment.deleteMany({
+      where: { taskId: taskId },
+    });
+    await this.prismaService.task.delete({ where: { id: taskId } });
     return true;
   }
 
   public async getTasks(projectId: string) {
     return this.prismaService.task.findMany({
-      where: { project: { is: { id: projectId } } },
-    }) as unknown as Promise<Task[]>;
+      where: { projectId: projectId },
+      include: {
+        assignments: {
+          include: {
+            user: {
+              select: { id: true, alias: true, emailBi: true },
+            },
+          },
+        },
+      },
+    }) as unknown as Promise<any[]>;
   }
 }

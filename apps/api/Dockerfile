@@ -33,4 +33,5 @@ USER appuser
 COPY --from=installer --chown=appuser:appgroup /app ./
 
 EXPOSE 3001
-CMD ["bun", "apps/api/dist/main.js"]
+CMD ["sh", "-c", "bunx turbo run db:deploy && bun apps/api/dist/main.js"]
+

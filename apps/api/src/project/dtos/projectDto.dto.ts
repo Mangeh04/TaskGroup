@@ -9,8 +9,4 @@ export class ProjectDto {
   @IsString()
   @MaxLength(255)
   description: string;
-
-  @IsNotEmpty()
-  @IsString()
-  createdByUserId: string;
 }

@@ -51,7 +51,7 @@ services:
             context: .
             dockerfile: ./apps/api/Dockerfile
         env_file:
-            - .env # ✅ cargamos variables de entorno desde archivo seguro
+            - .env
         depends_on:
             db:
                 condition: service_healthy

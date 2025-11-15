@@ -1,8 +1,9 @@
 import { Injectable, Inject } from '@nestjs/common';
-import { PrismaClient, type Project, type Prisma } from '@repo/database';
+import { PrismaClient, type Project, type Prisma, Role } from '@repo/database';
+import { ProjectMembership } from '@repo/database';
 
 import { SERVICES } from 'src/utils/constants';
-import { CryptoService } from 'src/crypto/services/crypto.service';
+import type { ICryptoService } from 'src/crypto/interfaces/crypto.interface';
 
 import { ProjectDto } from '../dtos/projectDto.dto';
 import { IProjectService } from '../interfaces/project.interface';
@@ -12,10 +13,11 @@ import { ProjectDtoUpdate } from '../dtos/projectDtoUpdate.dto';
 export class ProjectService implements IProjectService {
   constructor(
     @Inject(SERVICES.PRISMA) private readonly prismaService: PrismaClient,
-    @Inject(SERVICES.CRYPTO) private readonly cryptoService: CryptoService,
+    @Inject(SERVICES.CRYPTO) private readonly cryptoService: ICryptoService,
   ) {}
 
   private async mapDtoToCreateInput(
+    userId: string,
     projectDto: ProjectDto,
   ): Promise<Prisma.ProjectCreateInput> {
     const encryptedName = await this.cryptoService.encrypt(projectDto.name);
@@ -23,8 +25,15 @@ export class ProjectService implements IProjectService {
     const data: Prisma.ProjectCreateInput = {
       name: encryptedName.ciphertext,
       nameIv: encryptedName.iv,
-      users: {
-        connect: { id: projectDto.createdByUserId },
+      members: {
+        create: {
+          role: Role.OWNER,
+          user: {
+            connect: {
+              id: userId,
+            },
+          },
+        },
       },
     };
 
@@ -60,8 +69,8 @@ export class ProjectService implements IProjectService {
     return data;
   }
 
-  public async createProject(projectDto: ProjectDto) {
-    const data = await this.mapDtoToCreateInput(projectDto);
+  public async createProject(userId: string, projectDto: ProjectDto) {
+    const data = await this.mapDtoToCreateInput(userId, projectDto);
     await this.prismaService.project.create({ data });
     return true;
   }
@@ -88,7 +97,21 @@ export class ProjectService implements IProjectService {
 
   public async getProjectsByUserId(userId: string) {
     return this.prismaService.project.findMany({
-      where: { users: { some: { id: userId } } },
+      where: { members: { some: { userId } } },
     }) as unknown as Promise<Project[]>;
+  }
+
+  async getMembership(
+    userId: string,
+    projectId: string,
+  ): Promise<ProjectMembership | null> {
+    return this.prismaService.projectMembership.findUnique({
+      where: {
+        userId_projectId: {
+          userId: userId,
+          projectId: projectId,
+        },
+      },
+    });
   }
 }

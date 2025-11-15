@@ -1,6 +1,17 @@
-import { IsNotEmpty, IsString, MaxLength, IsBoolean } from 'class-validator';
+import {
+  IsNotEmpty,
+  IsString,
+  MaxLength,
+  IsBoolean,
+  IsArray,
+  ArrayMinSize,
+} from 'class-validator';
 
 export class TaskDto {
+  @IsNotEmpty()
+  @IsString()
+  id: string;
+
   @IsNotEmpty()
   @IsString()
   @MaxLength(60)
@@ -15,9 +26,10 @@ export class TaskDto {
 
   @IsNotEmpty()
   @IsString()
-  userId: string;
-
-  @IsNotEmpty()
-  @IsString()
   projectId: string;
+
+  @IsArray()
+  @ArrayMinSize(1)
+  @IsString({ each: true })
+  userIds: string[];
 }

@@ -7,6 +7,8 @@ import { CryptoModule } from 'src/crypto/crypto.module';
 import { ProjectService } from './services/project.service';
 import { ProjectController } from './controllers/project.controller';
 
+import { ProjectMemberGuard } from './guards/projectMember.guard';
+
 @Module({
   imports: [PrismaModule, CryptoModule],
   providers: [
@@ -14,13 +16,9 @@ import { ProjectController } from './controllers/project.controller';
       provide: SERVICES.PROJECT,
       useClass: ProjectService,
     },
+    ProjectMemberGuard,
   ],
-  exports: [
-    {
-      provide: SERVICES.PROJECT,
-      useClass: ProjectService,
-    },
-  ],
+  exports: [SERVICES.PROJECT, ProjectMemberGuard],
   controllers: [ProjectController],
 })
 export class ProjectModule {}

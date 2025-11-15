@@ -1,7 +1,7 @@
 import { User } from '@repo/database';
 
 export interface IUserService {
-  createUser(user: User): Promise<boolean>;
+  createUser(user: Pick<User, 'email' | 'alias' | 'password'>): Promise<User>;
   findUser(userId: string): Promise<User>;
   findUserByEmail(emailPlain: string): Promise<User>;
   deleteUser(userId: string): Promise<boolean>;
