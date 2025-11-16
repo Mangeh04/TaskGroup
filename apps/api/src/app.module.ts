@@ -12,7 +12,6 @@ import { ProjectModule } from './project/project.module';
 
 import { JwtModule } from '@nestjs/jwt';
 import { TaskModule } from './task/task.module';
-import { TRPCModule } from 'nestjs-trpc';
 
 @Module({
   imports: [
@@ -20,9 +19,6 @@ import { TRPCModule } from 'nestjs-trpc';
     PrismaModule,
     CryptoModule,
     AuthModule,
-    TRPCModule.forRoot({
-      autoSchemaFile: '../../packages/trpc/src/server',
-    }),
     ConfigModule.forRoot({
       cache: true,
       validationSchema: envSchema,
