@@ -3,6 +3,7 @@ import { Module } from '@nestjs/common';
 import { PrismaModule } from 'src/prisma/prisma.module';
 import { SERVICES } from 'src/utils/constants';
 import { CryptoModule } from 'src/crypto/crypto.module';
+import { NotificationModule } from 'src/notification/notification.module';
 
 import { ProjectService } from './services/project.service';
 import { ProjectController } from './controllers/project.controller';
@@ -10,7 +11,7 @@ import { ProjectController } from './controllers/project.controller';
 import { ProjectMemberGuard } from './guards/projectMember.guard';
 
 @Module({
-  imports: [PrismaModule, CryptoModule],
+  imports: [PrismaModule, CryptoModule, NotificationModule],
   providers: [
     {
       provide: SERVICES.PROJECT,

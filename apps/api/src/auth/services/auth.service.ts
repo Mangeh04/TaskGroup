@@ -5,15 +5,13 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
+import type { User } from '@repo/database';
 
 import type { IUserService } from 'src/user/interfaces/user.interface';
 import { SERVICES } from 'src/utils/constants';
 import { IAuthService, type Payload } from '../interfaces/auth.interface';
-import type {
-  EncryptedField,
-  ICryptoService,
-} from 'src/crypto/interfaces/crypto.interface';
-import type { User } from '@repo/database';
+import type { ICryptoService } from 'src/crypto/interfaces/crypto.interface';
+import type { JwtPayload } from '../interfaces/jwt-payload.interface';
 
 @Injectable()
 export class AuthService implements IAuthService {
@@ -33,13 +31,13 @@ export class AuthService implements IAuthService {
       throw new UnauthorizedException();
     }
 
-    const payload = { sub: user.id, alias: user.alias };
+    const payload: JwtPayload = { sub: user.id, alias: user.alias };
     return {
       access_token: `Bearer ${await this.jwtService.signAsync(payload)}`,
     };
   }
 
-  public async singUp(
+  public async signUp(
     alias: string,
     email: string,
     password: string,
@@ -55,15 +53,28 @@ export class AuthService implements IAuthService {
       password,
     });
 
-    const payload = { sub: createdUser.id, alias: createdUser.alias };
+    const payload: JwtPayload = {
+      sub: createdUser.id,
+      alias,
+    };
 
     return {
       access_token: `Bearer ${await this.jwtService.signAsync(payload)}`,
     };
   }
 
-  private async getUser(email: string): Promise<User> {
-    const user = await this.usersService.findUserByEmail(email);
+  private async getUser(email: string): Promise<User | null> {
+    let user = await this.usersService.findUserByEmail(email);
+
+    if (!user) {
+      return null;
+    }
+
+    user.alias = await this.cryptoService.decrypt({
+      ciphertext: user.alias,
+      iv: user.aliasIv,
+    });
+
     return user;
   }
 }

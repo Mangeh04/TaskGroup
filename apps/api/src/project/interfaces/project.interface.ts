@@ -13,4 +13,17 @@ export interface IProjectService {
     userId: string,
     projectId: string,
   ): Promise<ProjectMembership | null>;
+  removeMember(projectId: string, userIdToKick: string): Promise<boolean>;
+  inviteMember(
+    projectId: string,
+    userIdToInvite: string,
+    inviterName: string,
+    projectName: string,
+  ): Promise<boolean>;
+  assignTask(
+    userIdToAssign: string,
+    taskName: string,
+    assignerName: string,
+  ): Promise<boolean>;
+  acceptInvitation(projectId: string, userId: string): Promise<boolean>;
 }

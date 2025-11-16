@@ -19,6 +19,10 @@ async function bootstrap() {
     }),
   );
 
+  const FRONTEND_URL = configService.get('FRONTEND_URL');
+  app.enableCors({
+    origin: FRONTEND_URL,
+  });
   const PORT = configService.get('API_PORT') as number;
   await app.listen(PORT);
 }

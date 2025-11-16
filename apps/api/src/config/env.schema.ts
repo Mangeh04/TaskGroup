@@ -20,6 +20,12 @@ export const envSchema: joi.ObjectSchema = joi.object({
   API_PORT: joi.number().required(),
 
   /**
+   * The url of the frontend.
+   * @type {string}
+   */
+  FRONTEND_URL: joi.string().required(),
+
+  /**
    * The secret key used for cookies.
    * @type {string}
    */

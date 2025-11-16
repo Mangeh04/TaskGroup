@@ -15,23 +15,25 @@ import placeholder from "@/public/images/placeholder.svg";
 
 import Image from "next/image";
 import Link from "next/link";
-import { UserRegisterSchema } from "@repo/schemas";
+import { UserRegisterSchema } from "@/lib/schemas";
 import { handleFormValidation } from "@/lib/formHandler";
 import { toast } from "sonner";
 import { useState } from "react";
+import { useRouter } from "next/navigation";
+import { fetcher } from "@/lib/api";
 
 export function SignupForm({
 	className,
 	...props
 }: React.ComponentProps<"div">) {
 	const [loading, setLoading] = useState(false);
+	const router = useRouter();
 
 	async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 		setLoading(true);
 
 		const formData = new FormData(e.currentTarget);
-
 		const parsed = handleFormValidation(formData, UserRegisterSchema);
 
 		if (!parsed.success) {
@@ -41,7 +43,24 @@ export function SignupForm({
 			return setLoading(false);
 		}
 
+		const { data, error } = await fetcher<
+			{ access_token: string },
+			typeof parsed.data
+		>("/auth/sign-up", {
+			method: "POST",
+			body: parsed.data,
+		});
+
+		if (error) {
+			toast.error(error);
+			return setLoading(false);
+		}
+
+		localStorage.setItem("jwt-token", data!.access_token);
+		toast.success("Account created successfully!");
+
 		setLoading(false);
+		router.push("/dashboard");
 	}
 	return (
 		<div className={cn("flex flex-col gap-6", className)} {...props}>
@@ -59,11 +78,11 @@ export function SignupForm({
 								</p>
 							</div>
 							<Field>
-								<FieldLabel htmlFor="text">Name</FieldLabel>
+								<FieldLabel htmlFor="text">Alias</FieldLabel>
 								<Input
-									id="name"
+									id="alias"
 									type="text"
-									name="name"
+									name="alias"
 									placeholder="Miguel"
 									required
 								/>

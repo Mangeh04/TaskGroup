@@ -30,12 +30,15 @@ export class CryptoService implements ICryptoService {
 
   private async getKey(): Promise<Buffer> {
     if (this.cachedKey) return this.cachedKey;
+
     const password = this.configService.get<string>('ENCRYPT_SECRET')!;
+
     this.cachedKey = (await promisify(scrypt)(
       password,
       'salt',
       KEY_LENGTH,
     )) as Buffer;
+
     return this.cachedKey;
   }
 

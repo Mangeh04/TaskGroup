@@ -1,7 +1,7 @@
 # ---- Base ----
 FROM oven/bun:1.3.2-alpine AS base
 WORKDIR /app
-ENV NODE_ENV=production
+
 
 # ---- Builder ----
 FROM base AS builder
@@ -32,6 +32,9 @@ USER appuser
 
 COPY --from=installer --chown=appuser:appgroup /app ./
 
-EXPOSE 3001
+ARG API_PORT
+ENV API_PORT=${API_PORT}
+
+EXPOSE ${API_PORT}
 CMD ["sh", "-c", "bunx turbo run db:deploy && bun apps/api/dist/main.js"]
 

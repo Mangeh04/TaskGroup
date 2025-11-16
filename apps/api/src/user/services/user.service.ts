@@ -1,5 +1,6 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { PrismaClient, type User } from '@repo/database';
+import type { ProfileConfiguration } from '@repo/database';
 
 import { IUserService } from '../interfaces/user.interface';
 import { SERVICES } from 'src/utils/constants';
@@ -34,7 +35,19 @@ export class UserService implements IUserService {
 
   public async createUser(user: User) {
     const data = await this.prepareDataForSaving(user);
-    return await this.prismaService.user.create({ data });
+
+    return this.prismaService.user.create({
+      data: {
+        ...data,
+        config: {
+          create: {
+            darkMode: 'SYSTEM',
+            language: 'en',
+            preference: true,
+          },
+        },
+      },
+    });
   }
 
   public async findUser(userId: string) {
@@ -56,9 +69,25 @@ export class UserService implements IUserService {
 
   public async findUserByEmail(emailPlain: string) {
     const emailBi = this.cryptoService.blindIndexEmail(emailPlain);
-    const user = await this.prismaService.user.findUnique({
+    return (await this.prismaService.user.findUnique({
       where: { emailBi },
+    })) as unknown as Promise<User>;
+  }
+
+  public async getUserConfiguration(userId: string) {
+    return (await this.prismaService.profileConfiguration.findUnique({
+      where: { userId },
+    })) as unknown as Promise<ProfileConfiguration>;
+  }
+
+  public async updateUserConfiguration(
+    userId: string,
+    data: ProfileConfiguration,
+  ) {
+    await this.prismaService.profileConfiguration.update({
+      where: { userId },
+      data,
     });
-    return user as unknown as Promise<User>;
+    return true;
   }
 }

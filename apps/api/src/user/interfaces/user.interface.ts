@@ -1,4 +1,4 @@
-import { User } from '@repo/database';
+import type { ProfileConfiguration, User } from '@repo/database';
 
 export interface IUserService {
   createUser(user: Pick<User, 'email' | 'alias' | 'password'>): Promise<User>;
@@ -6,4 +6,9 @@ export interface IUserService {
   findUserByEmail(emailPlain: string): Promise<User>;
   deleteUser(userId: string): Promise<boolean>;
   updateUser(user: User): Promise<boolean>;
+  getUserConfiguration(userId: string): Promise<ProfileConfiguration>;
+  updateUserConfiguration(
+    userId: string,
+    data: ProfileConfiguration,
+  ): Promise<boolean>;
 }

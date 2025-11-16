@@ -21,7 +21,6 @@ import { TaskGuard } from '../guards/task.guard';
 import { TaskDtoUpdate } from '../dtos/taskDtoUpdate.dto';
 
 @Controller('task')
-@UseGuards(AuthGuard)
 export class TaskController {
   constructor(
     @Inject(SERVICES.TASK) private readonly taskService: ITaskService,

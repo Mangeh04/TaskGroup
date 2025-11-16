@@ -1,7 +1,7 @@
 import { z } from "zod";
 
 export const UserRegisterSchema = z.object({
-	name: z.string().min(1, "Name is required"),
+	alias: z.string().min(1, "Name is required"),
 	email: z.email("Invalid email address"),
 	password: z.string().min(8, "Password must be at least 8 characters long"),
 	confirm_password: z

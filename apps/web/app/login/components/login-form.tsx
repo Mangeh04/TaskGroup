@@ -13,18 +13,21 @@ import { Input } from "@/components/ui/input";
 
 import placeholder from "@/public/images/placeholder.svg";
 import { handleFormValidation } from "@/lib/formHandler";
-import { UserLoginSchema } from "@repo/schemas";
+import { UserLoginSchema } from "@/lib/schemas";
 
 import { toast } from "sonner";
 import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { fetcher } from "@/lib/api";
 
 export function LoginForm({
 	className,
 	...props
 }: React.ComponentProps<"div">) {
 	const [loading, setLoading] = useState(false);
+	const router = useRouter();
 
 	async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
@@ -40,7 +43,21 @@ export function LoginForm({
 			return setLoading(false);
 		}
 
-		setLoading(false);
+		const { data, error } = await fetcher<
+			{ access_token: string },
+			typeof parsed.data
+		>("/auth/login", {
+			method: "POST",
+			body: parsed.data,
+		});
+
+		if (error) {
+			toast.error(error);
+			return setLoading(false);
+		}
+
+		localStorage.setItem("jwt-token", data!.access_token);
+		toast.success("Account created successfully!");
 	}
 	return (
 		<div className={cn("flex flex-col gap-6", className)} {...props}>

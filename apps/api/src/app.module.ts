@@ -1,16 +1,17 @@
 import { Module } from '@nestjs/common';
 import { APP_FILTER } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { JwtModule } from '@nestjs/jwt';
+import { EventEmitterModule } from '@nestjs/event-emitter';
 
 import { UserModule } from './user/user.module';
 import { PrismaModule } from './prisma/prisma.module';
 import { PrismaExceptionFilter } from './prisma-exception/prisma-exception.filter';
 import { CryptoModule } from './crypto/crypto.module';
 import { AuthModule } from './auth/auth.module';
+import { NotificationModule } from './notification/notification.module';
 import { envSchema } from './config/env.schema';
 import { ProjectModule } from './project/project.module';
-
-import { JwtModule } from '@nestjs/jwt';
 import { TaskModule } from './task/task.module';
 
 @Module({
@@ -19,6 +20,7 @@ import { TaskModule } from './task/task.module';
     PrismaModule,
     CryptoModule,
     AuthModule,
+    EventEmitterModule.forRoot(),
     ConfigModule.forRoot({
       cache: true,
       validationSchema: envSchema,
@@ -38,6 +40,7 @@ import { TaskModule } from './task/task.module';
     }),
     ProjectModule,
     TaskModule,
+    NotificationModule,
   ],
   controllers: [],
   providers: [

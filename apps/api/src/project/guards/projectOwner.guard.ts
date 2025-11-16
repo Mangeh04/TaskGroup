@@ -1,3 +1,5 @@
+// src/project/guards/project-owner.guard.ts
+
 import {
   Injectable,
   CanActivate,
@@ -9,10 +11,10 @@ import {
 import { SERVICES } from 'src/utils/constants';
 import type { IProjectService } from '../interfaces/project.interface';
 import type { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
-import type { ProjectDtoUpdate } from '../dtos/projectDtoUpdate.dto';
+import { Role } from '@repo/database'; // Tu enum de Roles
 
 @Injectable()
-export class ProjectGuard implements CanActivate {
+export class ProjectOwnerGuard implements CanActivate {
   constructor(
     @Inject(SERVICES.PROJECT) private projectService: IProjectService,
   ) {}
@@ -20,13 +22,14 @@ export class ProjectGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
     const user = request.user as JwtPayload;
-    const body = request.body as ProjectDtoUpdate;
 
-    const projectId = body.id;
+    const projectId = request.params.id;
     const userId = user.sub;
 
     if (!projectId) {
-      throw new BadRequestException('Project ID is required in the body');
+      throw new BadRequestException(
+        'Project ID is required in the URL parameter',
+      );
     }
 
     const membership = await this.projectService.getMembership(
@@ -38,14 +41,12 @@ export class ProjectGuard implements CanActivate {
       throw new ForbiddenException('You are not a member of this project');
     }
 
-    const allowedRoles = ['OWNER', 'ADMIN'];
-
-    if (allowedRoles.includes(membership.role)) {
-      return true;
+    if (membership.role !== Role.OWNER) {
+      throw new ForbiddenException(
+        'You do not have permission to delete this project (requires OWNER role)',
+      );
     }
 
-    throw new ForbiddenException(
-      'You do not have permission to modify this project (requires OWNER or ADMIN role)',
-    );
+    return true;
   }
 }

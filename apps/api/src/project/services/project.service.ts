@@ -4,6 +4,9 @@ import { ProjectMembership } from '@repo/database';
 
 import { SERVICES } from 'src/utils/constants';
 import type { ICryptoService } from 'src/crypto/interfaces/crypto.interface';
+import type { INotificationService } from 'src/notification/interfaces/notification.interface';
+import { EventEmitter2 } from '@nestjs/event-emitter';
+import { EVENTS } from 'src/utils/constants';
 
 import { ProjectDto } from '../dtos/projectDto.dto';
 import { IProjectService } from '../interfaces/project.interface';
@@ -14,6 +17,9 @@ export class ProjectService implements IProjectService {
   constructor(
     @Inject(SERVICES.PRISMA) private readonly prismaService: PrismaClient,
     @Inject(SERVICES.CRYPTO) private readonly cryptoService: ICryptoService,
+    @Inject(SERVICES.NOTIFICATION)
+    private readonly notificationService: INotificationService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   private async mapDtoToCreateInput(
@@ -113,5 +119,57 @@ export class ProjectService implements IProjectService {
         },
       },
     });
+  }
+
+  async removeMember(
+    projectId: string,
+    userIdToKick: string,
+  ): Promise<boolean> {
+    await this.prismaService.projectMembership.deleteMany({
+      where: {
+        projectId: projectId,
+        userId: userIdToKick,
+      },
+    });
+    return true;
+  }
+
+  async inviteMember(
+    projectId: string,
+    userIdToInvite: string,
+    inviterName: string,
+    projectName: string,
+  ) {
+    this.eventEmitter.emit(EVENTS.PROJECT_INVITED, {
+      invitedUserId: userIdToInvite,
+      projectId: projectId,
+      inviterName: inviterName,
+      projectName: projectName,
+    });
+    return true;
+  }
+
+  async assignTask(
+    userIdToAssign: string,
+    taskName: string,
+    assignerName: string,
+  ) {
+    this.eventEmitter.emit(EVENTS.TASK_ASSIGNED, {
+      taskName: taskName,
+      assignedUserId: userIdToAssign,
+      assignerName: assignerName,
+    });
+    return true;
+  }
+
+  async acceptInvitation(projectId: string, userId: string) {
+    await this.prismaService.projectMembership.create({
+      data: {
+        projectId: projectId,
+        userId: userId,
+        role: Role.MEMBER,
+      },
+    });
+    return true;
   }
 }

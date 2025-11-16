@@ -5,6 +5,7 @@ import { SERVICES } from 'src/utils/constants';
 import { CryptoModule } from 'src/crypto/crypto.module';
 
 import { UserService } from './services/user.service';
+import { UserController } from './controllers/user.controller';
 
 @Module({
   imports: [PrismaModule, CryptoModule],
@@ -15,5 +16,6 @@ import { UserService } from './services/user.service';
     },
   ],
   exports: [SERVICES.USER],
+  controllers: [UserController],
 })
 export class UserModule {}

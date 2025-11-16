@@ -4,5 +4,5 @@ export type Payload = {
 
 export interface IAuthService {
   signIn(email: string, password: string): Promise<Payload>;
-  singUp(alias: string, email: string, password: string): Promise<Payload>;
+  signUp(alias: string, email: string, password: string): Promise<Payload>;
 }
