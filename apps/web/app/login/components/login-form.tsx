@@ -1,6 +1,15 @@
 "use client";
 
+import { useState } from "react";
+import Image from "next/image";
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 import { cn } from "@/lib/utils";
+import { fetcher } from "@/lib/api";
+import { handleFormValidation } from "@/lib/formHandler";
+import { UserLoginSchema } from "@/lib/schemas";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import {
@@ -12,25 +21,19 @@ import {
 import { Input } from "@/components/ui/input";
 
 import placeholder from "@/public/images/placeholder.svg";
-import { handleFormValidation } from "@/lib/formHandler";
-import { UserLoginSchema } from "@/lib/schemas";
-
 import { toast } from "sonner";
-import { useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { fetcher } from "@/lib/api";
 
 export function LoginForm({
 	className,
 	...props
-}: React.ComponentProps<"div">) {
+}: React.HTMLAttributes<HTMLDivElement>) {
 	const [loading, setLoading] = useState(false);
 	const router = useRouter();
 
 	async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
+		if (loading) return; // avoids 2x submit.
+
 		setLoading(true);
 
 		const formData = new FormData(e.currentTarget);
@@ -40,11 +43,12 @@ export function LoginForm({
 			parsed.errors.forEach((issue) => {
 				toast.error(issue.message);
 			});
-			return setLoading(false);
+			setLoading(false);
+			return;
 		}
 
 		const { data, error } = await fetcher<
-			{ access_token: string },
+			{ message?: string },
 			typeof parsed.data
 		>("/auth/sign-in", {
 			method: "POST",
@@ -53,12 +57,16 @@ export function LoginForm({
 
 		if (error) {
 			toast.error(error);
-			return setLoading(false);
+			setLoading(false);
+			return;
 		}
 
-		localStorage.setItem("jwt-token", data!.access_token);
-		toast.success("Account created successfully!");
+		toast.success(data?.message ?? "Logged in successfully!");
+		setLoading(false);
+
+		router.push("/dashboard");
 	}
+
 	return (
 		<div className={cn("flex flex-col gap-6", className)} {...props}>
 			<Card className="overflow-hidden p-0">
@@ -69,10 +77,11 @@ export function LoginForm({
 								<h1 className="text-2xl font-bold">
 									Welcome back
 								</h1>
-								<p className="text-muted-foreground text-balance">
+								<p className="text-balance text-muted-foreground">
 									Login to your Task Group account
 								</p>
 							</div>
+
 							<Field>
 								<FieldLabel htmlFor="email">Email</FieldLabel>
 								<Input
@@ -80,11 +89,13 @@ export function LoginForm({
 									id="email"
 									type="email"
 									placeholder="m@example.com"
+									autoComplete="email"
 									required
 								/>
 							</Field>
+
 							<Field>
-								<div className="flex items-center">
+								<div className="flex items-center justify-between">
 									<FieldLabel htmlFor="password">
 										Password
 									</FieldLabel>
@@ -93,33 +104,56 @@ export function LoginForm({
 									id="password"
 									type="password"
 									name="password"
+									autoComplete="current-password"
 									required
 								/>
 							</Field>
+
 							<Field>
-								<Button type="submit">Login</Button>
+								<Button
+									type="submit"
+									disabled={loading}
+									aria-busy={loading}
+									className="w-full"
+								>
+									{loading ? "Logging in..." : "Login"}
+								</Button>
 							</Field>
+
 							<FieldDescription className="text-center">
 								Don&apos;t have an account?{" "}
-								<Link href="register">Sign up</Link>
+								<Link
+									href="/register"
+									className="font-medium underline underline-offset-4"
+								>
+									Sign up
+								</Link>
 							</FieldDescription>
 						</FieldGroup>
 					</form>
-					<div className="bg-muted relative hidden md:block">
+
+					<div className="relative hidden bg-muted md:block">
 						<Image
 							src={placeholder}
-							alt="Image"
+							alt="Login illustration"
+							fill
 							className="absolute inset-0 h-full w-full object-cover dark:brightness-[0.2] dark:grayscale"
-							width={100}
-							height={100}
+							priority
 						/>
 					</div>
 				</CardContent>
 			</Card>
+
 			<FieldDescription className="px-6 text-center">
 				By clicking continue, you agree to our{" "}
-				<Link href="#">Terms of Service</Link> and{" "}
-				<Link href="#">Privacy Policy</Link>.
+				<Link href="#" className="underline underline-offset-4">
+					Terms of Service
+				</Link>{" "}
+				and{" "}
+				<Link href="#" className="underline underline-offset-4">
+					Privacy Policy
+				</Link>
+				.
 			</FieldDescription>
 		</div>
 	);

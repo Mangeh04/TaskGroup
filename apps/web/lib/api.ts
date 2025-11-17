@@ -28,18 +28,12 @@ export async function fetcher<TResponse, TBody = unknown>(
 		...options.headers,
 	};
 
-	if (options.needsAuth) {
-		const token = localStorage.getItem("jwt-token");
-		if (token) {
-			headers["Authorization"] = `Bearer ${token}`;
-		}
-	}
-
 	try {
 		const response = await fetch(fullUrl, {
 			method: options.method || "GET",
 			headers,
 			body: options.body ? JSON.stringify(options.body) : undefined,
+			credentials: options.needsAuth ? "include" : "same-origin",
 		});
 
 		const result = await response.json();

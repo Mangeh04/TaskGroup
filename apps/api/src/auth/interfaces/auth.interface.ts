@@ -1,5 +1,5 @@
 export type Payload = {
-  access_token: string;
+  accessToken: string;
 };
 
 export interface IAuthService {

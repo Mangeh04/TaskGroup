@@ -28,10 +28,10 @@ export class AuthGuard implements CanActivate {
     }
 
     const request = context.switchToHttp().getRequest<Request>();
-    const token = this.extractTokenFromHeader(request);
+    const token = this.extractTokenFromCookie(request);
 
     if (!token) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Missing authentication token');
     }
 
     try {
@@ -39,13 +39,16 @@ export class AuthGuard implements CanActivate {
       (request as any).user = payload;
     } catch (e) {
       console.log('JWT error:', e);
-      throw new UnauthorizedException();
+      throw new UnauthorizedException('Invalid or expired token');
     }
+
     return true;
   }
 
-  private extractTokenFromHeader(request: Request): string | undefined {
-    const [type, token] = request.headers.authorization?.split(' ') ?? [];
-    return type === 'Bearer' ? token : undefined;
+  private extractTokenFromCookie(request: Request): string | undefined {
+    const cookies = (request as any).cookies as
+      | Record<string, string>
+      | undefined;
+    return cookies?.['access_token'];
   }
 }
