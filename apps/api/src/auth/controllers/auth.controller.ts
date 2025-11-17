@@ -70,7 +70,7 @@ export class AuthController {
   }
 
   @HttpCode(HttpStatus.OK)
-  @Post('logout')
+  @Post('log-out')
   async logout(@Res({ passthrough: true }) res: Response) {
     res.clearCookie('access_token', {
       httpOnly: true,
