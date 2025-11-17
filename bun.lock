@@ -80,7 +80,6 @@
         "@radix-ui/react-switch": "^1.2.6",
         "@radix-ui/react-tabs": "^1.1.13",
         "@radix-ui/react-tooltip": "^1.2.8",
-        "@repo/ui": "*",
         "@tabler/icons-react": "^3.35.0",
         "@tailwindcss/postcss": "^4.1.16",
         "class-variance-authority": "^0.7.1",
@@ -139,23 +138,6 @@
     "packages/typescript-config": {
       "name": "@repo/typescript-config",
       "version": "0.0.0",
-    },
-    "packages/ui": {
-      "name": "@repo/ui",
-      "version": "0.0.0",
-      "dependencies": {
-        "react": "^19.2.0",
-        "react-dom": "^19.1.0",
-      },
-      "devDependencies": {
-        "@repo/eslint-config": "*",
-        "@repo/typescript-config": "*",
-        "@types/node": "^22.15.3",
-        "@types/react": "19.1.0",
-        "@types/react-dom": "19.1.1",
-        "eslint": "^9.38.0",
-        "typescript": "5.9.2",
-      },
     },
   },
   "packages": {
@@ -594,8 +576,6 @@
     "@repo/eslint-config": ["@repo/eslint-config@workspace:packages/eslint-config"],
 
     "@repo/typescript-config": ["@repo/typescript-config@workspace:packages/typescript-config"],
-
-    "@repo/ui": ["@repo/ui@workspace:packages/ui"],
 
     "@sinclair/typebox": ["@sinclair/typebox@0.34.41", "", {}, "sha512-6gS8pZzSXdyRHTIqoqSVknxolr1kzfy4/CeDnrzsVz8TTIWUbOBr6gnzOmTYJ3eXQNh4IYHIGi5aIL7sOZ2G/g=="],
 
