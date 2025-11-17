@@ -82,6 +82,7 @@
         "@radix-ui/react-switch": "^1.2.6",
         "@radix-ui/react-tabs": "^1.1.13",
         "@radix-ui/react-tooltip": "^1.2.8",
+        "@repo/types": "*",
         "@tabler/icons-react": "^3.35.0",
         "@tailwindcss/postcss": "^4.1.16",
         "class-variance-authority": "^0.7.1",
@@ -135,6 +136,17 @@
         "globals": "^16.3.0",
         "typescript": "^5.9.2",
         "typescript-eslint": "^8.40.0",
+      },
+    },
+    "packages/types": {
+      "name": "@repo/types",
+      "version": "1.0.0",
+      "dependencies": {
+        "@repo/database": "*",
+      },
+      "devDependencies": {
+        "@repo/typescript-config": "*",
+        "typescript": "^5.6.0",
       },
     },
     "packages/typescript-config": {
@@ -576,6 +588,8 @@
     "@repo/database": ["@repo/database@workspace:packages/database"],
 
     "@repo/eslint-config": ["@repo/eslint-config@workspace:packages/eslint-config"],
+
+    "@repo/types": ["@repo/types@workspace:packages/types"],
 
     "@repo/typescript-config": ["@repo/typescript-config@workspace:packages/typescript-config"],
 

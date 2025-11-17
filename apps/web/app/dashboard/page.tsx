@@ -22,22 +22,19 @@ import { ProjectCard, SkeletonCard } from "./components/project";
 import { CustomDialog } from "@/components/custom/dialog";
 
 import emptyImage from "@/public/images/empty-folder.webp";
-import { PlusIcon, Loader2 } from "lucide-react";
-
-import { usePaginatedView } from "@/hooks/usePaginatedView";
-import { ProjectForm } from "./components/projectForm";
-import Link from "next/link";
 import { fetcher } from "@/lib/api";
+import { usePaginatedView } from "@/hooks/usePaginatedView";
+import type { Project } from "@repo/types";
+
+import { PlusIcon, Loader2 } from "lucide-react";
+import Link from "next/link";
 import { toast } from "sonner";
 
-type ProjectResponse = {
-	id: string;
-	name: string;
-	description: string;
-	tasksCount: number;
+import { ProjectForm } from "./components/projectForm";
+
+type ProjectResponse = Project & {
 	membersCount: number;
-	createdAt: string;
-	updatedAt: string;
+	tasksCount: number;
 };
 
 export default function DashboardPage() {
@@ -47,11 +44,16 @@ export default function DashboardPage() {
 	const [projects, setProjects] = useState<ProjectResponse[]>([]);
 	const [isFetching, setIsFetching] = useState(false);
 
+	const [formValues, setFormValues] = useState({
+		name: "",
+		description: "",
+	});
+
 	const fetchData = useCallback(async () => {
 		setIsFetching(true);
 
 		const { data, error } = await fetcher<ProjectResponse[]>(
-			"/project/recover-all",
+			`/project/recover-all/`,
 			{
 				method: "GET",
 				needsAuth: true,
@@ -128,6 +130,38 @@ export default function DashboardPage() {
 
 	const showList = hasProjects || isFetching || isSkeletonLoading;
 
+	const [isCreating, setIsCreating] = useState(false);
+
+	const onProjectSubmit = useCallback(async () => {
+		if (isCreating) return;
+
+		setIsCreating(true);
+
+		const { name, description } = formValues;
+
+		const { data, error } = await fetcher<
+			{ message?: string },
+			{ name: string; description: string }
+		>("/project/create", {
+			method: "POST",
+			body: { name, description },
+			needsAuth: true,
+		});
+
+		if (error) {
+			toast.error(error);
+			setIsCreating(false);
+			return;
+		}
+
+		toast.success(data?.message ?? "Project created successfully!");
+		await fetchData();
+
+		setFormValues({ name: "", description: "" });
+
+		setIsCreating(false);
+	}, [fetchData, formValues, isCreating]);
+
 	return (
 		<div className="flex h-dvh overflow-hidden">
 			<SidebarProvider>
@@ -154,9 +188,20 @@ export default function DashboardPage() {
 									buttonString="Create Project"
 									title="Create a new Project"
 									subtitle="Create your new projects here. Click save when you're done"
-									confirmIcon={<PlusIcon />}
+									confirmIcon={
+										isCreating ? (
+											<Loader2 className="h-4 w-4 animate-spin" />
+										) : (
+											<PlusIcon />
+										)
+									}
+									onSubmit={onProjectSubmit}
 								>
-									<ProjectForm />
+									<ProjectForm
+										values={formValues}
+										onChange={setFormValues}
+										isSubmitting={isCreating}
+									/>
 								</CustomDialog>
 							</div>
 
@@ -190,11 +235,14 @@ export default function DashboardPage() {
 													data-project-card
 													className="min-h-[88px]"
 												>
-													<Link href="/dashboard/projectdetails">
+													<Link
+														href={`/dashboard/projectdetails?projectId=${item.id}`}
+													>
 														<ProjectCard
-															title={item.name} // <- el backend devuelve `name`
+															title={item.name}
 															description={
-																item.description
+																item.description ??
+																"No description available"
 															}
 															numTasks={
 																item.tasksCount
@@ -277,7 +325,11 @@ export default function DashboardPage() {
 										"Create your new projects here. Click save when you're done",
 								}}
 							>
-								<ProjectForm />
+								<ProjectForm
+									values={formValues}
+									onChange={setFormValues}
+									isSubmitting={isCreating}
+								/>
 							</EmptyPage>
 						</div>
 					)}

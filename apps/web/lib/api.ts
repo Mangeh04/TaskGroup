@@ -1,12 +1,6 @@
 export type ApiResponse<T> =
-	| {
-			data: T;
-			error: null;
-	  }
-	| {
-			data: null;
-			error: string;
-	  };
+	| { data: T; error: null }
+	| { data: null; error: string };
 
 export type FetcherOptions<TBody> = {
 	method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -16,6 +10,17 @@ export type FetcherOptions<TBody> = {
 };
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL;
+
+async function safeJsonParse(response: Response) {
+	const text = await response.text();
+
+	if (!text) return null;
+	try {
+		return JSON.parse(text);
+	} catch {
+		return null;
+	}
+}
 
 export async function fetcher<TResponse, TBody = unknown>(
 	path: string,
@@ -30,25 +35,33 @@ export async function fetcher<TResponse, TBody = unknown>(
 
 	try {
 		const response = await fetch(fullUrl, {
-			method: options.method || "GET",
+			method: options.method ?? "GET",
 			headers,
 			body: options.body ? JSON.stringify(options.body) : undefined,
 			credentials: options.needsAuth ? "include" : "same-origin",
 		});
 
-		const result = await response.json();
+		const result = await safeJsonParse(response);
 
 		if (!response.ok) {
-			const errorMessage =
-				result.message || "An error occurred at the petition";
-			return { data: null, error: errorMessage };
+			const message =
+				result?.message ||
+				result?.error ||
+				response.statusText ||
+				"An error occurred at the request";
+
+			return { data: null, error: message };
+		}
+
+		if (result === null) {
+			return { data: null, error: "Empty server response" };
 		}
 
 		return { data: result as TResponse, error: null };
-	} catch (error) {
-		if (error instanceof Error) {
-			return { data: null, error: error.message };
-		}
-		return { data: null, error: "An unexpected net error ocurred" };
+	} catch (err) {
+		return {
+			data: null,
+			error: err instanceof Error ? err.message : "Network error",
+		};
 	}
 }

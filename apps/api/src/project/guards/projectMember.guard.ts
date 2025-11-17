@@ -8,11 +8,8 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaClient } from '@repo/database';
+import type { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
 import { SERVICES } from 'src/utils/constants';
-
-interface RequestUser {
-  id: string;
-}
 
 @Injectable()
 export class ProjectMemberGuard implements CanActivate {
@@ -23,13 +20,13 @@ export class ProjectMemberGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
 
-    const user = request.user as RequestUser;
-    if (!user || !user.id) {
+    const user = request.user as JwtPayload;
+    if (!user || !user.sub) {
       throw new UnauthorizedException('User not found in request.');
     }
-    const userId = user.id;
+    const userId = user.sub;
 
-    const projectId = request.body.projectId || request.params.projectId;
+    const projectId = request.body?.projectId || request.params?.projectId;
     if (!projectId) {
       throw new BadRequestException(
         'projectId must be provided in body or params.',

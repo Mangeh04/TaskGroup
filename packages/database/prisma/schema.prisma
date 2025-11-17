@@ -24,6 +24,13 @@ enum Notification {
   ASSIGNMENT
 }
 
+enum Status {
+  ONLINE
+  OFFLINE
+  AWAY
+  DO_NOT_DISTURB
+}
+
 model User {
   id       String @id @default(uuid())
   alias    String @unique
@@ -39,6 +46,8 @@ model User {
   assignments TaskAssignment[]
 
   config ProfileConfiguration[]
+
+  status Status @default(ONLINE)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt

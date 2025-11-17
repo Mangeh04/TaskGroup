@@ -10,7 +10,6 @@ import {
 } from "@/components/ui/dialog";
 
 import { JSX, ReactNode } from "react";
-import { PlusIcon } from "lucide-react";
 
 export type CustomDialog = {
 	buttonString?: string;
@@ -20,6 +19,8 @@ export type CustomDialog = {
 	confirmIcon: JSX.Element;
 	isIcon?: boolean;
 	onSubmit?: () => void;
+	open?: boolean;
+	onOpenChange?: (open: boolean) => void;
 };
 
 export function CustomDialog({
@@ -30,9 +31,11 @@ export function CustomDialog({
 	confirmIcon,
 	onSubmit,
 	isIcon,
+	open,
+	onOpenChange,
 }: CustomDialog) {
 	return (
-		<Dialog>
+		<Dialog open={open} onOpenChange={onOpenChange}>
 			<form onSubmit={onSubmit}>
 				<DialogTrigger asChild>
 					{isIcon ? (

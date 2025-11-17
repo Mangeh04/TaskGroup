@@ -28,12 +28,13 @@ import {
 	useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { MemberStatus } from "@/app/dashboard/projectdetails/members/components/member";
 import { fetcher } from "@/lib/api";
+import { type Status, StatusEnum } from "@repo/types";
 
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import { statusStyles } from "./status";
 
 const statusOptions = [
 	{ value: "online", label: "Online", color: "bg-green-500" },
@@ -42,26 +43,28 @@ const statusOptions = [
 	{ value: "offline", label: "Offline", color: "bg-destructive" },
 ];
 
-const statusStyles: Record<MemberStatus, { color: string; text: string }> = {
-	online: { color: "bg-green-500", text: "Online" },
-	offline: { color: "bg-destructive", text: "Offline" },
-	away: { color: "bg-yellow-500", text: "Away" },
-	"do not disturb": { color: "bg-gray-500", text: "Do not disturb" },
-};
-
 export function NavUser({
 	user,
 }: {
 	user: {
-		name: string;
-		email: string;
-		avatar: string;
-		status: MemberStatus;
+		name?: string | null;
+		email?: string;
+		avatar?: string;
+		status: Status;
 	};
 }) {
 	const { isMobile } = useSidebar();
-	const currentStatus = statusStyles[user.status];
+	const currentStatus =
+		statusStyles[user.status] ?? statusStyles[StatusEnum.ONLINE];
 	const router = useRouter();
+
+	const safeName = (user?.name && user.name.trim()) || "ERROR";
+	const safeEmail = user?.email ?? "";
+
+	const initial =
+		safeName.trim()[0]?.toLocaleUpperCase() ||
+		safeEmail.trim()[0]?.toLocaleUpperCase() ||
+		"?";
 
 	async function handleLogout() {
 		const { data, error } = await fetcher<{ message?: string }>(
@@ -82,6 +85,8 @@ export function NavUser({
 		router.push("/login");
 	}
 
+	if (!user) return null;
+
 	return (
 		<SidebarMenu>
 			<SidebarMenuItem>
@@ -92,20 +97,15 @@ export function NavUser({
 							className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
 						>
 							<Avatar>
-								<AvatarImage
-									src={user.avatar}
-									alt={user.name}
-								/>
-								<AvatarFallback>
-									{user.name.charAt(0).toLocaleUpperCase()}
-								</AvatarFallback>
+								<AvatarImage src={user.avatar} alt={safeName} />
+								<AvatarFallback>{initial}</AvatarFallback>
 							</Avatar>
 							<div className="grid flex-1 text-left text-sm leading-tight">
 								<span className="truncate font-medium">
-									{user.name}
+									{safeName}
 								</span>
 								<span className="truncate text-xs">
-									{user.email}
+									{safeEmail}
 								</span>
 							</div>
 							<div className="flex items-center gap-2">
@@ -133,20 +133,16 @@ export function NavUser({
 								<Avatar>
 									<AvatarImage
 										src={user.avatar}
-										alt={user.name}
+										alt={safeName}
 									/>
-									<AvatarFallback>
-										{user.name
-											.charAt(0)
-											.toLocaleUpperCase()}
-									</AvatarFallback>
+									<AvatarFallback>{initial}</AvatarFallback>
 								</Avatar>
 								<div className="grid flex-1 text-left text-sm leading-tight">
 									<span className="truncate font-medium">
-										{user.name}
+										{safeName}
 									</span>
 									<span className="truncate text-xs">
-										{user.email}
+										{safeEmail}
 									</span>
 								</div>
 							</div>
