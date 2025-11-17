@@ -13,7 +13,7 @@ export class PrismaExceptionFilter implements ExceptionFilter {
           .status(409)
           .json({ message: 'This registery already exists' });
       case 'P2025':
-        return response.status(404).json({ message: 'Registery not found' });
+        return response.status(401).json({ message: 'Unauthorized' });
       default:
         return response.status(500).json({ message: 'Internal Server Error' });
     }
