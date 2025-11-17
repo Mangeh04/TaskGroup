@@ -4,7 +4,6 @@ import { ProjectMembership } from '@repo/database';
 
 import { SERVICES } from 'src/utils/constants';
 import type { ICryptoService } from 'src/crypto/interfaces/crypto.interface';
-import type { INotificationService } from 'src/notification/interfaces/notification.interface';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EVENTS } from 'src/utils/constants';
 
@@ -17,8 +16,6 @@ export class ProjectService implements IProjectService {
   constructor(
     @Inject(SERVICES.PRISMA) private readonly prismaService: PrismaClient,
     @Inject(SERVICES.CRYPTO) private readonly cryptoService: ICryptoService,
-    @Inject(SERVICES.NOTIFICATION)
-    private readonly notificationService: INotificationService,
     private eventEmitter: EventEmitter2,
   ) {}
 
@@ -102,9 +99,9 @@ export class ProjectService implements IProjectService {
   }
 
   public async getProjectsByUserId(userId: string) {
-    return this.prismaService.project.findMany({
+    return await this.prismaService.project.findMany({
       where: { members: { some: { userId } } },
-    }) as unknown as Promise<Project[]>;
+    });
   }
 
   async getMembership(
@@ -150,6 +147,7 @@ export class ProjectService implements IProjectService {
   }
 
   async assignTask(
+    projectId: string,
     userIdToAssign: string,
     taskName: string,
     assignerName: string,
@@ -171,5 +169,17 @@ export class ProjectService implements IProjectService {
       },
     });
     return true;
+  }
+
+  async getNumUsersInProject(projectId: string): Promise<number> {
+    return this.prismaService.projectMembership.count({
+      where: { projectId: projectId },
+    });
+  }
+
+  async getNumTasksForProject(projectId: string): Promise<number> {
+    return this.prismaService.task.count({
+      where: { projectId: projectId },
+    });
   }
 }

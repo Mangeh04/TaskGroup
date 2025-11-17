@@ -17,6 +17,7 @@ import { SignUpDto } from 'src/user/dtos/signUp';
 
 import { Public } from '../decorators/public.decorator';
 import { ConfigService } from '@nestjs/config';
+import { SkipDecrypt } from 'src/crypto/decorators/skip-deccrypt.decorator';
 
 const expirationTime = 1_000 * 60 * 60 * 24 * 7; // 7 days.
 
@@ -29,6 +30,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Public()
+  @SkipDecrypt()
   @Post('sign-in')
   async signIn(
     @Body() signInDto: SignInDto,
@@ -48,6 +50,7 @@ export class AuthController {
 
   @HttpCode(HttpStatus.OK)
   @Public()
+  @SkipDecrypt()
   @Post('sign-up')
   async signUp(
     @Body() signUpDto: SignUpDto,
@@ -82,7 +85,7 @@ export class AuthController {
     res.cookie('access_token', accesToken, {
       httpOnly: true,
       secure: false, // this should be (this.configService.get('NODE_ENV') === 'production') but since it's for education purposes we'll keep it like this.
-      sameSite: 'lax', // secure is forced to be true in here but we're in dev so we omit it.
+      sameSite: 'lax',
       maxAge: expirationTime,
     });
   }

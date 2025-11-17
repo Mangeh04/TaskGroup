@@ -21,9 +21,12 @@ export interface IProjectService {
     projectName: string,
   ): Promise<boolean>;
   assignTask(
+    projectId: string,
     userIdToAssign: string,
     taskName: string,
     assignerName: string,
   ): Promise<boolean>;
   acceptInvitation(projectId: string, userId: string): Promise<boolean>;
+  getNumUsersInProject(projectId: string): Promise<number>;
+  getNumTasksForProject(projectId: string): Promise<number>;
 }

@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { APP_FILTER } from '@nestjs/core';
+import { APP_FILTER, APP_GUARD, APP_INTERCEPTOR } from '@nestjs/core';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { EventEmitterModule } from '@nestjs/event-emitter';
@@ -13,6 +13,8 @@ import { NotificationModule } from './notification/notification.module';
 import { envSchema } from './config/env.schema';
 import { ProjectModule } from './project/project.module';
 import { TaskModule } from './task/task.module';
+import { DecryptResponseInterceptor } from './crypto/interceptors/decrypt-reponse.interceptor';
+import { AuthGuard } from './auth/guards/auth.guard';
 
 @Module({
   imports: [
@@ -47,6 +49,14 @@ import { TaskModule } from './task/task.module';
     {
       provide: APP_FILTER,
       useClass: PrismaExceptionFilter,
+    },
+    {
+      provide: APP_INTERCEPTOR,
+      useClass: DecryptResponseInterceptor,
+    },
+    {
+      provide: APP_GUARD,
+      useClass: AuthGuard,
     },
   ],
 })

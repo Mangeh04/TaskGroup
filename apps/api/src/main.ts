@@ -11,11 +11,13 @@ async function bootstrap() {
   const configService = app.get<ConfigService>(ConfigService);
 
   app.setGlobalPrefix('api');
+
   const FRONTEND_URL = configService.get('FRONTEND_URL');
   app.enableCors({
     origin: FRONTEND_URL,
     credentials: true,
   });
+
   app.use(helmet());
   app.use(cookieParser());
 
@@ -26,7 +28,7 @@ async function bootstrap() {
     }),
   );
 
-  const PORT = configService.get('API_PORT') as number;
+  const PORT = configService.get<number>('API_PORT')!;
   await app.listen(PORT);
 }
 

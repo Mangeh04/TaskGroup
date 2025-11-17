@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+
 import { CryptoService } from './services/crypto.service';
 import { SERVICES } from 'src/utils/constants';
 
