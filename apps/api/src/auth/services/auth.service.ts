@@ -11,6 +11,7 @@ import type { IUserService } from 'src/user/interfaces/user.interface';
 import { SERVICES } from 'src/utils/constants';
 import { IAuthService, type Payload } from '../interfaces/auth.interface';
 import type { ICryptoService } from 'src/crypto/interfaces/crypto.interface';
+
 import type { JwtPayload } from '../interfaces/jwt-payload.interface';
 
 @Injectable()
@@ -32,9 +33,9 @@ export class AuthService implements IAuthService {
     }
 
     const payload: JwtPayload = { sub: user.id, alias: user.alias };
-    return {
-      access_token: `Bearer ${await this.jwtService.signAsync(payload)}`,
-    };
+    const accessToken = await this.jwtService.signAsync(payload);
+
+    return { accessToken };
   }
 
   public async signUp(
@@ -58,9 +59,8 @@ export class AuthService implements IAuthService {
       alias,
     };
 
-    return {
-      access_token: `Bearer ${await this.jwtService.signAsync(payload)}`,
-    };
+    const accessToken = await this.jwtService.signAsync(payload);
+    return { accessToken };
   }
 
   private async getUser(email: string): Promise<User | null> {

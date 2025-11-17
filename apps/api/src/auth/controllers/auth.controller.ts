@@ -72,7 +72,7 @@ export class AuthController {
     res.clearCookie('access_token', {
       httpOnly: true,
       secure: false,
-      sameSite: 'none',
+      sameSite: 'lax',
     });
 
     return { message: 'Logged out successfully' };
@@ -82,7 +82,7 @@ export class AuthController {
     res.cookie('access_token', accesToken, {
       httpOnly: true,
       secure: false, // this should be (this.configService.get('NODE_ENV') === 'production') but since it's for education purposes we'll keep it like this.
-      sameSite: 'none', // secure is forced to be true in here but we're in dev so we omit it.
+      sameSite: 'lax', // secure is forced to be true in here but we're in dev so we omit it.
       maxAge: expirationTime,
     });
   }
