@@ -46,7 +46,7 @@ export function LoginForm({
 		const { data, error } = await fetcher<
 			{ access_token: string },
 			typeof parsed.data
-		>("/auth/login", {
+		>("/auth/sign-in", {
 			method: "POST",
 			body: parsed.data,
 		});
