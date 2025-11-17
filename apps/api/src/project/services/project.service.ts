@@ -99,9 +99,24 @@ export class ProjectService implements IProjectService {
   }
 
   public async getProjectsByUserId(userId: string) {
-    return await this.prismaService.project.findMany({
+    const projectsPromise = this.prismaService.project.findMany({
       where: { members: { some: { userId } } },
     });
+
+    const usersPerProjectPromise = this.getNumUsersPerProject();
+    const tasksPerProjectPromise = this.getNumTasksPerProject();
+
+    const [projects, usersPerProject, tasksPerProject] = await Promise.all([
+      projectsPromise,
+      usersPerProjectPromise,
+      tasksPerProjectPromise,
+    ]);
+
+    return projects.map((project) => ({
+      ...project,
+      membersCount: usersPerProject[project.id] ?? 0,
+      tasksCount: tasksPerProject[project.id] ?? 0,
+    }));
   }
 
   async getMembership(
@@ -177,9 +192,41 @@ export class ProjectService implements IProjectService {
     });
   }
 
-  async getNumTasksForProject(projectId: string): Promise<number> {
+  async getNumUsersPerProject() {
+    const results = await this.prismaService.projectMembership.groupBy({
+      by: ['projectId'],
+      _count: {
+        projectId: true,
+      },
+    });
+
+    const map: Record<string, number> = {};
+    for (const row of results) {
+      map[row.projectId] = row._count.projectId;
+    }
+
+    return map;
+  }
+
+  async getNumTasksForProject(projectId: string) {
     return this.prismaService.task.count({
       where: { projectId: projectId },
     });
+  }
+
+  async getNumTasksPerProject() {
+    const results = await this.prismaService.task.groupBy({
+      by: ['projectId'],
+      _count: {
+        projectId: true,
+      },
+    });
+
+    const map: Record<string, number> = {};
+    for (const row of results) {
+      map[row.projectId] = row._count.projectId;
+    }
+
+    return map;
   }
 }
