@@ -27,9 +27,9 @@ export type TaskFormProps = {
 };
 
 const FormSchema = z.object({
-	title: z.string().min(1, "El título es requerido").max(60),
+	title: z.string().min(1, "Title is required").max(60),
 	description: z.string().optional(),
-	userId: z.string().min(1, "Debes asignar al menos un usuario"),
+	userId: z.string().min(1, "You must assign the task to a user"),
 	isCompleted: z.boolean().default(false),
 });
 
@@ -97,7 +97,7 @@ export function TaskForm({
 			return setLoading(false);
 		}
 
-		toast.success(isEditing ? "Tarea actualizada" : "Tarea creada");
+		toast.success(isEditing ? "Task updated" : "Task created");
 		setLoading(false);
 		onSuccess();
 	}
@@ -135,7 +135,7 @@ export function TaskForm({
 					defaultValue={selectedUserId}
 				>
 					<SelectTrigger className="w-full">
-						<SelectValue placeholder="Asignar un usuario" />
+						<SelectValue placeholder="Asign Task" />
 					</SelectTrigger>
 					<SelectContent>
 						{/* {users.map((user) => (
@@ -159,10 +159,10 @@ export function TaskForm({
 
 			<Button type="submit" disabled={loading} className="mt-4">
 				{loading
-					? "Guardando..."
+					? "Saving..."
 					: isEditing
-						? "Guardar Cambios"
-						: "Crear Tarea"}
+						? "Save Changes"
+						: "Create Task"}
 			</Button>
 		</form>
 	);
