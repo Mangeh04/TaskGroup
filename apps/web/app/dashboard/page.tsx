@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useMemo, useCallback, useEffect } from "react";
+import { useRef, useMemo, useCallback, useEffect, useState } from "react";
 import {
 	SidebarProvider,
 	SidebarTrigger,
@@ -18,11 +18,7 @@ import {
 
 import AppSidebar from "@/components/custom/sideBar";
 import { EmptyPage } from "@/components/custom/empty";
-import {
-	ProjectCard,
-	type ProjectCardProps,
-	SkeletonCard,
-} from "./components/project";
+import { ProjectCard, SkeletonCard } from "./components/project";
 import { CustomDialog } from "@/components/custom/dialog";
 
 import emptyImage from "@/public/images/empty-folder.webp";
@@ -31,89 +27,65 @@ import { PlusIcon, Loader2 } from "lucide-react";
 import { usePaginatedView } from "@/hooks/usePaginatedView";
 import { ProjectForm } from "./components/projectForm";
 import Link from "next/link";
+import { fetcher } from "@/lib/api";
+import { toast } from "sonner";
 
-const data: Array<ProjectCardProps> = [
-	{
-		title: "Proyecto Fénix",
-		description: "Refactorización completa del backend monolítico.",
-		numTasks: 45,
-		numUsers: 8,
-	},
-	{
-		title: "E-commerce Relaunch",
-		description:
-			"Rediseño y migración de la tienda online (Shopify a Next.js).",
-		numTasks: 28,
-		numUsers: 5,
-	},
-	{
-		title: "Portal de Onboarding (RRHH)",
-		description: "Crear una herramienta interna para los nuevos empleados.",
-		numTasks: 12,
-		numUsers: 3,
-	},
-	{
-		title: "App Móvil v2.0",
-		description: "Desarrollo de la nueva app nativa (iOS y Android).",
-		numTasks: 35,
-		numUsers: 6,
-	},
-	{
-		title: "Optimización SEO (Marketing)",
-		description: "Mejorar Core Web Vitals y estrategia de keywords.",
-		numTasks: 9,
-		numUsers: 2,
-	},
-	{
-		title: "Integración API (Cliente Acme)",
-		description: "Conectar nuestro sistema con el ERP del cliente Acme.",
-		numTasks: 14,
-		numUsers: 4,
-	},
-	{
-		title: "Dashboard de Analíticas",
-		description: "Implementación de Metabase para Business Intelligence.",
-		numTasks: 11,
-		numUsers: 3,
-	},
-	{
-		title: "Iniciativa Titán",
-		description: "Expansión de la plataforma a mercados de LATAM.",
-		numTasks: 5,
-		numUsers: 4,
-	},
-	{
-		title: "Sprint Deuda Técnica (Q4)",
-		description: "Resolución de bugs críticos y mejora de performance.",
-		numTasks: 52,
-		numUsers: 10,
-	},
-	{
-		title: "Sistema de Notificaciones",
-		description: "Crear el microservicio de alertas y emails.",
-		numTasks: 17,
-		numUsers: 3,
-	},
-];
+type ProjectResponse = {
+	id: string;
+	name: string;
+	description: string;
+	tasksCount: number;
+	membersCount: number;
+	createdAt: string;
+	updatedAt: string;
+};
 
 export default function DashboardPage() {
 	const listContainerRef = useRef<HTMLDivElement>(null);
 	const listRef = useRef<HTMLDivElement>(null);
 
-	const hasProjects = useMemo(() => data.length > 0, []);
+	const [projects, setProjects] = useState<ProjectResponse[]>([]);
+	const [isFetching, setIsFetching] = useState(false);
+
+	const fetchData = useCallback(async () => {
+		setIsFetching(true);
+
+		const { data, error } = await fetcher<ProjectResponse[]>(
+			"/project/recover-all",
+			{
+				method: "GET",
+				needsAuth: true,
+			}
+		);
+
+		if (error) {
+			toast.error(error);
+			setIsFetching(false);
+			return;
+		}
+
+		setProjects(data ?? []);
+		setIsFetching(false);
+	}, []);
+
+	useEffect(() => {
+		void fetchData();
+	}, [fetchData]);
 
 	const {
 		currentPage,
 		totalPages,
 		currentData,
 		visibleCount,
-		isLoading, // For initial skeleton load
-		isPaginating, // For page-change spinner
-		setItemsPerPage, // We get the setter from the hook
+		isLoading: isSkeletonLoading,
+		isPaginating,
+		setItemsPerPage,
 		handlePrevious,
 		handleNext,
 		handlePageClick,
-	} = usePaginatedView(data, 6, 350); // Pass in the data
+	} = usePaginatedView(projects, 6, 350);
+
+	const hasProjects = useMemo(() => projects.length > 0, [projects]);
 
 	const updateItemsPerPage = useCallback(() => {
 		if (!listContainerRef.current || !listRef.current) return;
@@ -126,18 +98,16 @@ export default function DashboardPage() {
 		const sampleCard = listRef.current.querySelector<HTMLElement>(
 			"[data-project-card]"
 		);
-		const cardHeight = sampleCard?.offsetHeight ?? 120; // Default height
+		const cardHeight = sampleCard?.offsetHeight ?? 120;
 
 		const rows = Math.max(
 			1,
 			Math.floor((availableHeight + gap) / (cardHeight + gap))
 		);
 
-		// Call the setter from our hook
 		setItemsPerPage(rows);
-	}, [setItemsPerPage]); // Dependency is stable
+	}, [setItemsPerPage]);
 
-	// This effect observes layout changes specific to this component
 	useEffect(() => {
 		updateItemsPerPage();
 		window.addEventListener("resize", updateItemsPerPage);
@@ -147,14 +117,16 @@ export default function DashboardPage() {
 			ro.observe(listContainerRef.current);
 		}
 		if (listRef.current) {
-			ro.observe(listRef.current); // Observes the list
+			ro.observe(listRef.current);
 		}
 
 		return () => {
 			window.removeEventListener("resize", updateItemsPerPage);
 			ro.disconnect();
 		};
-	}, [updateItemsPerPage]); // Runs when the memoized function changes
+	}, [updateItemsPerPage]);
+
+	const showList = hasProjects || isFetching || isSkeletonLoading;
 
 	return (
 		<div className="flex h-dvh overflow-hidden">
@@ -165,7 +137,7 @@ export default function DashboardPage() {
 						<SidebarTrigger />
 						<h1 className="text-lg font-semibold">Home</h1>
 
-						{isLoading && (
+						{(isFetching || isPaginating) && (
 							<div className="ml-auto flex items-center gap-2">
 								<Loader2 className="h-4 w-4 animate-spin text-muted-foreground/80" />
 								<span className="text-xs text-muted-foreground">
@@ -175,7 +147,7 @@ export default function DashboardPage() {
 						)}
 					</header>
 
-					{hasProjects ? (
+					{showList ? (
 						<div className="flex flex-col gap-4 flex-1 min-h-0 px-4 py-6 overflow-hidden">
 							<div className="shrink-0">
 								<CustomDialog
@@ -200,9 +172,9 @@ export default function DashboardPage() {
 									ref={listRef}
 									className="flex flex-col gap-4"
 								>
-									{isLoading
+									{isSkeletonLoading || isFetching
 										? Array.from({
-												length: visibleCount,
+												length: visibleCount || 6,
 											}).map((_, i) => (
 												<div
 													key={`project_skeleton_${i}`}
@@ -214,21 +186,21 @@ export default function DashboardPage() {
 											))
 										: currentData.map((item, index) => (
 												<div
-													key={index}
+													key={item.id ?? index}
 													data-project-card
 													className="min-h-[88px]"
 												>
 													<Link href="/dashboard/projectdetails">
 														<ProjectCard
-															title={item.title}
+															title={item.name} // <- el backend devuelve `name`
 															description={
 																item.description
 															}
 															numTasks={
-																item.numTasks
+																item.tasksCount
 															}
 															numUsers={
-																item.numUsers
+																item.membersCount
 															}
 														/>
 													</Link>

@@ -53,6 +53,7 @@ export function LoginForm({
 		>("/auth/sign-in", {
 			method: "POST",
 			body: parsed.data,
+			needsAuth: true,
 		});
 
 		if (error) {

@@ -32,7 +32,7 @@ export function SignupForm({
 
 	async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
-		if (loading) return; // evita doble submit
+		if (loading) return; // avoids 2x submit
 
 		setLoading(true);
 
@@ -47,14 +47,13 @@ export function SignupForm({
 			return;
 		}
 
-		// El backend setea la cookie httpOnly con el JWT
 		const { data, error } = await fetcher<
 			{ message?: string },
 			typeof parsed.data
 		>("/auth/sign-up", {
 			method: "POST",
 			body: parsed.data,
-			// no hace falta needsAuth aquí, la cookie se setea en la respuesta
+			needsAuth: true,
 		});
 
 		if (error) {
@@ -63,7 +62,6 @@ export function SignupForm({
 			return;
 		}
 
-		// Ya no guardamos token en localStorage
 		toast.success(data?.message ?? "Account created successfully!");
 		setLoading(false);
 
