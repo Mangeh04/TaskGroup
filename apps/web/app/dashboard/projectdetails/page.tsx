@@ -178,7 +178,6 @@ function ProjectPage() {
 		};
 	}, [updateItemsPerPage]);
 
-	// Mientras redirige o todavía no hay projectId, no renderizamos nada
 	if (!projectId) return null;
 
 	return (
