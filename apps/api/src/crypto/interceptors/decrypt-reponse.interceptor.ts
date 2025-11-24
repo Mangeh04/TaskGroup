@@ -38,41 +38,56 @@ export class DecryptResponseInterceptor implements NestInterceptor {
   }
 
   private async handleData(data: any): Promise<any> {
-    if (data == null) return data;
-
-    if (Array.isArray(data)) {
-      return Promise.all(data.map((item) => this.decryptFlatObject(item)));
-    }
-
-    if (typeof data === 'object') {
-      return this.decryptFlatObject(data);
-    }
-
-    return data;
+    return this.decryptDeep(data);
   }
 
-  private async decryptFlatObject(obj: any): Promise<any> {
+  private async decryptDeep(value: any): Promise<any> {
+    if (value == null) return value;
+
+    if (Array.isArray(value)) {
+      return Promise.all(value.map((item) => this.decryptDeep(item)));
+    }
+
+    if (typeof value === 'object') {
+      return this.decryptObject(value);
+    }
+
+    return value;
+  }
+
+  private async decryptObject(obj: any): Promise<any> {
     if (!obj || typeof obj !== 'object') return obj;
 
-    const result: any = { ...obj };
+    const result: any = {};
 
-    for (const [key, value] of Object.entries(result)) {
-      if (!key.endsWith('Iv')) continue;
+    for (const [key, value] of Object.entries(obj)) {
+      if (key.endsWith('Iv')) {
+        continue;
+      }
 
-      const baseKey = key.slice(0, -2); // "nameIv" -> "name"
+      const ivKey = `${key}Iv`;
 
-      delete result[key];
+      if (ivKey in obj) {
+        const ciphertext = value;
+        const iv = (obj as any)[ivKey];
 
-      if (!value) continue;
-      if (!(baseKey in result)) continue;
-      if (result[baseKey] == null) continue;
+        if (ciphertext != null && iv != null) {
+          try {
+            result[key] = await this.cryptoService.decrypt({
+              ciphertext: String(ciphertext),
+              iv: String(iv),
+            });
+          } catch {
+            result[key] = ciphertext;
+          }
+        } else {
+          result[key] = ciphertext;
+        }
 
-      try {
-        result[baseKey] = await this.cryptoService.decrypt({
-          ciphertext: String(result[baseKey]),
-          iv: String(value),
-        });
-      } catch {}
+        continue;
+      }
+
+      result[key] = await this.decryptDeep(value);
     }
 
     return result;

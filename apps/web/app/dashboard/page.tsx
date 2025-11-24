@@ -49,6 +49,8 @@ export default function DashboardPage() {
 		description: "",
 	});
 
+	const [isCreating, setIsCreating] = useState(false);
+
 	const fetchData = useCallback(async () => {
 		setIsFetching(true);
 
@@ -130,21 +132,13 @@ export default function DashboardPage() {
 
 	const showList = hasProjects || isFetching || isSkeletonLoading;
 
-	const [isCreating, setIsCreating] = useState(false);
-
 	const onProjectSubmit = useCallback(async () => {
 		if (isCreating) return;
-
 		setIsCreating(true);
 
-		const { name, description } = formValues;
-
-		const { data, error } = await fetcher<
-			{ message?: string },
-			{ name: string; description: string }
-		>("/project/create", {
+		const { error } = await fetcher("/project/create", {
 			method: "POST",
-			body: { name, description },
+			body: formValues,
 			needsAuth: true,
 		});
 
@@ -154,12 +148,12 @@ export default function DashboardPage() {
 			return;
 		}
 
-		toast.success(data?.message ?? "Project created successfully!");
-		await fetchData();
-
-		setFormValues({ name: "", description: "" });
-
+		setFormValues({
+			name: "",
+			description: "",
+		});
 		setIsCreating(false);
+		void fetchData();
 	}, [fetchData, formValues, isCreating]);
 
 	return (
@@ -199,8 +193,13 @@ export default function DashboardPage() {
 								>
 									<ProjectForm
 										values={formValues}
-										onChange={setFormValues}
-										isSubmitting={isCreating}
+										onChange={(field, value) =>
+											setFormValues((prev) => ({
+												...prev,
+												[field]: value,
+											}))
+										}
+										loading={isCreating}
 									/>
 								</CustomDialog>
 							</div>
@@ -323,12 +322,23 @@ export default function DashboardPage() {
 									title: "You don't have any projects yet",
 									subtitle:
 										"Create your new projects here. Click save when you're done",
+									confirmIcon: isCreating ? (
+										<Loader2 className="h-4 w-4 animate-spin" />
+									) : (
+										<PlusIcon />
+									),
+									onSubmit: onProjectSubmit,
 								}}
 							>
 								<ProjectForm
 									values={formValues}
-									onChange={setFormValues}
-									isSubmitting={isCreating}
+									onChange={(field, value) =>
+										setFormValues((prev) => ({
+											...prev,
+											[field]: value,
+										}))
+									}
+									loading={isCreating}
 								/>
 							</EmptyPage>
 						</div>

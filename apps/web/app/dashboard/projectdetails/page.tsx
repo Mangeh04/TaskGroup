@@ -26,27 +26,23 @@ import {
 import AppSidebar from "@/components/custom/sideBar";
 import { EmptyPage } from "@/components/custom/empty";
 import { CustomDialog } from "@/components/custom/dialog";
-import { Separator } from "@/components/ui/separator";
 import { Progress } from "@/components/ui/progress";
 import { BreadCrumbCustom } from "@/components/custom/breadCrumbCustom";
 import { usePaginatedView } from "@/hooks/usePaginatedView";
 
 import emptyImage from "@/public/images/empty-task.webp";
-import type { TaskWithAssignments, ProjectMember } from "@repo/types";
+import type { TaskWithAssignments, ProjectMember, Task } from "@repo/types";
 import { fetcher } from "@/lib/api";
 
 import { PlusIcon, Loader2 } from "lucide-react";
 import { TaskCard, SkeletonCard } from "./components/task";
-import { TaskForm } from "./components/taskForm";
+import {
+	TaskForm,
+	TaskFormSchema,
+	TaskFormValues,
+} from "./components/taskForm";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
-
-const users: Array<string> = [
-	"mangeh04",
-	"blackfox099",
-	"axiur",
-	"alejandropxrez",
-];
 
 export default function ProjectDetailsPage() {
 	return (
@@ -71,9 +67,16 @@ function ProjectPage() {
 	const gridRef = useRef<HTMLDivElement>(null);
 
 	const [tasks, setTasks] = useState<TaskWithAssignments[]>([]);
-	const [projectMembers, setProjectMembers] = useState<ProjectMember[]>([]);
+	const [users, setUsers] = useState<ProjectMember[]>([]);
 	const [isFetching, setIsFetching] = useState(true);
-	const [isCreateDialogOpen, setIsCreateDialogOpen] = useState(false);
+
+	const [createValues, setCreateValues] = useState<TaskFormValues>({
+		title: "",
+		description: "",
+		userId: "",
+		isCompleted: false,
+	});
+	const [isSavingTask, setIsSavingTask] = useState(false);
 
 	const fetchTasks = useCallback(async () => {
 		if (!projectId) return;
@@ -99,10 +102,29 @@ function ProjectPage() {
 		void fetchTasks();
 	}, [fetchTasks]);
 
-	const handleTaskSuccess = () => {
-		void fetchTasks();
-		setIsCreateDialogOpen(false);
-	};
+	const fetchMembers = useCallback(async () => {
+		if (!projectId) return;
+
+		setIsFetching(true);
+		const { data, error } = await fetcher<ProjectMember[]>(
+			`/project/${projectId}/members`,
+			{
+				method: "GET",
+				needsAuth: true,
+			}
+		);
+
+		if (error) {
+			toast.error(error);
+		} else {
+			setUsers(data ?? []);
+		}
+		setIsFetching(false);
+	}, [projectId]);
+
+	useEffect(() => {
+		void fetchMembers();
+	}, [fetchMembers]);
 
 	const { totalTasks, completedTasks, pendingTasks, progressPercentage } =
 		useMemo(() => {
@@ -178,6 +200,61 @@ function ProjectPage() {
 		};
 	}, [updateItemsPerPage]);
 
+	// ⬇️ onSubmit para crear tarea (ya sin FormEvent, lo controla CustomDialog)
+	const handleCreateSubmit = async () => {
+		if (!projectId) return;
+		if (isSavingTask) return;
+
+		setIsSavingTask(true);
+
+		const parsed = TaskFormSchema.safeParse(createValues);
+
+		if (!parsed.success) {
+			parsed.error.issues.forEach((issue) => toast.error(issue.message));
+			setIsSavingTask(false);
+			return;
+		}
+
+		const apiBody = {
+			title: parsed.data.title,
+			description: parsed.data.description,
+			isCompleted: parsed.data.isCompleted,
+			userIds: [parsed.data.userId],
+			projectId,
+		};
+
+		const { error } = await fetcher<Task, typeof apiBody>("/task", {
+			method: "POST",
+			body: apiBody,
+			needsAuth: true,
+		});
+
+		if (error) {
+			toast.error(error);
+			setIsSavingTask(false);
+			return;
+		}
+
+		toast.success("Task created");
+		setIsSavingTask(false);
+		setCreateValues({
+			title: "",
+			description: "",
+			userId: "",
+			isCompleted: false,
+		});
+		void fetchTasks();
+	};
+
+	const handleCreateChange = (
+		field: keyof TaskFormValues,
+		value: string | boolean
+	) => {
+		setCreateValues(
+			(prev) => ({ ...prev, [field]: value }) as TaskFormValues
+		);
+	};
+
 	if (!projectId) return null;
 
 	return (
@@ -185,8 +262,9 @@ function ProjectPage() {
 			<SidebarProvider>
 				<AppSidebar
 					isProject={true}
-					hasMembers={users.length > 0}
-				></AppSidebar>
+					hasMembers={users.length > 1}
+					projectId={projectId}
+				/>
 				<SidebarInset className="flex flex-1 min-h-0 flex-col bg-white dark:bg-neutral-950">
 					<header className="relative flex h-14 shrink-0 items-center gap-6 px-4 border-b">
 						<SidebarTrigger />
@@ -249,13 +327,20 @@ function ProjectPage() {
 									buttonString="Create Task"
 									title="Create a new Task"
 									subtitle="Create your new tasks here. Click save when you're done"
-									confirmIcon={<PlusIcon />}
-									open={isCreateDialogOpen}
-									onOpenChange={setIsCreateDialogOpen}
+									confirmIcon={
+										isSavingTask ? (
+											<Loader2 className="h-4 w-4 animate-spin" />
+										) : (
+											<PlusIcon />
+										)
+									}
+									onSubmit={handleCreateSubmit}
 								>
 									<TaskForm
-										projectId={projectId}
-										onSuccess={handleTaskSuccess}
+										values={createValues}
+										users={users}
+										loading={isSavingTask}
+										onChange={handleCreateChange}
 									/>
 								</CustomDialog>
 							</div>
@@ -310,9 +395,7 @@ function ProjectPage() {
 												>
 													<TaskCard
 														{...task}
-														projectMembers={
-															projectMembers
-														}
+														projectMembers={users}
 														onUpdate={fetchTasks}
 													/>
 												</div>
@@ -386,12 +469,19 @@ function ProjectPage() {
 									title: "Create Task",
 									subtitle:
 										"Create your new tasks here. Click save when you're done",
+									confirmIcon: isSavingTask ? (
+										<Loader2 className="h-4 w-4 animate-spin" />
+									) : (
+										<PlusIcon />
+									),
+									onSubmit: handleCreateSubmit,
 								}}
 							>
-								<Separator />
 								<TaskForm
-									projectId={projectId}
-									onSuccess={fetchTasks}
+									values={createValues}
+									users={users}
+									loading={isSavingTask}
+									onChange={handleCreateChange}
 								/>
 							</EmptyPage>
 						</div>

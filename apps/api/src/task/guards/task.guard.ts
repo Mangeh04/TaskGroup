@@ -8,11 +8,8 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { PrismaClient, Role } from '@repo/database';
+import type { JwtPayload } from 'src/auth/types/jwt-payload.type';
 import { SERVICES } from 'src/utils/constants';
-
-interface RequestUser {
-  id: string;
-}
 
 @Injectable()
 export class TaskGuard implements CanActivate {
@@ -23,11 +20,11 @@ export class TaskGuard implements CanActivate {
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
 
-    const user = request.user as RequestUser;
-    if (!user || !user.id) {
+    const user = request.user as JwtPayload;
+    if (!user || !user.sub) {
       throw new UnauthorizedException('User not found in request.');
     }
-    const userId = user.id;
+    const userId = user.sub;
 
     const taskId = request.params.id;
     if (!taskId) {

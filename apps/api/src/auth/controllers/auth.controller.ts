@@ -6,27 +6,28 @@ import {
   Inject,
   Post,
   Res,
+  UseGuards,
 } from '@nestjs/common';
 
 import type { Response } from 'express';
 
-import { AuthService } from '../services/auth.service';
 import { SignInDto } from 'src/user/dtos/signIn';
+import { PasswordChangeDto } from 'src/user/dtos/password.dto';
 import { SERVICES } from 'src/utils/constants';
 import { SignUpDto } from 'src/user/dtos/signUp';
 
 import { Public } from '../decorators/public.decorator';
-import { ConfigService } from '@nestjs/config';
 import { SkipDecrypt } from 'src/crypto/decorators/skip-deccrypt.decorator';
+import type { IAuthService } from '../interfaces/auth.interface';
+import { User } from '../decorators/user.decorator';
+import type { JwtPayload } from '../types/jwt-payload.type';
+import { AuthGuard } from '../guards/auth.guard';
 
 const expirationTime = 1_000 * 60 * 60 * 24 * 7; // 7 days.
 
 @Controller('auth')
 export class AuthController {
-  constructor(
-    @Inject(SERVICES.AUTH) private authService: AuthService,
-    private readonly configService: ConfigService,
-  ) {}
+  constructor(@Inject(SERVICES.AUTH) private authService: IAuthService) {}
 
   @HttpCode(HttpStatus.OK)
   @Public()
@@ -67,6 +68,22 @@ export class AuthController {
     return {
       message: 'Account created successfully',
     };
+  }
+
+  @HttpCode(HttpStatus.OK)
+  @SkipDecrypt()
+  @Post('changePassword')
+  @UseGuards(AuthGuard)
+  async changePassword(
+    @Body() passwordChangeDto: PasswordChangeDto,
+    @User() user: JwtPayload,
+  ) {
+    return await this.authService.changePassword(
+      user.sub,
+      passwordChangeDto.password,
+      passwordChangeDto.new_password1,
+      passwordChangeDto.new_password2,
+    );
   }
 
   @HttpCode(HttpStatus.OK)

@@ -1,3 +1,6 @@
+"use client";
+
+import { useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
 	Dialog,
@@ -8,19 +11,16 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from "@/components/ui/dialog";
+import { ReactNode } from "react";
 
-import { JSX, ReactNode } from "react";
-
-export type CustomDialog = {
+export type CustomDialogProps = {
 	buttonString?: string;
 	title: string;
-	subtitle: string;
+	subtitle?: string;
 	children: ReactNode;
-	confirmIcon: JSX.Element;
+	confirmIcon?: ReactNode;
 	isIcon?: boolean;
-	onSubmit?: () => void;
-	open?: boolean;
-	onOpenChange?: (open: boolean) => void;
+	onSubmit?: () => void | Promise<void>;
 };
 
 export function CustomDialog({
@@ -29,44 +29,51 @@ export function CustomDialog({
 	subtitle,
 	children,
 	confirmIcon,
-	onSubmit,
 	isIcon,
-	open,
-	onOpenChange,
-}: CustomDialog) {
+	onSubmit,
+}: CustomDialogProps) {
+	const [open, setOpen] = useState(false);
+
+	const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+		e.preventDefault();
+
+		if (onSubmit) {
+			await onSubmit();
+		}
+
+		setOpen(false);
+	};
+
 	return (
-		<Dialog open={open} onOpenChange={onOpenChange}>
-			<form onSubmit={onSubmit}>
-				<DialogTrigger asChild>
-					{isIcon ? (
-						<Button
-							size="icon"
-							variant="outline"
-							className="h-8 w-8"
-						>
-							{" "}
-							{confirmIcon} {buttonString}{" "}
-						</Button>
-					) : (
-						<Button>
-							{" "}
-							{confirmIcon} {buttonString}{" "}
-						</Button>
-					)}
-				</DialogTrigger>
-				<DialogContent className="sm:max-w-[425px]">
+		<Dialog open={open} onOpenChange={setOpen}>
+			<DialogTrigger asChild>
+				{isIcon ? (
+					<Button size="icon" variant="outline">
+						{confirmIcon}
+					</Button>
+				) : (
+					<Button>
+						{confirmIcon} {buttonString}
+					</Button>
+				)}
+			</DialogTrigger>
+
+			<DialogContent className="sm:max-w-[425px]">
+				<form onSubmit={handleSubmit}>
 					<DialogHeader>
 						<DialogTitle>{title}</DialogTitle>
-						<DialogDescription>{subtitle}</DialogDescription>
+						{subtitle && (
+							<DialogDescription>{subtitle}</DialogDescription>
+						)}
 					</DialogHeader>
-					<div className="grid gap-4">
-						<div className="grid gap-3">{children}</div>
-					</div>
+
+					<div className="grid gap-4 mt-4 pb-4">{children}</div>
+
 					<DialogFooter>
-						<Button type="submit">{confirmIcon}</Button>
+						<Button type="submit">{confirmIcon || "Save"}</Button>
 					</DialogFooter>
-				</DialogContent>
-			</form>
+				</form>
+			</DialogContent>
 		</Dialog>
 	);
 }

@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
-import placeholder from "@/public/images/placeholder.svg";
+import placeholder from "@/public/images/sneaky.jpg";
 
 import { UserRegisterSchema } from "@/lib/schemas";
 import { handleFormValidation } from "@/lib/formHandler";

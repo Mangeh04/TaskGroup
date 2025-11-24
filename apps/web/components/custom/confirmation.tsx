@@ -23,6 +23,7 @@ export function ConfirmationDialog({
 	dialogAction,
 	text,
 	objective,
+	onConfirm,
 }: ConfirmationDialog) {
 	return (
 		<AlertDialog>
@@ -41,7 +42,10 @@ export function ConfirmationDialog({
 				</AlertDialogHeader>
 				<AlertDialogFooter>
 					<AlertDialogCancel>Cancel</AlertDialogCancel>
-					<AlertDialogAction className="capitalize">
+					<AlertDialogAction
+						className="capitalize"
+						onClick={onConfirm}
+					>
 						{dialogAction}
 					</AlertDialogAction>
 				</AlertDialogFooter>

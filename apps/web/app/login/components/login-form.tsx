@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { type FormEvent, type HTMLAttributes, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -20,17 +20,17 @@ import {
 } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 
-import placeholder from "@/public/images/placeholder.svg";
+import placeholder from "@/public/images/binchillin.jpeg";
 import { toast } from "sonner";
 
 export function LoginForm({
 	className,
 	...props
-}: React.HTMLAttributes<HTMLDivElement>) {
+}: HTMLAttributes<HTMLDivElement>) {
 	const [loading, setLoading] = useState(false);
 	const router = useRouter();
 
-	async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
+	async function handleSubmit(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
 		if (loading) return; // avoids 2x submit.
 

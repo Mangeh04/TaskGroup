@@ -25,49 +25,51 @@ import { fetcher } from "@/lib/api";
 
 import { type Status, User, StatusEnum } from "@repo/types";
 
-const data = {
-	user: {
-		name: "Mangeh04",
-		email: "mapsantamaria@esei.uvigo.es",
-		avatar: "https://raw.githubusercontent.com/Mangeh04/Storage/main/dragonite.jpeg",
-		status: StatusEnum.ONLINE as Status,
-	},
-	projects: [
-		{
-			name: "Main",
-			url: "/dashboard",
-			icon: Home,
-		},
-		{
-			name: "Inbox",
-			url: "/inbox",
-			icon: InboxIcon,
-		},
-	],
-
-	Configuration: [
-		{
-			name: "Settings",
-			url: "/dashboard/projectdetails/settings",
-			icon: Settings2,
-		},
-		{
-			name: "Members",
-			url: "/dashboard/projectdetails/members",
-			icon: PersonStandingIcon,
-		},
-	],
-};
-
 export type SidebarProps = {
 	isProject?: boolean;
+	projectId?: string;
 	hasMembers?: boolean;
 };
 
 export default function AppSidebar({
 	isProject,
+	projectId,
 	hasMembers,
 }: React.ComponentProps<typeof Sidebar> & SidebarProps) {
+	const dataSideBar = {
+		user: {
+			alias: "Mangeh04",
+			email: "mapsantamaria@esei.uvigo.es",
+			avatar: "https://raw.githubusercontent.com/Mangeh04/Storage/main/dragonite.jpeg",
+			status: StatusEnum.ONLINE as Status,
+		},
+		projects: [
+			{
+				name: "Main",
+				url: "/dashboard",
+				icon: Home,
+			},
+			{
+				name: "Inbox",
+				url: "/inbox",
+				icon: InboxIcon,
+			},
+		],
+
+		Configuration: [
+			{
+				name: "Settings",
+				url: `/dashboard/projectdetails?projectId=${projectId}/settings`,
+				icon: Settings2,
+			},
+			{
+				name: "Members",
+				url: `/dashboard/projectdetails?projectId=${projectId}/members`,
+				icon: PersonStandingIcon,
+			},
+		],
+	};
+
 	const [user, setUser] = useState<User | null>(null);
 	const [loadingUser, setLoadingUser] = useState(true);
 
@@ -91,12 +93,12 @@ export default function AppSidebar({
 
 	const sidebarUser = user
 		? {
-				name: user.alias,
+				alias: user.alias,
 				email: user.email,
 				avatar: "https://raw.githubusercontent.com/Mangeh04/Storage/main/dragonite.jpeg",
 				status: user.status,
 			}
-		: data.user;
+		: dataSideBar.user;
 
 	return (
 		<Sidebar variant="inset">
@@ -126,13 +128,13 @@ export default function AppSidebar({
 				</SidebarMenu>
 			</SidebarHeader>
 			<SidebarContent>
-				<NavProjects projects={data.projects} />
+				<NavProjects projects={dataSideBar.projects} />
 				{isProject &&
 					(hasMembers ? (
-						<NavConfiguration config={data.Configuration} />
+						<NavConfiguration config={dataSideBar.Configuration} />
 					) : (
 						<NavConfiguration
-							config={data.Configuration.slice(0, 1)}
+							config={dataSideBar.Configuration.slice(0, 1)}
 						/>
 					))}
 			</SidebarContent>

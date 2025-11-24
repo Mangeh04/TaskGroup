@@ -1,4 +1,18 @@
-import type { ProfileConfiguration, User } from '@repo/database';
+import type { ProfileConfiguration, User, Status } from '@repo/database';
+
+export type UserConfiguration = Omit<
+  ProfileConfiguration & {
+    user: {
+      status: Status;
+    };
+  },
+  'userId' | 'createdAt' | 'updatedAt'
+>;
+
+export type SanitaizedUser = Omit<
+  User,
+  'password' | 'emailBi' | 'createdAt' | 'updatedAt'
+>;
 
 export interface IUserService {
   createUser(user: Pick<User, 'email' | 'alias' | 'password'>): Promise<User>;
@@ -6,9 +20,10 @@ export interface IUserService {
   findUserByEmail(emailPlain: string): Promise<User>;
   deleteUser(userId: string): Promise<boolean>;
   updateUser(user: User): Promise<boolean>;
-  getUserConfiguration(userId: string): Promise<ProfileConfiguration>;
+  getUserConfiguration(userId: string): Promise<UserConfiguration>;
   updateUserConfiguration(
     userId: string,
     data: ProfileConfiguration,
   ): Promise<boolean>;
+  updateStatus(userId: string, status: Status): Promise<boolean>;
 }

@@ -1,8 +1,11 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { PrismaClient, type User } from '@repo/database';
-import type { ProfileConfiguration } from '@repo/database';
+import type { ProfileConfiguration, Status } from '@repo/database';
 
-import { IUserService } from '../interfaces/user.interface';
+import type {
+  IUserService,
+  UserConfiguration,
+} from '../interfaces/user.interface';
 import { SERVICES } from 'src/utils/constants';
 import type { ICryptoService } from 'src/crypto/interfaces/crypto.interface';
 
@@ -77,7 +80,19 @@ export class UserService implements IUserService {
   public async getUserConfiguration(userId: string) {
     return (await this.prismaService.profileConfiguration.findUnique({
       where: { userId },
-    })) as unknown as Promise<ProfileConfiguration>;
+      omit: {
+        userId: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+      include: {
+        user: {
+          select: {
+            status: true,
+          },
+        },
+      },
+    })) as unknown as UserConfiguration;
   }
 
   public async updateUserConfiguration(
@@ -87,6 +102,14 @@ export class UserService implements IUserService {
     await this.prismaService.profileConfiguration.update({
       where: { userId },
       data,
+    });
+    return true;
+  }
+
+  public async updateStatus(userId: string, status: Status) {
+    await this.prismaService.user.update({
+      where: { id: userId },
+      data: { status },
     });
     return true;
   }

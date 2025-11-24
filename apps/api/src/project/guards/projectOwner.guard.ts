@@ -10,7 +10,7 @@ import {
 } from '@nestjs/common';
 import { SERVICES } from 'src/utils/constants';
 import type { IProjectService } from '../interfaces/project.interface';
-import type { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
+import type { JwtPayload } from 'src/auth/types/jwt-payload.type';
 import { Role } from '@repo/database'; // Tu enum de Roles
 
 @Injectable()

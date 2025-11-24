@@ -29,42 +29,56 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { fetcher } from "@/lib/api";
-import { type Status, StatusEnum } from "@repo/types";
+import { StatusEnum, User } from "@repo/types";
 
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { statusStyles } from "./status";
-
-const statusOptions = [
-	{ value: "online", label: "Online", color: "bg-green-500" },
-	{ value: "away", label: "Away", color: "bg-yellow-500" },
-	{ value: "do not disturb", label: "Do not disturb", color: "bg-gray-500" },
-	{ value: "offline", label: "Offline", color: "bg-destructive" },
-];
+import { useEffect, useState } from "react";
 
 export function NavUser({
 	user,
 }: {
-	user: {
-		name?: string | null;
-		email?: string;
-		avatar?: string;
-		status: Status;
+	user: Omit<User, "id" | "createdAt" | "updatedAt"> & {
+		avatar: string;
 	};
 }) {
 	const { isMobile } = useSidebar();
-	const currentStatus =
-		statusStyles[user.status] ?? statusStyles[StatusEnum.ONLINE];
 	const router = useRouter();
 
-	const safeName = (user?.name && user.name.trim()) || "ERROR";
-	const safeEmail = user?.email ?? "";
+	const [status, setStatus] = useState<StatusEnum>(user.status);
+	useEffect(() => {
+		if (user.status) {
+			setStatus(user.status);
+		}
+	}, [user.status]);
+	const currentStatus =
+		statusStyles[status] ?? statusStyles[StatusEnum.ONLINE];
 
 	const initial =
-		safeName.trim()[0]?.toLocaleUpperCase() ||
-		safeEmail.trim()[0]?.toLocaleUpperCase() ||
+		user.alias.trim()[0]?.toLocaleUpperCase() ||
+		user.email.trim()[0]?.toLocaleUpperCase() ||
 		"?";
+
+	async function handleStatusChange(newStatus: StatusEnum) {
+		setStatus(newStatus);
+
+		const { error } = await fetcher("/user/status", {
+			method: "PATCH",
+			body: { status: newStatus },
+			needsAuth: true,
+		});
+
+		if (error) {
+			toast.error("Failed to update status: " + error);
+			setStatus(user.status);
+		} else {
+			toast.success(
+				`Status set to ${capitalize(newStatus.toLowerCase().replaceAll("_", " "))}`
+			);
+		}
+	}
 
 	async function handleLogout() {
 		const { data, error } = await fetcher<{ message?: string }>(
@@ -85,6 +99,10 @@ export function NavUser({
 		router.push("/login");
 	}
 
+	function capitalize(str: string) {
+		return str.charAt(0).toUpperCase() + str.slice(1);
+	}
+
 	if (!user) return null;
 
 	return (
@@ -97,15 +115,18 @@ export function NavUser({
 							className="data-[state=open]:bg-sidebar-accent data-[state=open]:text-sidebar-accent-foreground"
 						>
 							<Avatar>
-								<AvatarImage src={user.avatar} alt={safeName} />
+								<AvatarImage
+									src={user.avatar}
+									alt={user.alias}
+								/>
 								<AvatarFallback>{initial}</AvatarFallback>
 							</Avatar>
 							<div className="grid flex-1 text-left text-sm leading-tight">
 								<span className="truncate font-medium">
-									{safeName}
+									{user.alias}
 								</span>
 								<span className="truncate text-xs">
-									{safeEmail}
+									{user.email}
 								</span>
 							</div>
 							<div className="flex items-center gap-2">
@@ -133,16 +154,16 @@ export function NavUser({
 								<Avatar>
 									<AvatarImage
 										src={user.avatar}
-										alt={safeName}
+										alt={user.alias}
 									/>
 									<AvatarFallback>{initial}</AvatarFallback>
 								</Avatar>
 								<div className="grid flex-1 text-left text-sm leading-tight">
 									<span className="truncate font-medium">
-										{safeName}
+										{user.alias}
 									</span>
 									<span className="truncate text-xs">
-										{safeEmail}
+										{user.email}
 									</span>
 								</div>
 							</div>
@@ -154,20 +175,27 @@ export function NavUser({
 								<span>Status</span>
 							</DropdownMenuSubTrigger>
 							<DropdownMenuSubContent>
-								{statusOptions.map((status) => (
-									<DropdownMenuItem
-										key={status.value}
-										className="gap-2"
-									>
-										<span
-											className={cn(
-												"flex h-2 w-2 rounded-full",
-												status.color
-											)}
-										/>
-										<span>{status.label}</span>
-									</DropdownMenuItem>
-								))}
+								{Object.entries(statusStyles).map(
+									([value, info]) => (
+										<DropdownMenuItem
+											key={value}
+											onClick={() =>
+												handleStatusChange(
+													value as StatusEnum
+												)
+											}
+											className="gap-2"
+										>
+											<span
+												className={cn(
+													"flex h-2 w-2 rounded-full",
+													info.color
+												)}
+											/>
+											<span>{info.text}</span>
+										</DropdownMenuItem>
+									)
+								)}
 							</DropdownMenuSubContent>
 						</DropdownMenuSub>
 						<DropdownMenuSeparator />

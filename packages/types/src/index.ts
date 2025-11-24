@@ -3,6 +3,7 @@ import {
 	Status as DatabaseStatus,
 	Task as DatabaseTask,
 	Project as DataBaseProject,
+	Role,
 } from "@repo/database";
 
 export type User = Omit<
@@ -16,7 +17,10 @@ export { DatabaseStatus as StatusEnum };
 export type Task = Omit<DatabaseTask, "descriptionIv" | "titleIv">;
 export type Project = Omit<DataBaseProject, "descriptionIv" | "nameIv">;
 
-export type ProjectMember = Pick<User, "id" | "alias">;
+export type ProjectMember = {
+	role: Role;
+	userId: string;
+} & Omit<User, "password" | "emailBi" | "createdAt" | "updatedAt" | "id">;
 
 export type TaskWithAssignments = Task & {
 	assignments: {

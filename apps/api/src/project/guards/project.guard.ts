@@ -8,7 +8,7 @@ import {
 } from '@nestjs/common';
 import { SERVICES } from 'src/utils/constants';
 import type { IProjectService } from '../interfaces/project.interface';
-import type { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
+import type { JwtPayload } from 'src/auth/types/jwt-payload.type';
 import type { ProjectDtoUpdate } from '../dtos/projectDtoUpdate.dto';
 
 @Injectable()

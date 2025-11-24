@@ -50,7 +50,7 @@ export default function MembersPage() {
 		},
 	];
 
-	const hasMembers = users.length > 0;
+	const hasMembers = users.length > 1;
 	const breadcrumbItems = [
 		{ label: "Home", href: "/dashboard" },
 		{ label: "Project", href: "/dashboard/projectdetails" },

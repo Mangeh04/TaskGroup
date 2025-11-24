@@ -4,33 +4,34 @@ import { ConfirmationDialog } from "@/components/custom/confirmation";
 
 import { Trash2 } from "lucide-react";
 
-export function DangerZone() {
-  return (
-    <Card className="rounded-2xl border-red-200/40 dark:border-red-900/40">
-      <CardHeader>
-        <CardTitle className="text-base flex items-center gap-2 text-red-600 dark:text-red-400">
-          <Trash2 className="size-4" /> Delete Project
-        </CardTitle>
-        <p className="text-sm text-muted-foreground">
-          Once deleted, this action cannot be undone.
-        </p>
-      </CardHeader>
-      <CardContent>
-        { /* @ts-expect-error ConfirmationDialog does not have its type properly defined */ }
-        <ConfirmationDialog
-          dialogAction="delete"
-          objective="project"
-          text={`This action will permanently delete the project and all its data.`}
-        >
-          <Button
-            variant="destructive"
-            className="w-full h-12 text-base font-semibold gap-2"
-          >
-            <Trash2 className="size-5" />
-            Delete project
-          </Button>
-        </ConfirmationDialog>
-      </CardContent>
-    </Card>
-  );
+export function DangerZone({ onSubmit }: { onSubmit: () => Promise<void> }) {
+	return (
+		<Card className="rounded-2xl border-red-200/40 dark:border-red-900/40">
+			<CardHeader>
+				<CardTitle className="text-base flex items-center gap-2 text-red-600 dark:text-red-400">
+					<Trash2 className="size-4" /> Delete Project
+				</CardTitle>
+				<p className="text-sm text-muted-foreground">
+					Once deleted, this action cannot be undone.
+				</p>
+			</CardHeader>
+			<CardContent>
+				{/* @ts-expect-error ConfirmationDialog does not have its type properly defined */}
+				<ConfirmationDialog
+					dialogAction="delete"
+					objective="project"
+					text={`This action will permanently delete the project and all its data.`}
+					onSubmit={onSubmit}
+				>
+					<Button
+						variant="destructive"
+						className="w-full h-12 text-base font-semibold gap-2"
+					>
+						<Trash2 className="size-5" />
+						Delete project
+					</Button>
+				</ConfirmationDialog>
+			</CardContent>
+		</Card>
+	);
 }

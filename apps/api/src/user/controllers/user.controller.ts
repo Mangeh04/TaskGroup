@@ -1,10 +1,12 @@
-import { Controller, Get, Inject, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Inject, Patch } from '@nestjs/common';
 
 import { User } from 'src/auth/decorators/user.decorator';
-import type { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
+import type { JwtPayload } from 'src/auth/types/jwt-payload.type';
 import { SERVICES } from 'src/utils/constants';
 
 import type { IUserService } from '../interfaces/user.interface';
+import { Status } from '@repo/database';
+import { UpdateStatusDto } from '../dtos/userStatus.dto';
 
 @Controller('user')
 export class UserController {
@@ -14,6 +16,25 @@ export class UserController {
 
   @Get('profile')
   async getProfile(@User() user: JwtPayload) {
-    return await this.userService.getUserConfiguration(user.sub);
+    const userConfiguration = await this.userService.getUserConfiguration(
+      user.sub,
+    );
+
+    (userConfiguration as any).status = userConfiguration.user.status;
+    // We fetched everything in a query and the frontend expect it as status, this is much better DX.
+    delete (userConfiguration as any).user;
+
+    return {
+      ...user,
+      ...userConfiguration,
+    };
+  }
+
+  @Patch('status')
+  async updateStatus(
+    @Body() updateStatusDto: UpdateStatusDto,
+    @User() user: JwtPayload,
+  ) {
+    return this.userService.updateStatus(user.sub, updateStatusDto.status);
   }
 }

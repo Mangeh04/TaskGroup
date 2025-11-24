@@ -10,10 +10,6 @@ import {
 export class TaskDto {
   @IsNotEmpty()
   @IsString()
-  id: string;
-
-  @IsNotEmpty()
-  @IsString()
   @MaxLength(60)
   title: string;
 

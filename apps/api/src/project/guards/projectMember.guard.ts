@@ -8,7 +8,7 @@ import {
   BadRequestException,
 } from '@nestjs/common';
 import { PrismaClient } from '@repo/database';
-import type { JwtPayload } from 'src/auth/interfaces/jwt-payload.interface';
+import type { JwtPayload } from 'src/auth/types/jwt-payload.type';
 import { SERVICES } from 'src/utils/constants';
 
 @Injectable()

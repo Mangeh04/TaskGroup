@@ -8,7 +8,10 @@ import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EVENTS } from 'src/utils/constants';
 
 import { ProjectDto } from '../dtos/projectDto.dto';
-import { IProjectService } from '../interfaces/project.interface';
+import type {
+  IProjectService,
+  MembersProject,
+} from '../interfaces/project.interface';
 import { ProjectDtoUpdate } from '../dtos/projectDtoUpdate.dto';
 
 @Injectable()
@@ -228,5 +231,25 @@ export class ProjectService implements IProjectService {
     }
 
     return map;
+  }
+
+  async getMembersbyProjectId(projectId: string) {
+    return this.prismaService.projectMembership.findMany({
+      where: { projectId: projectId },
+      include: {
+        user: {
+          omit: {
+            password: true,
+            emailBi: true,
+            createdAt: true,
+            updatedAt: true,
+            id: true,
+          },
+        },
+      },
+      omit: {
+        projectId: true,
+      },
+    }) as unknown as MembersProject;
   }
 }

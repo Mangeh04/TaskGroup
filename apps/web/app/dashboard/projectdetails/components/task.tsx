@@ -1,5 +1,8 @@
+"use client";
+
+import { useState, FormEvent } from "react";
 import { Card } from "@/components/ui/card";
-import { CalendarDays, User, Edit } from "lucide-react";
+import { CalendarDays, User, Edit, Loader2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmationDialog } from "@/components/custom/confirmation";
@@ -7,32 +10,85 @@ import { CustomDialog } from "@/components/custom/dialog";
 import { toast } from "sonner";
 
 import { fetcher } from "@/lib/api";
-import type { TaskWithAssignments, ProjectMember } from "@repo/types";
+import type { TaskWithAssignments, ProjectMember, Task } from "@repo/types";
 
-import { TaskForm } from "./taskForm";
+import { TaskForm, TaskFormValues, TaskFormSchema } from "./taskForm";
 
 export type TaskCardProps = TaskWithAssignments & {
 	projectMembers: ProjectMember[];
 	onUpdate: () => void;
 };
 
-export function TaskCard(props: TaskCardProps) {
-	const {
-		id,
-		title,
-		description,
-		isCompleted,
-		createdAt,
-		assignments,
-		projectId,
-		projectMembers,
-		onUpdate,
-	} = props;
-
+export function TaskCard({
+	id,
+	title,
+	description,
+	isCompleted,
+	createdAt,
+	assignments,
+	projectId,
+	projectMembers,
+	onUpdate,
+}: TaskCardProps) {
 	const state = isCompleted ? "Done" : "Pending";
 	const badgeVariant = state === "Done" ? "green" : "destructive";
 
 	const primaryUser = assignments[0]?.user.alias || "Sin asignar";
+
+	const [editValues, setEditValues] = useState<TaskFormValues>({
+		title,
+		description: description ?? "",
+		userId: assignments[0]?.user.userId ?? "",
+		isCompleted,
+	});
+	const [isSaving, setIsSaving] = useState(false);
+
+	const handleEditChange = (
+		field: keyof TaskFormValues,
+		value: string | boolean
+	) => {
+		setEditValues(
+			(prev) => ({ ...prev, [field]: value }) as TaskFormValues
+		);
+	};
+
+	async function handleEditSubmit() {
+		if (isSaving) return;
+		setIsSaving(true);
+
+		const parsed = TaskFormSchema.safeParse(editValues);
+
+		if (!parsed.success) {
+			parsed.error.issues.forEach((issue) => {
+				toast.error(issue.message);
+			});
+			setIsSaving(false);
+			return;
+		}
+
+		const apiBody = {
+			title: parsed.data.title,
+			description: parsed.data.description,
+			isCompleted: parsed.data.isCompleted,
+			userIds: [parsed.data.userId],
+		};
+
+		const { error } = await fetcher<Task, typeof apiBody>(`/task/${id}`, {
+			method: "PATCH",
+			body: apiBody,
+			needsAuth: true,
+		});
+
+		if (error) {
+			toast.error(error);
+			setIsSaving(false);
+			return;
+		}
+
+		toast.success("Task updated");
+		setIsSaving(false);
+		onUpdate();
+	}
 
 	async function handleDelete() {
 		const { error } = await fetcher(`/task/${id}`, {
@@ -43,7 +99,7 @@ export function TaskCard(props: TaskCardProps) {
 		if (error) {
 			toast.error(error);
 		} else {
-			toast.success("Tarea borrada");
+			toast.success("Task deleted");
 			onUpdate();
 		}
 	}
@@ -73,7 +129,7 @@ export function TaskCard(props: TaskCardProps) {
 					<div className="flex items-center text-xs text-muted-foreground mt-1">
 						<CalendarDays className="size-3.5 mr-1" />
 						<span>
-							Creada el {new Date(createdAt).toLocaleDateString()}
+							Created: {new Date(createdAt).toLocaleDateString()}
 						</span>
 					</div>
 
@@ -93,20 +149,27 @@ export function TaskCard(props: TaskCardProps) {
 				<CustomDialog
 					title={`Editando tarea: "${title}"`}
 					subtitle="Modify the fields and save the changes"
-					confirmIcon={<Edit />}
+					confirmIcon={
+						isSaving ? (
+							<Loader2 className="h-4 w-4 animate-spin" />
+						) : (
+							<Edit />
+						)
+					}
 					isIcon={true}
+					onSubmit={handleEditSubmit}
 				>
 					<TaskForm
-						projectId={projectId}
-						// users={projectMembers}
-						taskToEdit={props}
-						onSuccess={onUpdate}
+						values={editValues}
+						users={projectMembers}
+						loading={isSaving}
+						onChange={handleEditChange}
 					/>
 				</CustomDialog>
 
 				<ConfirmationDialog
 					dialogAction="delete"
-					text={`Task"${title}" will be permantently deleted.`}
+					text={`Task "${title}" will be permantently deleted.`}
 					objective={"task"}
 					onConfirm={handleDelete}
 				/>
@@ -119,10 +182,7 @@ export function SkeletonCard() {
 	return (
 		<div
 			data-task-card
-			className="
-        relative p-5 rounded-2xl border border-border/40 bg-card
-        shadow-sm hover:shadow-md transition-all duration-300
-      "
+			className="relative p-5 rounded-2xl border border-border/40 bg-card shadow-sm hover:shadow-md transition-all duration-300"
 		>
 			<Skeleton className="absolute top-3 right-3 h-5 w-14 rounded-full bg-neutral-300/70 animate-pulse" />
 
