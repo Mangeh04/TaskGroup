@@ -13,7 +13,7 @@ enum Role {
   MEMBER // view, create / edit tasks
 }
 
-enum Mode {
+enum Theme {
   SYSTEM
   DARK
   LIGHT
@@ -47,8 +47,6 @@ model User {
 
   config ProfileConfiguration[]
 
-  status Status @default(ONLINE)
-
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -59,9 +57,10 @@ model ProfileConfiguration {
   userId String @unique
   user   User   @relation(fields: [userId], references: [id])
 
-  darkMode   Mode    @default(SYSTEM)
+  darkMode   Theme    @default(SYSTEM)
   language   String  @default("en")
   preference Boolean @default(true)
+  status Status @default(ONLINE)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
