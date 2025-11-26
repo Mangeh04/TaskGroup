@@ -27,3 +27,5 @@ export type TaskWithAssignments = Task & {
 		user: ProjectMember;
 	}[];
 };
+
+export { Role as RoleEnum };
