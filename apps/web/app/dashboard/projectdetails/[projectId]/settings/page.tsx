@@ -1,6 +1,7 @@
 "use client";
 
-import { useMemo, Suspense } from "react";
+import { useMemo } from "react";
+import { useParams } from "next/navigation";
 import {
 	SidebarProvider,
 	SidebarTrigger,
@@ -14,36 +15,29 @@ import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
 import { fetcher } from "@/lib/api";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { DangerZone } from "./components/dangerZone";
 import { OverviewCard } from "./components/overviewCard";
 import { GeneralSettings } from "./components/generalSettings";
 import { TeamSettings } from "./components/teamSettings";
+import { RoleEnum } from "@repo/types";
 
 const users: Array<{
 	id: string;
 	username: string;
-	role: "Owner" | "Admin" | "Member";
+	role: RoleEnum;
 }> = [
-	{ id: "1", username: "mangeh04", role: "Owner" },
-	{ id: "2", username: "blackfox099", role: "Admin" },
-	{ id: "3", username: "axiur", role: "Member" },
-	{ id: "4", username: "alejandropxrez", role: "Member" },
+	{ id: "1", username: "mangeh04", role: RoleEnum.OWNER },
+	{ id: "2", username: "blackfox099", role: RoleEnum.ADMIN },
+	{ id: "3", username: "axiur", role: RoleEnum.MEMBER },
+	{ id: "4", username: "alejandropxrez", role: RoleEnum.MEMBER },
 ];
 
-export default function ProjectSettingsPageWrapper() {
-	return (
-		<Suspense>
-			<ProjectSettingsPage />
-		</Suspense>
-	);
-}
-
-function ProjectSettingsPage() {
+export default function ProjectSettingsPage() {
 	const router = useRouter();
 
-	const searchParams = useSearchParams();
-	const projectId = searchParams.get("projectId") as string;
+	const params = useParams();
+	const projectId = params.projectId as string;
 
 	async function handleDelete() {
 		const { error } = await fetcher(`/project/${projectId}`, {
@@ -66,7 +60,7 @@ function ProjectSettingsPage() {
 
 	const memberCount = users.length;
 	const adminCount = useMemo(
-		() => users.filter((u) => u.role !== "Member").length,
+		() => users.filter((u) => u.role !== RoleEnum.MEMBER).length,
 		[]
 	);
 

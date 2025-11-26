@@ -29,7 +29,7 @@ import {
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
 import { fetcher } from "@/lib/api";
-import { StatusEnum, User } from "@repo/types";
+import { type ProfileEndpoint, StatusEnum } from "@repo/types";
 
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
@@ -40,7 +40,7 @@ import { useEffect, useState } from "react";
 export function NavUser({
 	user,
 }: {
-	user: Omit<User, "id" | "createdAt" | "updatedAt"> & {
+	user: ProfileEndpoint & {
 		avatar: string;
 	};
 }) {

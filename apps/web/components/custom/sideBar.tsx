@@ -1,10 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
 import { Settings2, InboxIcon, Home, PersonStandingIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
-import { toast } from "sonner";
 
 import { NavProjects } from "@/components/nav/nav-projects";
 import { NavUser } from "@/components/nav/nav-user";
@@ -21,9 +19,9 @@ import {
 } from "@/components/ui/sidebar";
 
 import { NavConfiguration } from "@/components/nav/nav-configuration";
-import { fetcher } from "@/lib/api";
 
-import { type Status, User, StatusEnum } from "@repo/types";
+import { type Status, StatusEnum } from "@repo/types";
+import { useUser } from "@/context/UserContext";
 
 export type SidebarProps = {
 	isProject?: boolean;
@@ -59,37 +57,18 @@ export default function AppSidebar({
 		Configuration: [
 			{
 				name: "Settings",
-				url: `/dashboard/projectdetails?projectId=${projectId}/settings`,
+				url: `/dashboard/projectdetails/${projectId}/settings`,
 				icon: Settings2,
 			},
 			{
 				name: "Members",
-				url: `/dashboard/projectdetails?projectId=${projectId}/members`,
+				url: `/dashboard/projectdetails/${projectId}/members`,
 				icon: PersonStandingIcon,
 			},
 		],
 	};
 
-	const [user, setUser] = useState<User | null>(null);
-	const [loadingUser, setLoadingUser] = useState(true);
-
-	const fetchUser = useCallback(async () => {
-		setLoadingUser(true);
-
-		const { data, error } = await fetcher<User>("/user/profile", {
-			method: "GET",
-			needsAuth: true,
-		});
-
-		if (error) {
-			toast.error("Failed to load user profile");
-			console.error(error);
-		} else {
-			setUser(data);
-		}
-	}, []);
-
-	useEffect(() => void fetchUser(), [fetchUser]);
+	const { user } = useUser();
 
 	const sidebarUser = user
 		? {
@@ -140,7 +119,7 @@ export default function AppSidebar({
 			</SidebarContent>
 			<SidebarFooter>
 				{isProject && !hasMembers && <EmptyUser />}
-				<NavUser user={sidebarUser} />
+				<NavUser user={sidebarUser as unknown as any} />
 			</SidebarFooter>
 		</Sidebar>
 	);

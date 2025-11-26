@@ -7,7 +7,7 @@ import AppSidebar from "@/components/custom/sideBar";
 import {
 	MemberCard,
 	MemberCardProps,
-} from "@/app/dashboard/projectdetails/members/components/member";
+} from "@/app/dashboard/projectdetails/[projectId]/members/components/member";
 import { type Status, StatusEnum } from "@repo/types";
 
 type DeveloperData = MemberCardProps & { status: Status };

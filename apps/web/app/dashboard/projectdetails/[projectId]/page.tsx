@@ -1,13 +1,7 @@
 "use client";
 
-import {
-	useRef,
-	useMemo,
-	useCallback,
-	useEffect,
-	useState,
-	Suspense,
-} from "react";
+import { useRef, useMemo, useCallback, useEffect, useState } from "react";
+import { useParams } from "next/navigation";
 import {
 	SidebarProvider,
 	SidebarTrigger,
@@ -35,27 +29,19 @@ import type { TaskWithAssignments, ProjectMember, Task } from "@repo/types";
 import { fetcher } from "@/lib/api";
 
 import { PlusIcon, Loader2 } from "lucide-react";
-import { TaskCard, SkeletonCard } from "./components/task";
+import { TaskCard, SkeletonCard } from "../components/task";
 import {
 	TaskForm,
 	TaskFormSchema,
 	TaskFormValues,
-} from "./components/taskForm";
+} from "../components/taskForm";
 import { toast } from "sonner";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
-export default function ProjectDetailsPage() {
-	return (
-		<Suspense fallback={<div className="p-4">Cargando proyecto…</div>}>
-			<ProjectPage />
-		</Suspense>
-	);
-}
-
-function ProjectPage() {
+export default function ProjectPage() {
+	const params = useParams();
+	const projectId = params.projectId as string;
 	const router = useRouter();
-	const searchParams = useSearchParams();
-	const projectId = searchParams.get("projectId");
 
 	useEffect(() => {
 		if (!projectId) {

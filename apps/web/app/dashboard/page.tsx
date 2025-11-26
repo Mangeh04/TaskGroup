@@ -232,7 +232,7 @@ export default function DashboardPage() {
 													className="min-h-[88px]"
 												>
 													<Link
-														href={`/dashboard/projectdetails?projectId=${item.id}`}
+														href={`/dashboard/projectdetails/${item.id}`}
 													>
 														<ProjectCard
 															title={item.name}
