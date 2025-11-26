@@ -12,7 +12,6 @@ import {
 	LayoutDashboard,
 	Palette,
 } from "lucide-react";
-import { cn } from "@/lib/utils";
 
 import { SecuritySection } from "./securitySection";
 import { ProfileSection } from "./profileSection";
@@ -20,10 +19,9 @@ import { NotificationsSection } from "./notificationsSection";
 import { AppearanceSection } from "./appearanceSection";
 
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { fetcher } from "@/lib/api";
-import { toast } from "sonner";
 
-import type { User } from "@repo/types";
+import { cn } from "@/lib/utils";
+import { useUser } from "@/context/UserContext";
 
 type SectionId = "profile" | "security" | "notifications" | "appearance";
 
@@ -45,24 +43,7 @@ export function SettingsPage() {
 		useState<SectionId>(initialSection);
 	const [sidebarOpen, setSidebarOpen] = useState(false);
 
-	const [user, setUser] = useState<User | null>(null);
-	const [loadingUser, setLoadingUser] = useState(true);
-
-	const fetchUser = useCallback(async () => {
-		setLoadingUser(true);
-
-		const { data, error } = await fetcher<User>("/user/profile", {
-			method: "GET",
-			needsAuth: true,
-		});
-
-		if (error) {
-			toast.error("Failed to load user profile");
-			console.error(error);
-		} else {
-			setUser(data);
-		}
-	}, []);
+	const { user } = useUser();
 
 	const data = {
 		user: {
@@ -79,8 +60,6 @@ export function SettingsPage() {
 				avatar: "https://raw.githubusercontent.com/Mangeh04/Storage/main/dragonite.jpeg",
 			}
 		: data.user;
-
-	useEffect(() => void fetchUser(), [fetchUser]);
 
 	const baseParams = useMemo(
 		() => new URLSearchParams(Array.from(searchParams.entries())),

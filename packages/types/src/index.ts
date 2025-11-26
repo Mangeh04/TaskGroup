@@ -4,6 +4,8 @@ import {
 	Task as DatabaseTask,
 	Project as DataBaseProject,
 	Role,
+	Theme,
+	ProfileConfiguration as DataBaseProfileConfiguration,
 } from "@repo/database";
 
 export type User = Omit<
@@ -29,3 +31,10 @@ export type TaskWithAssignments = Task & {
 };
 
 export { Role as RoleEnum };
+export { Theme as ThemeEnum };
+export type ProfileConfiguration = Omit<
+	DataBaseProfileConfiguration,
+	"createdAt" | "updatedAt" | "userId"
+>;
+
+export type ProfileEndpoint = User & ProfileConfiguration;
