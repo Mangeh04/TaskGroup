@@ -23,8 +23,9 @@ export interface IUserService {
   getUserConfiguration(userId: string): Promise<UserConfiguration>;
   updateUserConfiguration(
     userId: string,
-    data: ProfileConfiguration,
+    data: Partial<
+      Omit<ProfileConfiguration, 'userId' | 'createdAt' | 'updatedAt'>
+    >,
   ): Promise<boolean>;
   updateUserPassword(userId: string, password: string): Promise<boolean>;
-  updateStatus(userId: string, status: Status): Promise<boolean>;
 }

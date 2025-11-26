@@ -5,8 +5,11 @@ import { User } from 'src/auth/decorators/user.decorator';
 import type { JwtPayload } from 'src/auth/types/jwt-payload.type';
 import { SERVICES } from 'src/utils/constants';
 
-import type { IUserService } from '../interfaces/user.interface';
-import { UpdateStatusDto } from '../dtos/userStatus.dto';
+import type {
+  IUserService,
+  UserConfiguration,
+} from '../interfaces/user.interface';
+import { UpdatePreferenceDto } from '../dtos/userPreference.dto';
 
 @Controller('user')
 export class UserController {
@@ -30,11 +33,14 @@ export class UserController {
     };
   }
 
-  @Patch('status')
-  async updateStatus(
-    @Body() updateStatusDto: UpdateStatusDto,
+  @Patch('preference')
+  async updatePreference(
+    @Body() updatePreference: UpdatePreferenceDto,
     @User() user: JwtPayload,
   ) {
-    return this.userService.updateStatus(user.sub, updateStatusDto.status);
+    return this.userService.updateUserConfiguration(
+      user.sub,
+      updatePreference as unknown as UserConfiguration,
+    );
   }
 }

@@ -64,7 +64,7 @@ export function NavUser({
 	async function handleStatusChange(newStatus: StatusEnum) {
 		setStatus(newStatus);
 
-		const { error } = await fetcher("/user/status", {
+		const { error } = await fetcher("/user/preference", {
 			method: "PATCH",
 			body: { status: newStatus },
 			needsAuth: true,

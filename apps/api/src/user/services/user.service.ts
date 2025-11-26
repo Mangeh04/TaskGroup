@@ -108,19 +108,13 @@ export class UserService implements IUserService {
 
   public async updateUserConfiguration(
     userId: string,
-    data: ProfileConfiguration,
+    data: Partial<
+      Omit<ProfileConfiguration, 'userId' | 'createdAt' | 'updatedAt'>
+    >,
   ) {
     await this.prismaService.profileConfiguration.update({
       where: { userId },
       data,
-    });
-    return true;
-  }
-
-  public async updateStatus(userId: string, status: Status) {
-    await this.prismaService.user.update({
-      where: { id: userId },
-      data: { status },
     });
     return true;
   }
