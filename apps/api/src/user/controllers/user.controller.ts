@@ -1,11 +1,11 @@
 import { Body, Controller, Get, Inject, Patch } from '@nestjs/common';
+import { Status } from '@repo/database';
 
 import { User } from 'src/auth/decorators/user.decorator';
 import type { JwtPayload } from 'src/auth/types/jwt-payload.type';
 import { SERVICES } from 'src/utils/constants';
 
 import type { IUserService } from '../interfaces/user.interface';
-import { Status } from '@repo/database';
 import { UpdateStatusDto } from '../dtos/userStatus.dto';
 
 @Controller('user')
