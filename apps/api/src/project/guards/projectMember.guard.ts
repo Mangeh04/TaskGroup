@@ -3,9 +3,9 @@ import {
   ExecutionContext,
   Injectable,
   Inject,
-  ForbiddenException,
   UnauthorizedException,
   BadRequestException,
+  NotFoundException,
 } from '@nestjs/common';
 import { PrismaClient } from '@repo/database';
 import type { JwtPayload } from 'src/auth/types/jwt-payload.type';
@@ -43,7 +43,7 @@ export class ProjectMemberGuard implements CanActivate {
     });
 
     if (!membership) {
-      throw new ForbiddenException('You are not a member of this project.');
+      throw new NotFoundException();
     }
 
     return true;
