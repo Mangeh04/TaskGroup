@@ -23,10 +23,6 @@ export class UserController {
       user.sub,
     );
 
-    (userConfiguration as any).status = userConfiguration.user.status;
-    // We fetched everything in a query and the frontend expect it as status, this is much better DX.
-    delete (userConfiguration as any).user;
-
     return {
       ...user,
       ...userConfiguration,
