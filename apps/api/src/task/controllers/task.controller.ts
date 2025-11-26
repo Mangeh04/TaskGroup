@@ -11,7 +11,6 @@ import {
 } from '@nestjs/common';
 import { Task } from '@repo/database';
 
-import { AuthGuard } from 'src/auth/guards/auth.guard';
 import { SERVICES } from 'src/utils/constants';
 
 import { TaskDto } from '../dtos/taskDto.dto';
