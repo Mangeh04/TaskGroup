@@ -70,6 +70,17 @@ export class UserService implements IUserService {
     return true;
   }
 
+  public async updateUserPassword(userId: string, password: string) {
+    const hashedPassword = await this.cryptoService.hash(password);
+    await this.prismaService.user.update({
+      where: { id: userId },
+      data: {
+        password: hashedPassword,
+      },
+    });
+    return true;
+  }
+
   public async findUserByEmail(emailPlain: string) {
     const emailBi = this.cryptoService.blindIndexEmail(emailPlain);
     return (await this.prismaService.user.findUnique({

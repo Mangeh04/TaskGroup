@@ -25,5 +25,6 @@ export interface IUserService {
     userId: string,
     data: ProfileConfiguration,
   ): Promise<boolean>;
+  updateUserPassword(userId: string, password: string): Promise<boolean>;
   updateStatus(userId: string, status: Status): Promise<boolean>;
 }

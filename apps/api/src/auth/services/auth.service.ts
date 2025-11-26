@@ -93,9 +93,7 @@ export class AuthService implements IAuthService {
       throw new ConflictException('New passwords do not match');
     }
 
-    user.password = newPassword1;
-
-    await this.usersService.updateUser(user);
+    await this.usersService.updateUserPassword(id, newPassword1);
     return true;
   }
 
