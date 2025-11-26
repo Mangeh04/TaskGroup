@@ -1,36 +1,39 @@
+// app/layout.tsx
 import "./globals.css";
-
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { type ReactNode } from "react";
 
 import { UserProvider } from "@/context/UserContext";
 import { Toaster } from "@/components/ui/sonner";
+import { getUserServer } from "@/lib/getUserServer";
 
 export const metadata: Metadata = {
 	title: "Task Group",
 	description: "A lightweight task management app",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
 	children,
 }: Readonly<{
 	children: ReactNode;
 }>) {
+	const user = await getUserServer();
+
 	return (
 		<html lang="en" suppressHydrationWarning>
 			<body>
-				<UserProvider>
-					<ThemeProvider
-						attribute="class"
-						defaultTheme="system"
-						enableSystem
-						disableTransitionOnChange
-					>
+				<ThemeProvider
+					attribute="class"
+					defaultTheme="system"
+					enableSystem
+					disableTransitionOnChange
+				>
+					<UserProvider initialUser={user}>
 						{children}
 						<Toaster richColors position="top-right" />
-					</ThemeProvider>
-				</UserProvider>
+					</UserProvider>
+				</ThemeProvider>
 			</body>
 		</html>
 	);

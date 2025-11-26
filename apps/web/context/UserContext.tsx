@@ -1,10 +1,10 @@
 "use client";
 
-import { createContext, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useContext, useMemo, useState } from "react";
 import { toast } from "sonner";
 
 import { fetcher } from "@/lib/api";
-import { ProfileEndpoint } from "@repo/types";
+import type { ProfileEndpoint } from "@repo/types";
 
 type UserContextType = {
 	user: ProfileEndpoint | null;
@@ -14,11 +14,17 @@ type UserContextType = {
 
 const UserContext = createContext<UserContextType | null>(null);
 
-export const UserProvider = ({ children }: { children: React.ReactNode }) => {
-	const [user, setUser] = useState<ProfileEndpoint | null>(null);
-	const [loading, setLoading] = useState(true);
+export const UserProvider = ({
+	children,
+	initialUser,
+}: {
+	children: React.ReactNode;
+	initialUser: ProfileEndpoint | null;
+}) => {
+	const [user, setUser] = useState<ProfileEndpoint | null>(initialUser);
+	const [loading, setLoading] = useState(false);
 
-	const fetchUser = async () => {
+	const refetchUser = async () => {
 		try {
 			setLoading(true);
 
@@ -30,7 +36,7 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 				}
 			);
 
-			if (error) {
+			if (error || !data) {
 				toast.error("Failed to load user profile");
 				console.error(error);
 				return;
@@ -42,12 +48,8 @@ export const UserProvider = ({ children }: { children: React.ReactNode }) => {
 		}
 	};
 
-	useEffect(() => {
-		if (!user) fetchUser();
-	}, [user]);
-
 	const value = useMemo(
-		() => ({ user, loading, refetchUser: fetchUser }),
+		() => ({ user, loading, refetchUser }),
 		[user, loading]
 	);
 
