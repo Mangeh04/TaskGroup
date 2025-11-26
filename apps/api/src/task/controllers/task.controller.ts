@@ -32,7 +32,7 @@ export class TaskController {
     return this.taskService.createTask(taskDto);
   }
 
-  @Get('recover-all/:projectId')
+  @Get(':projectId')
   @UseGuards(ProjectMemberGuard)
   async getTasks(@Param('projectId') projectId: string): Promise<Task[]> {
     return this.taskService.getTasks(projectId);

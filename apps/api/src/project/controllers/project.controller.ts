@@ -35,7 +35,7 @@ export class ProjectController {
     @Inject(SERVICES.PROJECT) private projectService: IProjectService,
   ) {}
 
-  @Post('create')
+  @Post()
   createProject(
     @Body() projectDto: ProjectDto,
     @User() user: JwtPayload,
@@ -49,7 +49,7 @@ export class ProjectController {
     return this.projectService.updateProject(projectDtoUpdate);
   }
 
-  @Get('recover-all')
+  @Get()
   getProjects(@User() user: JwtPayload): Promise<Project[]> {
     return this.projectService.getProjectsByUserId(user.sub);
   }

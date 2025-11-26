@@ -83,7 +83,7 @@ function ProjectPage() {
 
 		setIsFetching(true);
 		const { data, error } = await fetcher<TaskWithAssignments[]>(
-			`/task/recover-all/${projectId}`,
+			`/task/${projectId}`,
 			{
 				method: "GET",
 				needsAuth: true,

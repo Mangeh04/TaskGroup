@@ -54,13 +54,10 @@ export default function DashboardPage() {
 	const fetchData = useCallback(async () => {
 		setIsFetching(true);
 
-		const { data, error } = await fetcher<ProjectResponse[]>(
-			`/project/recover-all/`,
-			{
-				method: "GET",
-				needsAuth: true,
-			}
-		);
+		const { data, error } = await fetcher<ProjectResponse[]>(`/project/`, {
+			method: "GET",
+			needsAuth: true,
+		});
 
 		if (error) {
 			toast.error(error);
@@ -136,7 +133,7 @@ export default function DashboardPage() {
 		if (isCreating) return;
 		setIsCreating(true);
 
-		const { error } = await fetcher("/project/create", {
+		const { error } = await fetcher("/project/", {
 			method: "POST",
 			body: formValues,
 			needsAuth: true,
