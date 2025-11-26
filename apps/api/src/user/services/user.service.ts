@@ -96,13 +96,6 @@ export class UserService implements IUserService {
         createdAt: true,
         updatedAt: true,
       },
-      include: {
-        user: {
-          select: {
-            status: true,
-          },
-        },
-      },
     })) as unknown as UserConfiguration;
   }
 
