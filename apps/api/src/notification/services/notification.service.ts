@@ -2,11 +2,17 @@ import { Injectable } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 import { Subject, Observable } from 'rxjs';
 import { finalize } from 'rxjs/operators';
-import { Notification, type UserNotification } from '@repo/database';
+import type {
+  TaskAssignedNotification,
+  ProjectInviteNotification,
+} from '@repo/database';
 import { EVENTS } from 'src/utils/constants';
 import type { INotificationService } from '../interfaces/notification.interface';
 
-export type NotificationPayload = Omit<UserNotification, 'userId'>;
+// TODO
+type Notification = TaskAssignedNotification | ProjectInviteNotification;
+
+export type NotificationPayload = Omit<Notification, 'userId'>;
 
 type UserChannel = Subject<NotificationPayload>;
 
@@ -64,10 +70,9 @@ export class NotificationService implements INotificationService {
     const { invitedUserId, inviterName, projectName } = payload;
 
     const notification: NotificationPayload = {
-      title: 'New invitation',
-      description: `You have been invited by ${inviterName} to join ${projectName}`,
-      projectId: payload.projectId,
-      type: Notification.INVITE,
+      holderId: '',
+      inviterId: '',
+      id: '',
     };
 
     this.sendNotificationToUser(invitedUserId, notification);
@@ -82,10 +87,9 @@ export class NotificationService implements INotificationService {
     const { assignedUserId, assignerName, taskName } = payload;
 
     const notification: NotificationPayload = {
-      title: 'New assigned task',
-      description: `You have a new assignment posted by ${assignerName} in ${taskName}`,
-      projectId: null,
-      type: Notification.ASSIGNMENT,
+      holderId: '',
+      inviterId: '',
+      id: '',
     };
 
     this.sendNotificationToUser(assignedUserId, notification);

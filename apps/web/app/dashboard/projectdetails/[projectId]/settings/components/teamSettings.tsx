@@ -11,28 +11,28 @@ import {
 } from "@/components/ui/select";
 import { ConfirmationDialog } from "@/components/custom/confirmation";
 import { Button } from "@/components/ui/button";
-import { InviteMemberDialog } from "../../settings/components/inviteMembersDialog";
-import { RoleEnum } from "@repo/types";
+import { ProjectMember, RoleEnum } from "@repo/types";
+import { CustomDialog } from "@/components/custom/dialog";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
+import Image from "next/image";
+import buttonIcon from "@/public/images/add-member.webp";
 
-export function TeamSettings({
-	users,
-}: {
-	users: Array<{
-		id: string;
-		username: string;
-		role: RoleEnum;
-	}>;
-}) {
+export type TeamSettingsProps = {
+	users: Array<ProjectMember>;
+};
+
+export function TeamSettings({ users }: TeamSettingsProps) {
 	const [members, setMembers] = useState(users);
 
 	const updateRole = (id: string, role: RoleEnum) => {
 		setMembers((prev) =>
-			prev.map((m) => (m.id === id ? { ...m, role } : m))
+			prev.map((m) => (m.userId === id ? { ...m, role } : m))
 		);
 	};
 
 	const removeMember = (id: string) =>
-		setMembers((prev) => prev.filter((m) => m.id !== id));
+		setMembers((prev) => prev.filter((m) => m.userId !== id));
 
 	return (
 		<Card className="rounded-2xl shadow-sm">
@@ -46,24 +46,42 @@ export function TeamSettings({
 					<div className="text-sm text-muted-foreground">
 						Manage roles and invitations.
 					</div>
-					<InviteMemberDialog />
+					<CustomDialog
+						buttonString="Invite Members"
+						title="Invite a new User"
+						subtitle="Invite a person here. Introduce his email to invite."
+						confirmIcon={
+							<Image
+								src={buttonIcon}
+								width={15}
+								height={15}
+								alt="Add new members to the project"
+								className="dark:invert dark:brightness-100"
+							/>
+						}
+					>
+						<Label htmlFor="user-email-inv">Task Name</Label>
+						<Input
+							id="user-email-inv"
+							name="User Email Invitation"
+							placeholder="a@example.com"
+						/>
+					</CustomDialog>
 				</div>
 				<Separator />
 
 				<div className="space-y-3">
 					{members.map((m) => (
 						<div
-							key={m.id}
+							key={m.userId}
 							className="grid grid-cols-1 md:grid-cols-12 items-center gap-3 rounded-xl border p-3"
 						>
 							<div className="md:col-span-5 flex items-center gap-3">
 								<div className="size-8 rounded-full bg-black text-white flex items-center justify-center font-semibold">
-									{m.username[0]}
+									{m.alias[0]}
 								</div>
 								<div className="leading-tight">
-									<div className="font-medium">
-										{m.username}
-									</div>
+									<div className="font-medium">{m.alias}</div>
 									<div className="text-xs text-muted-foreground">
 										{m.role}
 									</div>
@@ -73,7 +91,7 @@ export function TeamSettings({
 								<Select
 									value={m.role}
 									onValueChange={(v) =>
-										updateRole(m.id, v as RoleEnum)
+										updateRole(m.userId, v as RoleEnum)
 									}
 								>
 									<SelectTrigger className="w-full md:w-48">
@@ -97,13 +115,13 @@ export function TeamSettings({
 								<ConfirmationDialog
 									dialogAction="remove"
 									objective="member"
-									text={`Remove @${m.username} from project?`}
+									text={`Remove @${m.alias} from project?`}
 								>
 									<Button
 										variant="destructive"
 										size="sm"
 										className="gap-2"
-										onClick={() => removeMember(m.id)}
+										onClick={() => removeMember(m.userId)}
 									>
 										<Trash2 className="size-4" /> Remove
 									</Button>

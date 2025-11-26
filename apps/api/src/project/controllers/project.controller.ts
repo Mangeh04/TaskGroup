@@ -23,6 +23,7 @@ import { ProjectDto } from '../dtos/projectDto.dto';
 import { ProjectDtoUpdate } from '../dtos/projectDtoUpdate.dto';
 import { BadRequestException } from '@nestjs/common/exceptions';
 import { SanitaizedUser } from 'src/user/interfaces/user.interface';
+import { ProjectAdminGuard } from '../guards/projectAdmin.guard';
 
 type ResultArray = {
   userId: string;
@@ -36,7 +37,7 @@ export class ProjectController {
   ) {}
 
   @Post()
-  createProject(
+  async createProject(
     @Body() projectDto: ProjectDto,
     @User() user: JwtPayload,
   ): Promise<boolean> {
@@ -45,13 +46,20 @@ export class ProjectController {
 
   @Patch('update')
   @UseGuards(ProjectGuard)
-  updateProject(@Body() projectDtoUpdate: ProjectDtoUpdate): Promise<boolean> {
+  async updateProject(
+    @Body() projectDtoUpdate: ProjectDtoUpdate,
+  ): Promise<boolean> {
     return this.projectService.updateProject(projectDtoUpdate);
   }
 
   @Get()
-  getProjects(@User() user: JwtPayload): Promise<Project[]> {
+  async getProjects(@User() user: JwtPayload): Promise<Project[]> {
     return this.projectService.getProjectsByUserId(user.sub);
+  }
+
+  @Get(':id')
+  async getProject(@Param('id') projectId: string): Promise<Project[]> {
+    return this.projectService.getProjectsByUserId(projectId);
   }
 
   @Delete(':id')
@@ -65,9 +73,9 @@ export class ProjectController {
   async removeMember(
     @Param('id') projectId: string,
     @Param('memberId') userIdToKick: string,
-    @User() actor: JwtPayload,
+    @User() user: JwtPayload,
   ): Promise<boolean> {
-    if (actor.sub === userIdToKick) {
+    if (user.sub === userIdToKick) {
       throw new BadRequestException(
         'An owner cannot remove themselves from the project. Please delete the project instead.',
       );
@@ -75,8 +83,21 @@ export class ProjectController {
     return this.projectService.removeMember(projectId, userIdToKick);
   }
 
+  @Post(':id/invite')
+  @UseGuards(ProjectOwnerGuard, ProjectAdminGuard)
+  async inviteMember(
+    @Param('id') projectId: string,
+    @Body('email') email: string,
+    @User() user: JwtPayload,
+  ) {
+    return this.projectService.inviteMember(projectId, email, user.alias);
+  }
+
   @Post(':id/accept')
-  acceptInvitation(@Param('id') projectId: string, @User() user: JwtPayload) {
+  async acceptInvitation(
+    @Param('id') projectId: string,
+    @User() user: JwtPayload,
+  ) {
     return this.projectService.acceptInvitation(projectId, user.sub);
   }
 

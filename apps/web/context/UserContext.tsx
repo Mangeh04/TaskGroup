@@ -1,6 +1,13 @@
 "use client";
 
-import { createContext, useContext, useMemo, useState } from "react";
+import {
+	createContext,
+	useContext,
+	useMemo,
+	useState,
+	useEffect,
+	useCallback,
+} from "react";
 import { toast } from "sonner";
 
 import { fetcher } from "@/lib/api";
@@ -24,7 +31,7 @@ export const UserProvider = ({
 	const [user, setUser] = useState<ProfileEndpoint | null>(initialUser);
 	const [loading, setLoading] = useState(false);
 
-	const refetchUser = async () => {
+	const refetchUser = useCallback(async () => {
 		try {
 			setLoading(true);
 
@@ -46,11 +53,17 @@ export const UserProvider = ({
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, []);
+
+	useEffect(() => {
+		if (!initialUser) {
+			void refetchUser();
+		}
+	}, [initialUser, refetchUser]);
 
 	const value = useMemo(
 		() => ({ user, loading, refetchUser }),
-		[user, loading]
+		[user, loading, refetchUser]
 	);
 
 	return (

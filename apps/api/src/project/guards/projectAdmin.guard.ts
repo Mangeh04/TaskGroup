@@ -13,7 +13,7 @@ import type { IProjectService } from '../interfaces/project.interface';
 import type { JwtPayload } from 'src/auth/types/jwt-payload.type';
 
 @Injectable()
-export class ProjectOwnerGuard implements CanActivate {
+export class ProjectAdminGuard implements CanActivate {
   constructor(
     @Inject(SERVICES.PROJECT) private projectService: IProjectService,
   ) {}
@@ -40,9 +40,9 @@ export class ProjectOwnerGuard implements CanActivate {
       throw new NotFoundException();
     }
 
-    if (membership.role !== Role.OWNER) {
+    if (membership.role === Role.MEMBER) {
       throw new ForbiddenException(
-        'You do not have permission to do this action (requires OWNER role)',
+        'You do not have permission to do this action(requires ADMIN role)',
       );
     }
 

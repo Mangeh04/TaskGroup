@@ -1,12 +1,8 @@
 "use client";
 
 import { useRef, useMemo, useCallback, useEffect, useState } from "react";
-import { useParams } from "next/navigation";
-import {
-	SidebarProvider,
-	SidebarTrigger,
-	SidebarInset,
-} from "@/components/ui/sidebar";
+import { useParams, useRouter } from "next/navigation";
+import { SidebarTrigger } from "@/components/ui/sidebar";
 
 import {
 	Pagination,
@@ -17,7 +13,6 @@ import {
 	PaginationPrevious,
 } from "@/components/ui/pagination";
 
-import AppSidebar from "@/components/custom/sideBar";
 import { EmptyPage } from "@/components/custom/empty";
 import { CustomDialog } from "@/components/custom/dialog";
 import { Progress } from "@/components/ui/progress";
@@ -36,7 +31,6 @@ import {
 	TaskFormValues,
 } from "../components/taskForm";
 import { toast } from "sonner";
-import { useRouter } from "next/navigation";
 
 export default function ProjectPage() {
 	const params = useParams();
@@ -186,7 +180,6 @@ export default function ProjectPage() {
 		};
 	}, [updateItemsPerPage]);
 
-	// ⬇️ onSubmit para crear tarea (ya sin FormEvent, lo controla CustomDialog)
 	const handleCreateSubmit = async () => {
 		if (!projectId) return;
 		if (isSavingTask) return;
@@ -244,236 +237,223 @@ export default function ProjectPage() {
 	if (!projectId) return null;
 
 	return (
-		<div className="flex h-dvh overflow-hidden bg-white">
-			<SidebarProvider>
-				<AppSidebar
-					isProject={true}
-					hasMembers={users.length > 1}
-					projectId={projectId}
+		<>
+			<header className="relative flex h-14 shrink-0 items-center gap-6 px-4 border-b">
+				<SidebarTrigger />
+				<BreadCrumbCustom
+					items={breadcrumbItems}
+					currentPage="Project"
 				/>
-				<SidebarInset className="flex flex-1 min-h-0 flex-col bg-white dark:bg-neutral-950">
-					<header className="relative flex h-14 shrink-0 items-center gap-6 px-4 border-b">
-						<SidebarTrigger />
-						<BreadCrumbCustom
-							items={breadcrumbItems}
-							currentPage="Project"
+
+				{hasTasks && (
+					<div className="ml-auto flex items-center gap-6">
+						<div className="flex items-baseline gap-1">
+							<span className="text-2xl font-bold">
+								{totalTasks}
+							</span>
+							<span className="text-xs font-medium text-muted-foreground">
+								TOTAL
+							</span>
+						</div>
+						<div className="flex items-baseline gap-1">
+							<span className="text-2xl font-bold">
+								{pendingTasks}
+							</span>
+							<span className="text-xs font-medium text-muted-foreground">
+								Pending
+							</span>
+						</div>
+						<div className="flex items-baseline gap-1">
+							<span className="text-2xl font-bold">
+								{completedTasks}
+							</span>
+							<span className="text-xs font-medium text-muted-foreground">
+								Completed
+							</span>
+						</div>
+						<div className="flex items-baseline gap-1">
+							<span className="text-2xl font-bold">
+								{Math.round(progressPercentage)}%
+							</span>
+							<span className="text-xs font-medium text-muted-foreground">
+								Progress
+							</span>
+						</div>
+					</div>
+				)}
+
+				{isFetching && (
+					<div className="ml-4 flex items-center gap-2">
+						<Loader2 className="h-4 w-4 animate-spin text-muted-foreground/80" />
+						<span className="text-xs text-muted-foreground">
+							Loading…
+						</span>
+					</div>
+				)}
+			</header>
+
+			{hasTasks && (
+				<div className="flex items-center justify-between gap-4 px-4 py-4 border-b">
+					<div className="shrink-0">
+						<CustomDialog
+							buttonString="Create Task"
+							title="Create a new Task"
+							subtitle="Create your new tasks here. Click save when you're done"
+							confirmIcon={
+								isSavingTask ? (
+									<Loader2 className="h-4 w-4 animate-spin" />
+								) : (
+									<PlusIcon />
+								)
+							}
+							onSubmit={handleCreateSubmit}
+						>
+							<TaskForm
+								values={createValues}
+								users={users}
+								loading={isSavingTask}
+								onChange={handleCreateChange}
+							/>
+						</CustomDialog>
+					</div>
+					<div className="flex-1 max-w-sm">
+						<div className="flex justify-between items-center mb-1">
+							<span className="text-sm font-medium">
+								Task Progress
+							</span>
+							<span className="text-sm font-medium text-muted-foreground">
+								{Math.round(progressPercentage)}%
+							</span>
+						</div>
+						<Progress
+							value={progressPercentage}
+							className="w-full"
 						/>
+					</div>
+				</div>
+			)}
 
-						{hasTasks && (
-							<div className="ml-auto flex items-center gap-6">
-								<div className="flex items-baseline gap-1">
-									<span className="text-2xl font-bold">
-										{totalTasks}
-									</span>
-									<span className="text-xs font-medium text-muted-foreground">
-										TOTAL
-									</span>
-								</div>
-								<div className="flex items-baseline gap-1">
-									<span className="text-2xl font-bold">
-										{pendingTasks}
-									</span>
-									<span className="text-xs font-medium text-muted-foreground">
-										Pending
-									</span>
-								</div>
-								<div className="flex items-baseline gap-1">
-									<span className="text-2xl font-bold">
-										{completedTasks}
-									</span>
-									<span className="text-xs font-medium text-muted-foreground">
-										Completed
-									</span>
-								</div>
-								<div className="flex items-baseline gap-1">
-									<span className="text-2xl font-bold">
-										{Math.round(progressPercentage)}%
-									</span>
-									<span className="text-xs font-medium text-muted-foreground">
-										Progress
-									</span>
-								</div>
-							</div>
+			{hasTasks ? (
+				<div className="flex flex-col gap-4 flex-1 min-h-0 px-4 py-6 overflow-hidden">
+					<div
+						ref={listContainerRef}
+						className="relative flex-1 overflow-y-auto"
+					>
+						{isPaginating && (
+							<div className="pointer-events-none absolute inset-0 z-10" />
 						)}
 
-						{isFetching && (
-							<div className="ml-4 flex items-center gap-2">
-								<Loader2 className="h-4 w-4 animate-spin text-muted-foreground/80" />
-								<span className="text-xs text-muted-foreground">
-									Loading…
-								</span>
-							</div>
-						)}
-					</header>
+						<div
+							ref={gridRef}
+							className="grid grid-cols-1 md:grid-cols-2 gap-4"
+						>
+							{isInitialLoading
+								? Array.from({
+										length: visibleCount,
+									}).map((_, i) => (
+										<div
+											key={`skeleton_${i}`}
+											data-task-card
+											className="min-h-40"
+										>
+											<SkeletonCard />
+										</div>
+									))
+								: currentData.map((task) => (
+										<div
+											key={task.id}
+											data-task-card
+											className="min-h-40"
+										>
+											<TaskCard
+												{...task}
+												projectMembers={users}
+												onUpdate={fetchTasks}
+											/>
+										</div>
+									))}
+						</div>
+					</div>
 
-					{hasTasks && (
-						<div className="flex items-center justify-between gap-4 px-4 py-4 border-b">
-							<div className="shrink-0">
-								<CustomDialog
-									buttonString="Create Task"
-									title="Create a new Task"
-									subtitle="Create your new tasks here. Click save when you're done"
-									confirmIcon={
-										isSavingTask ? (
-											<Loader2 className="h-4 w-4 animate-spin" />
-										) : (
-											<PlusIcon />
-										)
-									}
-									onSubmit={handleCreateSubmit}
-								>
-									<TaskForm
-										values={createValues}
-										users={users}
-										loading={isSavingTask}
-										onChange={handleCreateChange}
+					<div className="shrink-0">
+						<Pagination>
+							<PaginationContent>
+								<PaginationItem>
+									<PaginationPrevious
+										href="#"
+										onClick={handlePrevious}
+										aria-disabled={currentPage === 1}
+										className={
+											currentPage === 1
+												? "pointer-events-none opacity-50"
+												: ""
+										}
 									/>
-								</CustomDialog>
-							</div>
-							<div className="flex-1 max-w-sm">
-								<div className="flex justify-between items-center mb-1">
-									<span className="text-sm font-medium">
-										Task Progress
-									</span>
-									<span className="text-sm font-medium text-muted-foreground">
-										{Math.round(progressPercentage)}%
-									</span>
-								</div>
-								<Progress
-									value={progressPercentage}
-									className="w-full"
-								/>
-							</div>
-						</div>
-					)}
+								</PaginationItem>
 
-					{hasTasks ? (
-						<div className="flex flex-col gap-4 flex-1 min-h-0 px-4 py-6 overflow-hidden">
-							<div
-								ref={listContainerRef}
-								className="relative flex-1 overflow-y-auto"
-							>
-								{isPaginating && (
-									<div className="pointer-events-none absolute inset-0 z-10" />
-								)}
+								{Array.from(
+									{ length: totalPages },
+									(_, i) => i + 1
+								).map((page) => (
+									<PaginationItem key={page}>
+										<PaginationLink
+											href="#"
+											onClick={(e) =>
+												handlePageClick(e, page)
+											}
+											isActive={currentPage === page}
+										>
+											{page}
+										</PaginationLink>
+									</PaginationItem>
+								))}
 
-								<div
-									ref={gridRef}
-									className="grid grid-cols-1 md:grid-cols-2 gap-4"
-								>
-									{isInitialLoading
-										? Array.from({
-												length: visibleCount,
-											}).map((_, i) => (
-												<div
-													key={`skeleton_${i}`}
-													data-task-card
-													className="min-h-40"
-												>
-													<SkeletonCard />
-												</div>
-											))
-										: currentData.map((task) => (
-												<div
-													key={task.id}
-													data-task-card
-													className="min-h-40"
-												>
-													<TaskCard
-														{...task}
-														projectMembers={users}
-														onUpdate={fetchTasks}
-													/>
-												</div>
-											))}
-								</div>
-							</div>
-
-							<div className="shrink-0">
-								<Pagination>
-									<PaginationContent>
-										<PaginationItem>
-											<PaginationPrevious
-												href="#"
-												onClick={handlePrevious}
-												aria-disabled={
-													currentPage === 1
-												}
-												className={
-													currentPage === 1
-														? "pointer-events-none opacity-50"
-														: ""
-												}
-											/>
-										</PaginationItem>
-
-										{Array.from(
-											{ length: totalPages },
-											(_, i) => i + 1
-										).map((page) => (
-											<PaginationItem key={page}>
-												<PaginationLink
-													href="#"
-													onClick={(e) =>
-														handlePageClick(e, page)
-													}
-													isActive={
-														currentPage === page
-													}
-												>
-													{page}
-												</PaginationLink>
-											</PaginationItem>
-										))}
-
-										<PaginationItem>
-											<PaginationNext
-												href="#"
-												onClick={handleNext}
-												aria-disabled={
-													currentPage === totalPages
-												}
-												className={
-													currentPage === totalPages
-														? "pointer-events-none opacity-50"
-														: ""
-												}
-											/>
-										</PaginationItem>
-									</PaginationContent>
-								</Pagination>
-							</div>
-						</div>
-					) : (
-						<div className="flex flex-1 items-center justify-center p-6 overflow-hidden">
-							<EmptyPage
-								title="You don't have any tasks yet"
-								buttonString="Create Task"
-								imageSrc={emptyImage}
-								imageAlt="Empty tasks illustration"
-								customDialog={{
-									title: "Create Task",
-									subtitle:
-										"Create your new tasks here. Click save when you're done",
-									confirmIcon: isSavingTask ? (
-										<Loader2 className="h-4 w-4 animate-spin" />
-									) : (
-										<PlusIcon />
-									),
-									onSubmit: handleCreateSubmit,
-								}}
-							>
-								<TaskForm
-									values={createValues}
-									users={users}
-									loading={isSavingTask}
-									onChange={handleCreateChange}
-								/>
-							</EmptyPage>
-						</div>
-					)}
-				</SidebarInset>
-			</SidebarProvider>
-		</div>
+								<PaginationItem>
+									<PaginationNext
+										href="#"
+										onClick={handleNext}
+										aria-disabled={
+											currentPage === totalPages
+										}
+										className={
+											currentPage === totalPages
+												? "pointer-events-none opacity-50"
+												: ""
+										}
+									/>
+								</PaginationItem>
+							</PaginationContent>
+						</Pagination>
+					</div>
+				</div>
+			) : (
+				<div className="flex flex-1 items-center justify-center p-6 overflow-hidden">
+					<EmptyPage
+						title="You don't have any tasks yet"
+						buttonString="Create Task"
+						imageSrc={emptyImage}
+						imageAlt="Empty tasks illustration"
+						customDialog={{
+							title: "Create Task",
+							subtitle:
+								"Create your new tasks here. Click save when you're done",
+							confirmIcon: isSavingTask ? (
+								<Loader2 className="h-4 w-4 animate-spin" />
+							) : (
+								<PlusIcon />
+							),
+							onSubmit: handleCreateSubmit,
+						}}
+					>
+						<TaskForm
+							values={createValues}
+							users={users}
+							loading={isSavingTask}
+							onChange={handleCreateChange}
+						/>
+					</EmptyPage>
+				</div>
+			)}
+		</>
 	);
 }

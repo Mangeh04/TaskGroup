@@ -1,5 +1,7 @@
 "use client";
 
+import { useMemo } from "react";
+import { usePathname, useParams } from "next/navigation";
 import { Settings2, InboxIcon, Home, PersonStandingIcon } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -23,50 +25,54 @@ import { NavConfiguration } from "@/components/nav/nav-configuration";
 import { type Status, StatusEnum } from "@repo/types";
 import { useUser } from "@/context/UserContext";
 
-export type SidebarProps = {
-	isProject?: boolean;
-	projectId?: string;
-	hasMembers?: boolean;
-};
+export type SidebarProps = React.ComponentProps<typeof Sidebar>;
 
-export default function AppSidebar({
-	isProject,
-	projectId,
-	hasMembers,
-}: React.ComponentProps<typeof Sidebar> & SidebarProps) {
-	const dataSideBar = {
-		user: {
-			alias: "Mangeh04",
-			email: "mapsantamaria@esei.uvigo.es",
-			avatar: "https://raw.githubusercontent.com/Mangeh04/Storage/main/dragonite.jpeg",
-			status: StatusEnum.ONLINE as Status,
-		},
-		projects: [
-			{
-				name: "Main",
-				url: "/dashboard",
-				icon: Home,
-			},
-			{
-				name: "Inbox",
-				url: "/inbox",
-				icon: InboxIcon,
-			},
-		],
+export default function AppSidebar(props: SidebarProps) {
+	const pathname = usePathname();
+	const params = useParams() as { projectId?: string };
 
-		Configuration: [
-			{
-				name: "Settings",
-				url: `/dashboard/projectdetails/${projectId}/settings`,
-				icon: Settings2,
+	const isProject = pathname.startsWith("/dashboard/projectdetails");
+	const projectId = params.projectId;
+
+	const hasMembers = false;
+
+	const dataSideBar = useMemo(
+		() => ({
+			user: {
+				alias: "Mangeh04",
+				email: "mapsantamaria@esei.uvigo.es",
+				status: StatusEnum.ONLINE as Status,
 			},
-			{
-				name: "Members",
-				url: `/dashboard/projectdetails/${projectId}/members`,
-				icon: PersonStandingIcon,
-			},
-		],
-	};
+			projects: [
+				{
+					name: "Main",
+					url: "/dashboard",
+					icon: Home,
+				},
+				{
+					name: "Inbox",
+					url: "/inbox",
+					icon: InboxIcon,
+				},
+			],
+			Configuration:
+				projectId != null
+					? [
+							{
+								name: "Settings",
+								url: `/dashboard/projectdetails/${projectId}/settings`,
+								icon: Settings2,
+							},
+							{
+								name: "Members",
+								url: `/dashboard/projectdetails/${projectId}/members`,
+								icon: PersonStandingIcon,
+							},
+						]
+					: [],
+		}),
+		[projectId]
+	);
 
 	const { user } = useUser();
 
@@ -74,20 +80,19 @@ export default function AppSidebar({
 		? {
 				alias: user.alias,
 				email: user.email,
-				avatar: "https://raw.githubusercontent.com/Mangeh04/Storage/main/dragonite.jpeg",
 				status: user.status,
 			}
-		: dataSideBar.user;
+		: null;
 
 	return (
-		<Sidebar variant="inset">
+		<Sidebar variant="inset" {...props}>
 			<SidebarHeader>
 				<SidebarMenu>
 					<SidebarMenuItem>
 						<SidebarMenuButton size="lg" asChild>
 							<Link href="/group-information">
 								<Image
-									src="/images/logoTM.png"
+									src="/images/calvo.png"
 									alt="Logo"
 									width={32}
 									height={32}
@@ -106,9 +111,12 @@ export default function AppSidebar({
 					</SidebarMenuItem>
 				</SidebarMenu>
 			</SidebarHeader>
+
 			<SidebarContent>
 				<NavProjects projects={dataSideBar.projects} />
+
 				{isProject &&
+					dataSideBar.Configuration.length > 0 &&
 					(hasMembers ? (
 						<NavConfiguration config={dataSideBar.Configuration} />
 					) : (
@@ -117,9 +125,10 @@ export default function AppSidebar({
 						/>
 					))}
 			</SidebarContent>
+
 			<SidebarFooter>
 				{isProject && !hasMembers && <EmptyUser />}
-				<NavUser user={sidebarUser as unknown as any} />
+				<NavUser user={sidebarUser as any} />
 			</SidebarFooter>
 		</Sidebar>
 	);

@@ -15,6 +15,7 @@ export class PrismaExceptionFilter implements ExceptionFilter {
       case 'P2025':
         return response.status(401).json({ message: 'Unauthorized' });
       default:
+        console.log('Prisma Exception:', exception);
         return response.status(500).json({ message: 'Internal Server Error' });
     }
   }

@@ -14,6 +14,7 @@ export interface IProjectService {
   deleteProject(projectId: string): Promise<boolean>;
   updateProject(projectDtoUpdate: ProjectDtoUpdate): Promise<boolean>;
   getProjectsByUserId(userId: string): Promise<Project[]>;
+  getProjectById(projectId: string): Promise<Project | null>;
   getMembership(
     userId: string,
     projectId: string,
@@ -21,9 +22,8 @@ export interface IProjectService {
   removeMember(projectId: string, userIdToKick: string): Promise<boolean>;
   inviteMember(
     projectId: string,
-    userIdToInvite: string,
+    userEmailToInvite: string,
     inviterName: string,
-    projectName: string,
   ): Promise<boolean>;
   assignTask(
     projectId: string,

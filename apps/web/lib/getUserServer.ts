@@ -26,10 +26,11 @@ export const getUserServer = cache(
 			}
 		);
 
-		if (error || !data) {
+		if (error) {
 			return null;
 		}
 
+		console.log(data);
 		return data;
 	}
 );

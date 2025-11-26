@@ -19,11 +19,6 @@ enum Theme {
   LIGHT
 }
 
-enum Notification {
-  INVITE
-  ASSIGNMENT
-}
-
 enum Status {
   ONLINE
   OFFLINE
@@ -42,30 +37,31 @@ model User {
   emailBi String @unique @db.VarChar(64)
 
   memberships ProjectMembership[]
-
   assignments TaskAssignment[]
 
-  config ProfileConfiguration[]
+  config ProfileConfiguration?
+
+  taskAssignedNotifications  TaskAssignedNotification[]  @relation("TaskAssignedHolder")
+  projectInviteNotifications ProjectInviteNotification[] @relation("ProjectInviteHolder")
+
+  taskAssignedInvitesSent TaskAssignedNotification[]  @relation("TaskAssignedInviter")
+  projectInvitesSent      ProjectInviteNotification[] @relation("ProjectInviteInviter")
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  UserNotification UserNotification[]
 }
 
 model ProfileConfiguration {
-  userId String @unique
-  user   User   @relation(fields: [userId], references: [id])
+  userId String @id
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  darkMode   Theme    @default(SYSTEM)
+  darkMode   Theme   @default(SYSTEM)
   language   String  @default("en")
   preference Boolean @default(true)
-  status Status @default(ONLINE)
+  status     Status  @default(ONLINE)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-
-  @@id([userId])
 }
 
 model Project {
@@ -77,19 +73,19 @@ model Project {
   descriptionIv String?
 
   members ProjectMembership[]
+  tasks   Task[]
 
-  tasks Task[]
-
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt                 DateTime                    @default(now())
+  updatedAt                 DateTime                    @updatedAt
+  ProjectInviteNotification ProjectInviteNotification[]
 }
 
 model ProjectMembership {
   userId String
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   projectId String
-  project   Project @relation(fields: [projectId], references: [id])
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   role Role @default(MEMBER)
 
@@ -98,10 +94,10 @@ model ProjectMembership {
 
 model TaskAssignment {
   userId String
-  user   User   @relation(fields: [userId], references: [id])
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   taskId String
-  task   Task   @relation(fields: [taskId], references: [id])
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
 
   @@id([userId, taskId])
 }
@@ -117,22 +113,37 @@ model Task {
   isCompleted Boolean @default(false)
 
   projectId String
-  project   Project @relation(fields: [projectId], references: [id])
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
   assignments TaskAssignment[]
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  createdAt                DateTime                   @default(now())
+  updatedAt                DateTime                   @updatedAt
+  TaskAssignedNotification TaskAssignedNotification[]
 }
 
-model UserNotification {
-  userId String
-  user   User   @relation(fields: [userId], references: [id])
+model TaskAssignedNotification {
+  id String @id @default(uuid())
 
-  title       String
-  description String
-  projectId   String?
-  type        Notification
+  holderId String
+  holder   User   @relation("TaskAssignedHolder", fields: [holderId], references: [id], onDelete: Cascade)
 
-  @@id([userId])
+  inviterId String
+  inviter   User   @relation("TaskAssignedInviter", fields: [inviterId], references: [id], onDelete: Cascade)
+
+  taskId String
+  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
+}
+
+model ProjectInviteNotification {
+  id String @id @default(uuid())
+
+  holderId String
+  holder   User   @relation("ProjectInviteHolder", fields: [holderId], references: [id], onDelete: Cascade)
+
+  inviterId String
+  inviter   User   @relation("ProjectInviteInviter", fields: [inviterId], references: [id], onDelete: Cascade)
+
+  projectId String
+  project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 }

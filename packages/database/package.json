@@ -14,7 +14,8 @@
 		"db:generate": "prisma generate",
 		"build": "prisma generate && tsc -p tsconfig.json",
 		"prisma:generate": "prisma generate",
-		"db:deploy": "prisma db push"
+		"db:deploy": "prisma db push",
+		"db:format": "prisma format"
 	},
 	"dependencies": {
 		"@prisma/client": "6.18.0"

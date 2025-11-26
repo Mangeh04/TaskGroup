@@ -4,7 +4,11 @@ import { ConfirmationDialog } from "@/components/custom/confirmation";
 
 import { Trash2 } from "lucide-react";
 
-export function DangerZone({ onSubmit }: { onSubmit: () => Promise<void> }) {
+export function DangerZone({
+	onSubmit,
+}: {
+	onSubmit: () => Promise<void> | void;
+}) {
 	return (
 		<Card className="rounded-2xl border-red-200/40 dark:border-red-900/40">
 			<CardHeader>
@@ -21,7 +25,7 @@ export function DangerZone({ onSubmit }: { onSubmit: () => Promise<void> }) {
 					dialogAction="delete"
 					objective="project"
 					text={`This action will permanently delete the project and all its data.`}
-					onSubmit={onSubmit}
+					onConfirm={onSubmit}
 				>
 					<Button
 						variant="destructive"

@@ -1,5 +1,6 @@
 "use client";
 
+import React, { useEffect, useState } from "react";
 import {
 	BadgeCheck,
 	Bell,
@@ -35,24 +36,26 @@ import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { statusStyles } from "./status";
-import { useEffect, useState } from "react";
+import { useUser } from "@/context/UserContext";
 
-export function NavUser({
-	user,
-}: {
+type NavUserProps = {
 	user: ProfileEndpoint & {
 		avatar: string;
 	};
-}) {
+};
+
+function NavUserInner({ user }: NavUserProps) {
 	const { isMobile } = useSidebar();
 	const router = useRouter();
 
 	const [status, setStatus] = useState<StatusEnum>(user.status);
+
 	useEffect(() => {
 		if (user.status) {
 			setStatus(user.status);
 		}
 	}, [user.status]);
+
 	const currentStatus =
 		statusStyles[status] ?? statusStyles[StatusEnum.ONLINE];
 
@@ -60,6 +63,8 @@ export function NavUser({
 		user.alias.trim()[0]?.toLocaleUpperCase() ||
 		user.email.trim()[0]?.toLocaleUpperCase() ||
 		"?";
+
+	const { refetchUser } = useUser();
 
 	async function handleStatusChange(newStatus: StatusEnum) {
 		setStatus(newStatus);
@@ -75,9 +80,13 @@ export function NavUser({
 			setStatus(user.status);
 		} else {
 			toast.success(
-				`Status set to ${capitalize(newStatus.toLowerCase().replaceAll("_", " "))}`
+				`Status set to ${capitalize(
+					newStatus.toLowerCase().replaceAll("_", " ")
+				)}`
 			);
 		}
+
+		refetchUser();
 	}
 
 	async function handleLogout() {
@@ -224,3 +233,13 @@ export function NavUser({
 		</SidebarMenu>
 	);
 }
+
+export const NavUser = React.memo(
+	NavUserInner,
+	(prev, next) =>
+		prev.user.id === next.user.id &&
+		prev.user.status === next.user.status &&
+		prev.user.avatar === next.user.avatar &&
+		prev.user.alias === next.user.alias &&
+		prev.user.email === next.user.email
+);

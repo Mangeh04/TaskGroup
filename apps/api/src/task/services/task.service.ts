@@ -92,10 +92,9 @@ export class TaskService implements ITaskService {
   }
 
   public async deleteTask(taskId: string) {
-    await this.prismaService.taskAssignment.deleteMany({
-      where: { taskId: taskId },
+    await this.prismaService.task.delete({
+      where: { id: taskId },
     });
-    await this.prismaService.task.delete({ where: { id: taskId } });
     return true;
   }
 

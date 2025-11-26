@@ -1,41 +1,30 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
-import {
-	SidebarProvider,
-	SidebarTrigger,
-	SidebarInset,
-} from "@/components/ui/sidebar";
-
-import AppSidebar from "@/components/custom/sideBar";
-import { BreadCrumbCustom } from "@/components/custom/breadCrumbCustom";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 
-import { fetcher } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import { DangerZone } from "./components/dangerZone";
 import { OverviewCard } from "./components/overviewCard";
 import { GeneralSettings } from "./components/generalSettings";
 import { TeamSettings } from "./components/teamSettings";
-import { RoleEnum } from "@repo/types";
 
-const users: Array<{
-	id: string;
-	username: string;
-	role: RoleEnum;
-}> = [
-	{ id: "1", username: "mangeh04", role: RoleEnum.OWNER },
-	{ id: "2", username: "blackfox099", role: RoleEnum.ADMIN },
-	{ id: "3", username: "axiur", role: RoleEnum.MEMBER },
-	{ id: "4", username: "alejandropxrez", role: RoleEnum.MEMBER },
-];
+import {
+	SidebarProvider,
+	SidebarTrigger,
+	SidebarInset,
+} from "@/components/ui/sidebar";
+import AppSidebar from "@/components/custom/sideBar";
+import { BreadCrumbCustom } from "@/components/custom/breadCrumbCustom";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { fetcher } from "@/lib/api";
+import { RoleEnum } from "@repo/types";
+import type { Project, ProjectMember } from "@repo/types";
 
 export default function ProjectSettingsPage() {
 	const router = useRouter();
-
 	const params = useParams();
 	const projectId = params.projectId as string;
 
@@ -47,31 +36,81 @@ export default function ProjectSettingsPage() {
 
 		if (error) {
 			toast.error(error);
-		} else {
-			toast.success("Project deleted");
-			router.push("/dashboard");
+			return;
 		}
+
+		toast.success("Project deleted");
+		router.push("/dashboard");
 	}
+
+	const [project, setProjects] = useState<Project | null>(null);
+	const [users, setUsers] = useState<ProjectMember[]>([]);
+	const [isFetching, setIsFetching] = useState(false);
+
+	const fetchData = useCallback(async () => {
+		setIsFetching(true);
+
+		const { data, error } = await fetcher<Project>(
+			`/project/${projectId}`,
+			{
+				method: "GET",
+				needsAuth: true,
+			}
+		);
+
+		if (error) {
+			toast.error(error);
+			setIsFetching(false);
+			return;
+		}
+
+		setProjects(data ?? null);
+		setIsFetching(false);
+	}, [projectId]);
+
+	useEffect(() => {
+		void fetchData();
+	}, [fetchData]);
+
+	const fetchMembers = useCallback(async () => {
+		if (!projectId) return;
+
+		setIsFetching(true);
+		const { data, error } = await fetcher<ProjectMember[]>(
+			`/project/${projectId}/members`,
+			{
+				method: "GET",
+				needsAuth: true,
+			}
+		);
+
+		if (error) {
+			toast.error(error);
+		} else {
+			setUsers(data ?? []);
+		}
+		setIsFetching(false);
+	}, [projectId]);
+
+	useEffect(() => {
+		void fetchMembers();
+	}, [fetchMembers]);
 
 	const breadcrumbItems = [
 		{ label: "Home", href: "/dashboard" },
-		{ label: "Project", href: "/dashboard/projectdetails" },
+		{ label: "Project", href: `/dashboard/projectdetails/${projectId}` },
 	];
 
-	const memberCount = users.length;
+	const memberCount = users.length || 0;
 	const adminCount = useMemo(
 		() => users.filter((u) => u.role !== RoleEnum.MEMBER).length,
-		[]
+		[users]
 	);
 
 	return (
 		<div className="flex h-dvh overflow-hidden bg-white dark:bg-neutral-950">
 			<SidebarProvider>
-				<AppSidebar
-					isProject={true}
-					hasMembers={memberCount > 1}
-					projectId={projectId}
-				/>
+				<AppSidebar />
 				<SidebarInset className="flex flex-1 min-h-0 flex-col bg-white dark:bg-neutral-950">
 					<header className="relative flex h-14 shrink-0 items-center gap-6 px-4 border-b">
 						<SidebarTrigger />
@@ -112,7 +151,7 @@ export default function ProjectSettingsPage() {
 										value="general"
 										className="space-y-6"
 									>
-										<GeneralSettings />
+										<GeneralSettings project={project!} />
 									</TabsContent>
 
 									<TabsContent

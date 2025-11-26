@@ -97,7 +97,9 @@ export class ProjectService implements IProjectService {
   }
 
   public async deleteProject(projectId: string) {
-    await this.prismaService.project.delete({ where: { id: projectId } });
+    await this.prismaService.project.delete({
+      where: { id: projectId },
+    });
     return true;
   }
 
@@ -120,6 +122,12 @@ export class ProjectService implements IProjectService {
       membersCount: usersPerProject[project.id] ?? 0,
       tasksCount: tasksPerProject[project.id] ?? 0,
     }));
+  }
+
+  public async getProjectById(projectId: string) {
+    return this.prismaService.project.findUnique({
+      where: { id: projectId },
+    });
   }
 
   async getMembership(
@@ -151,16 +159,31 @@ export class ProjectService implements IProjectService {
 
   async inviteMember(
     projectId: string,
-    userIdToInvite: string,
+    userEmailToInvite: string,
     inviterName: string,
-    projectName: string,
   ) {
+    let userIdToInvite = await this.prismaService.user.findUnique({
+      where: { email: userEmailToInvite },
+    });
+    if (!userIdToInvite) {
+      throw new Error('User with this email does not exist');
+    }
+
+    const project = await this.prismaService.project.findUnique({
+      where: { id: projectId },
+    });
+
+    if (!project) {
+      throw new Error('Project does not exist');
+    }
+
     this.eventEmitter.emit(EVENTS.PROJECT_INVITED, {
       invitedUserId: userIdToInvite,
       projectId: projectId,
       inviterName: inviterName,
-      projectName: projectName,
+      projectName: project.name,
     });
+
     return true;
   }
 
@@ -170,6 +193,7 @@ export class ProjectService implements IProjectService {
     taskName: string,
     assignerName: string,
   ) {
+    // TODO
     this.eventEmitter.emit(EVENTS.TASK_ASSIGNED, {
       taskName: taskName,
       assignedUserId: userIdToAssign,

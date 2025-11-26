@@ -1,5 +1,5 @@
-// app/layout.tsx
 import "./globals.css";
+
 import type { Metadata } from "next";
 import { ThemeProvider } from "next-themes";
 import { type ReactNode } from "react";

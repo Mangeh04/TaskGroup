@@ -37,7 +37,7 @@ export default function GroupInformationPage() {
 	return (
 		<div className="flex h-dvh overflow-hidden bg-white">
 			<SidebarProvider>
-				<AppSidebar isProject={false} />
+				<AppSidebar />
 				<SidebarInset className="flex flex-1 min-h-0 flex-col bg-white dark:bg-neutral-950">
 					<header className="relative flex h-14 shrink-0 items-center gap-6 px-4 border-b">
 						<SidebarTrigger />
