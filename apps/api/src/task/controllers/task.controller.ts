@@ -27,13 +27,13 @@ export class TaskController {
 
   @Post()
   @UseGuards(ProjectMemberGuard)
-  async createTask(@Body() taskDto: TaskDto): Promise<boolean> {
+  async createTask(@Body() taskDto: TaskDto) {
     return this.taskService.createTask(taskDto);
   }
 
   @Get(':projectId')
   @UseGuards(ProjectMemberGuard)
-  async getTasks(@Param('projectId') projectId: string): Promise<Task[]> {
+  async getTasks(@Param('projectId') projectId: string) {
     return this.taskService.getTasks(projectId);
   }
 
@@ -42,13 +42,13 @@ export class TaskController {
   async updateTask(
     @Param('id') taskId: string,
     @Body() taskDtoUpdate: TaskDtoUpdate,
-  ): Promise<boolean> {
+  ) {
     return this.taskService.updateTask({ ...taskDtoUpdate, id: taskId });
   }
 
   @Delete(':id')
   @UseGuards(TaskGuard)
-  async deleteTask(@Param('id') taskId: string): Promise<boolean> {
+  async deleteTask(@Param('id') taskId: string) {
     return this.taskService.deleteTask(taskId);
   }
 }

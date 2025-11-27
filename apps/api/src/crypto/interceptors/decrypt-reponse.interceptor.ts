@@ -34,15 +34,15 @@ export class DecryptResponseInterceptor implements NestInterceptor {
       return next.handle();
     }
 
-    return next.handle().pipe(mergeMap((data) => this.handleData(data)));
-  }
-
-  private async handleData(data: any): Promise<any> {
-    return this.decryptDeep(data);
+    return next.handle().pipe(mergeMap((data) => this.decryptDeep(data)));
   }
 
   private async decryptDeep(value: any): Promise<any> {
     if (value == null) return value;
+
+    if (value instanceof Date) {
+      return value;
+    }
 
     if (Array.isArray(value)) {
       return Promise.all(value.map((item) => this.decryptDeep(item)));
@@ -56,7 +56,7 @@ export class DecryptResponseInterceptor implements NestInterceptor {
   }
 
   private async decryptObject(obj: any): Promise<any> {
-    if (!obj || typeof obj !== 'object') return obj;
+    if (!obj || typeof obj !== 'object' || obj instanceof Date) return obj;
 
     const result: any = {};
 

@@ -58,8 +58,8 @@ export class ProjectController {
   }
 
   @Get(':id')
-  async getProject(@Param('id') projectId: string): Promise<Project[]> {
-    return this.projectService.getProjectsByUserId(projectId);
+  async getProject(@Param('id') projectId: string): Promise<Project | null> {
+    return this.projectService.getProjectById(projectId);
   }
 
   @Delete(':id')

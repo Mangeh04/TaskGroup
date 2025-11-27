@@ -5,7 +5,7 @@ import { SERVICES } from 'src/utils/constants';
 import { CryptoService } from 'src/crypto/services/crypto.service';
 
 import { TaskDto } from '../dtos/taskDto.dto';
-import { ITaskService } from '../interfaces/task.interface';
+import type { ITaskService, TasksArray } from '../interfaces/task.interface';
 import { TaskDtoUpdate } from '../dtos/taskDtoUpdate.dto';
 
 @Injectable()
@@ -105,11 +105,16 @@ export class TaskService implements ITaskService {
         assignments: {
           include: {
             user: {
-              select: { id: true, alias: true, emailBi: true },
+              select: {
+                alias: true,
+                aliasIv: true,
+                email: true,
+                emailIv: true,
+              },
             },
           },
         },
       },
-    }) as unknown as Promise<any[]>;
+    }) as unknown as Promise<TasksArray>;
   }
 }
