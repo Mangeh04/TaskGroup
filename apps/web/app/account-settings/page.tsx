@@ -1,10 +1,13 @@
 import { Suspense } from "react";
 import { SettingsPage } from "@/app/account-settings/components/settingsPage";
+import { useTranslations } from "next-intl";
 
 export default function AccountSettingsWrapper() {
-  return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <SettingsPage />
-    </Suspense>
-  );
+	const t = useTranslations("generic");
+
+	return (
+		<Suspense fallback={<div>{t("loading")}</div>}>
+			<SettingsPage />
+		</Suspense>
+	);
 }

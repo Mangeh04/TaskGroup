@@ -1,10 +1,9 @@
 "use client";
 
 import { useMemo, useCallback, useEffect, useState } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
 
-import { useRouter } from "next/navigation";
 import { DangerZone } from "./components/dangerZone";
 import { OverviewCard } from "./components/overviewCard";
 import { GeneralSettings } from "./components/generalSettings";
@@ -19,14 +18,18 @@ import AppSidebar from "@/components/custom/sideBar";
 import { BreadCrumbCustom } from "@/components/custom/breadCrumbCustom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
-import { fetcher } from "@/lib/api";
+
 import { RoleEnum } from "@repo/types";
 import type { Project, ProjectMember } from "@repo/types";
+import { fetcher } from "@/lib/api";
+import { useTranslations } from "next-intl";
 
 export default function ProjectSettingsPage() {
 	const router = useRouter();
 	const params = useParams();
 	const projectId = params.projectId as string;
+
+	const t = useTranslations("projectSettings.page");
 
 	async function handleDelete() {
 		const { error } = await fetcher(`/project/${projectId}`, {
@@ -39,17 +42,34 @@ export default function ProjectSettingsPage() {
 			return;
 		}
 
-		toast.success("Project deleted");
+		toast.success(t("toastDeleted"));
 		router.push("/dashboard");
 	}
 
-	const [project, setProjects] = useState<Project | null>(null);
+	async function handleUpdateProject(updatedProject: Project) {
+		const { error } = await fetcher(`/project/update`, {
+			method: "PATCH",
+			body: updatedProject,
+			needsAuth: true,
+		});
+
+		if (error) {
+			toast.error(error);
+			return;
+		}
+
+		toast.success(t("toastUpdated"));
+		router.push("/dashboard");
+	}
+
+	const [project, setProject] = useState<Project | null>();
 	const [users, setUsers] = useState<ProjectMember[]>([]);
 	const [isFetching, setIsFetching] = useState(false);
 
-	const fetchData = useCallback(async () => {
-		setIsFetching(true);
+	const fetchProject = useCallback(async () => {
+		if (!projectId) return;
 
+		setIsFetching(true);
 		const { data, error } = await fetcher<Project>(
 			`/project/${projectId}`,
 			{
@@ -64,13 +84,13 @@ export default function ProjectSettingsPage() {
 			return;
 		}
 
-		setProjects(data ?? null);
+		setProject(data ?? null);
 		setIsFetching(false);
 	}, [projectId]);
 
 	useEffect(() => {
-		void fetchData();
-	}, [fetchData]);
+		void fetchProject();
+	}, [fetchProject]);
 
 	const fetchMembers = useCallback(async () => {
 		if (!projectId) return;
@@ -97,8 +117,11 @@ export default function ProjectSettingsPage() {
 	}, [fetchMembers]);
 
 	const breadcrumbItems = [
-		{ label: "Home", href: "/dashboard" },
-		{ label: "Project", href: `/dashboard/projectdetails/${projectId}` },
+		{ label: t("breadcrumbHome"), href: "/dashboard" },
+		{
+			label: t("breadcrumbProject"),
+			href: `/dashboard/projectdetails/${projectId}`,
+		},
 	];
 
 	const memberCount = users.length || 0;
@@ -116,15 +139,15 @@ export default function ProjectSettingsPage() {
 						<SidebarTrigger />
 						<BreadCrumbCustom
 							items={breadcrumbItems}
-							currentPage="Settings"
+							currentPage={t("breadcrumbCurrent")}
 						/>
 
 						<div className="ml-auto flex items-center gap-4">
 							<Badge variant="secondary" className="rounded-xl">
-								{memberCount} members
+								{t("membersBadge", { count: memberCount })}
 							</Badge>
 							<Badge variant="outline" className="rounded-xl">
-								{adminCount} admins
+								{t("adminsBadge", { count: adminCount })}
 							</Badge>
 						</div>
 					</header>
@@ -132,7 +155,9 @@ export default function ProjectSettingsPage() {
 					<div className="flex-1 overflow-y-auto px-4 py-6">
 						<div className="mx-auto max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6">
 							<div className="lg:col-span-4 space-y-4">
-								<OverviewCard />
+								<OverviewCard
+									projectDate={project?.createdAt}
+								/>
 								<DangerZone onSubmit={handleDelete} />
 							</div>
 
@@ -140,10 +165,10 @@ export default function ProjectSettingsPage() {
 								<Tabs defaultValue="general" className="w-full">
 									<TabsList className="grid grid-cols-2 w-full">
 										<TabsTrigger value="general">
-											General
+											{t("tabGeneral")}
 										</TabsTrigger>
 										<TabsTrigger value="team">
-											Team
+											{t("tabTeam")}
 										</TabsTrigger>
 									</TabsList>
 
@@ -151,7 +176,21 @@ export default function ProjectSettingsPage() {
 										value="general"
 										className="space-y-6"
 									>
-										<GeneralSettings project={project!} />
+										{project && (
+											<GeneralSettings
+												project={project}
+												onSubmit={(data) => {
+													handleUpdateProject({
+														id: projectId,
+														name: data.name,
+														description:
+															data.description,
+														createdAt:
+															project.createdAt,
+													});
+												}}
+											/>
+										)}
 									</TabsContent>
 
 									<TabsContent

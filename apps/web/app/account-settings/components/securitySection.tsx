@@ -1,3 +1,5 @@
+"use client";
+
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -6,8 +8,11 @@ import { Button } from "@/components/ui/button";
 import { fetcher } from "@/lib/api";
 import { toast } from "sonner";
 import { useCallback } from "react";
+import { useTranslations } from "next-intl";
 
 export function SecuritySection({ email }: { email: string }) {
+	const t = useTranslations("settings.security");
+
 	const onPasswordSubmit = useCallback(async () => {
 		const { error } = await fetcher<boolean>("/auth/changePassword", {
 			method: "POST",
@@ -31,51 +36,58 @@ export function SecuritySection({ email }: { email: string }) {
 		});
 
 		if (error) {
-			toast.error("Failed to change password.");
+			toast.error(t("toastError"));
 			console.error(error);
 		} else {
-			toast.success("Password changed successfully.");
+			toast.success(t("toastSuccess"));
 		}
-	}, [email]);
+	}, [email, t]);
 
 	return (
 		<div className="space-y-6">
 			<div>
 				<h1 className="text-2xl font-semibold text-balance">
-					Password
+					{t("title")}
 				</h1>
-				<p className="text-muted-foreground mt-1">
-					Remember, your password is your digital key to your account.
-					Keep it safe, keep it secure!
-				</p>
+				<p className="text-muted-foreground mt-1">{t("description")}</p>
 			</div>
-
 			<Card>
-				<CardContent className="space-y-4 p-6">
+				<CardContent className="space-y-8 p-6">
 					<form onSubmit={onPasswordSubmit}>
-						<div className="space-y-2">
-							<Label htmlFor="currentPassword">
-								Current password
-							</Label>
-							<Input id="currentPassword" type="password" />
+						<div className="space-y-6">
+							<div>
+								<Label htmlFor="currentPassword">
+									{t("currentPassword")}
+								</Label>
+								<Input
+									id="currentPassword"
+									type="password"
+									className="mt-2"
+								/>
+							</div>
+							<div>
+								<Label htmlFor="newPassword">
+									{t("newPassword")}
+								</Label>
+								<Input
+									id="newPassword"
+									type="password"
+									className="mt-2"
+								/>
+							</div>
+							<div>
+								<Label htmlFor="confirmPassword">
+									{t("confirmPassword")}
+								</Label>
+								<Input
+									id="confirmPassword"
+									type="password"
+									className="mt-2"
+								/>
+							</div>
 						</div>
-
-						<div className="space-y-2">
-							<Label htmlFor="newPassword">New password</Label>
-							<Input id="newPassword" type="password" />
-						</div>
-
-						<div className="space-y-2">
-							<Label htmlFor="confirmPassword">
-								Confirm new password
-							</Label>
-							<Input id="confirmPassword" type="password" />
-						</div>
-
-						<div className="flex justify-end">
-							<Button type="submit" onSubmit={onPasswordSubmit}>
-								Update
-							</Button>
+						<div className="flex justify-end mt-8">
+							<Button type="submit">{t("updateButton")}</Button>
 						</div>
 					</form>
 				</CardContent>

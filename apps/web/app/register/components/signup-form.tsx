@@ -4,6 +4,8 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
@@ -21,7 +23,6 @@ import placeholder from "@/public/images/sneaky.jpg";
 import { UserRegisterSchema } from "@/lib/schemas";
 import { handleFormValidation } from "@/lib/formHandler";
 import { fetcher } from "@/lib/api";
-import { toast } from "sonner";
 
 export function SignupForm({
 	className,
@@ -29,10 +30,11 @@ export function SignupForm({
 }: React.HTMLAttributes<HTMLDivElement>) {
 	const [loading, setLoading] = useState(false);
 	const router = useRouter();
+	const t = useTranslations("auth.register");
 
 	async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
-		if (loading) return; // avoids 2x submit
+		if (loading) return;
 
 		setLoading(true);
 
@@ -62,7 +64,7 @@ export function SignupForm({
 			return;
 		}
 
-		toast.success(data?.message ?? "Account created successfully!");
+		toast.success(data?.message ?? t("successToast"));
 		setLoading(false);
 
 		router.push("/dashboard");
@@ -76,38 +78,40 @@ export function SignupForm({
 						<FieldGroup>
 							<div className="flex flex-col items-center gap-2 text-center">
 								<h1 className="text-2xl font-bold">
-									Create your account
+									{t("title")}
 								</h1>
 								<p className="text-sm text-balance text-muted-foreground">
-									Enter your details below to create your
-									account
+									{t("subtitle")}
 								</p>
 							</div>
 
 							<Field>
-								<FieldLabel htmlFor="alias">Alias</FieldLabel>
+								<FieldLabel htmlFor="alias">
+									{t("aliasLabel")}
+								</FieldLabel>
 								<Input
 									id="alias"
 									type="text"
 									name="alias"
-									placeholder="Miguel"
+									placeholder={t("aliasPlaceholder")}
 									required
 								/>
 							</Field>
 
 							<Field>
-								<FieldLabel htmlFor="email">Email</FieldLabel>
+								<FieldLabel htmlFor="email">
+									{t("emailLabel")}
+								</FieldLabel>
 								<Input
 									id="email"
 									type="email"
 									name="email"
-									placeholder="m@example.com"
+									placeholder={t("emailPlaceholder")}
 									autoComplete="email"
 									required
 								/>
 								<FieldDescription>
-									We&apos;ll use this to contact you. We will
-									not share your email with anyone else.
+									{t("emailDescription")}
 								</FieldDescription>
 							</Field>
 
@@ -115,7 +119,7 @@ export function SignupForm({
 								<Field className="grid grid-cols-2 gap-4">
 									<Field>
 										<FieldLabel htmlFor="password">
-											Password
+											{t("passwordLabel")}
 										</FieldLabel>
 										<Input
 											id="password"
@@ -127,7 +131,7 @@ export function SignupForm({
 									</Field>
 									<Field>
 										<FieldLabel htmlFor="confirm_password">
-											Confirm Password
+											{t("confirmPasswordLabel")}
 										</FieldLabel>
 										<Input
 											id="confirm_password"
@@ -139,7 +143,7 @@ export function SignupForm({
 									</Field>
 								</Field>
 								<FieldDescription>
-									Must be at least 8 characters long.
+									{t("passwordDescription")}
 								</FieldDescription>
 							</Field>
 
@@ -151,18 +155,18 @@ export function SignupForm({
 									className="w-full"
 								>
 									{loading
-										? "Creating account..."
-										: "Create Account"}
+										? t("buttonLoading")
+										: t("buttonIdle")}
 								</Button>
 							</Field>
 
 							<FieldDescription className="text-center">
-								Already have an account?{" "}
+								{t("loginPrompt")}{" "}
 								<Link
 									href="/login"
 									className="font-medium underline underline-offset-4"
 								>
-									Sign in
+									{t("loginLink")}
 								</Link>
 							</FieldDescription>
 						</FieldGroup>
@@ -181,13 +185,13 @@ export function SignupForm({
 			</Card>
 
 			<FieldDescription className="px-6 text-center">
-				By clicking continue, you agree to our{" "}
+				{t("tosText")}{" "}
 				<Link href="#" className="underline underline-offset-4">
-					Terms of Service
+					{t("tosTerms")}
 				</Link>{" "}
 				and{" "}
 				<Link href="#" className="underline underline-offset-4">
-					Privacy Policy
+					{t("tosPrivacy")}
 				</Link>
 				.
 			</FieldDescription>

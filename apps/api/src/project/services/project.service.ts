@@ -5,20 +5,22 @@ import { ProjectMembership } from '@repo/database';
 import { SERVICES } from 'src/utils/constants';
 import type { ICryptoService } from 'src/crypto/interfaces/crypto.interface';
 import { EventEmitter2 } from '@nestjs/event-emitter';
-import { EVENTS } from 'src/utils/constants';
+import { EVENTS, ProjectMember } from '@repo/types';
 
 import { ProjectDto } from '../dtos/projectDto.dto';
-import type {
-  IProjectService,
-  MembersProject,
-} from '../interfaces/project.interface';
+import type { IProjectService } from '../interfaces/project.interface';
 import { ProjectDtoUpdate } from '../dtos/projectDtoUpdate.dto';
+import type { IUserService } from 'src/user/interfaces/user.interface';
+import type { INotificationService } from 'src/notification/interfaces/notification.interface';
 
 @Injectable()
 export class ProjectService implements IProjectService {
   constructor(
     @Inject(SERVICES.PRISMA) private readonly prismaService: PrismaClient,
     @Inject(SERVICES.CRYPTO) private readonly cryptoService: ICryptoService,
+    @Inject(SERVICES.USER) private readonly userService: IUserService,
+    @Inject(SERVICES.NOTIFICATION)
+    private readonly notificationService: INotificationService,
     private eventEmitter: EventEmitter2,
   ) {}
 
@@ -160,45 +162,44 @@ export class ProjectService implements IProjectService {
   async inviteMember(
     projectId: string,
     userEmailToInvite: string,
-    inviterName: string,
+    inviterId: string,
   ) {
-    let userIdToInvite = await this.prismaService.user.findUnique({
-      where: { email: userEmailToInvite },
-    });
-    if (!userIdToInvite) {
+    const userToInvite =
+      await this.userService.findUserByEmail(userEmailToInvite);
+    if (!userToInvite) {
       throw new Error('User with this email does not exist');
     }
 
-    const project = await this.prismaService.project.findUnique({
-      where: { id: projectId },
-    });
+    const inviter = await this.userService.findUser(inviterId);
+
+    const project = await this.findProject(projectId);
 
     if (!project) {
       throw new Error('Project does not exist');
     }
 
+    if (
+      await this.notificationService.checkExistingInvite(
+        projectId,
+        userToInvite.id,
+        inviterId,
+      )
+    ) {
+      throw new Error('This user is already invited');
+    }
+
+    if (await this.isUserInProject(userToInvite.id, projectId)) {
+      throw new Error('This user is already a member of this project');
+    }
+
     this.eventEmitter.emit(EVENTS.PROJECT_INVITED, {
-      invitedUserId: userIdToInvite,
+      invitedUserId: userToInvite.id,
       projectId: projectId,
-      inviterName: inviterName,
+      inviterId: inviterId,
       projectName: project.name,
+      inviterName: inviter!!.alias,
     });
 
-    return true;
-  }
-
-  async assignTask(
-    projectId: string,
-    userIdToAssign: string,
-    taskName: string,
-    assignerName: string,
-  ) {
-    // TODO
-    this.eventEmitter.emit(EVENTS.TASK_ASSIGNED, {
-      taskName: taskName,
-      assignedUserId: userIdToAssign,
-      assignerName: assignerName,
-    });
     return true;
   }
 
@@ -257,6 +258,14 @@ export class ProjectService implements IProjectService {
     return map;
   }
 
+  async isUserInProject(userId: string, projectId: string) {
+    const member = await this.prismaService.projectMembership.findUnique({
+      where: { userId_projectId: { userId, projectId } },
+    });
+
+    return member != null;
+  }
+
   async getMembersbyProjectId(projectId: string) {
     return this.prismaService.projectMembership.findMany({
       where: { projectId: projectId },
@@ -269,11 +278,18 @@ export class ProjectService implements IProjectService {
             updatedAt: true,
             id: true,
           },
+          include: {
+            config: {
+              select: {
+                status: true,
+              },
+            },
+          },
         },
       },
       omit: {
         projectId: true,
       },
-    }) as unknown as MembersProject;
+    }) as unknown as ProjectMember[];
   }
 }

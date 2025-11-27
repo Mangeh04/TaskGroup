@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Button } from "@/components/ui/button";
 
 import {
@@ -11,6 +11,7 @@ import {
 	X,
 	LayoutDashboard,
 	Palette,
+	LanguagesIcon,
 } from "lucide-react";
 
 import { SecuritySection } from "./securitySection";
@@ -22,28 +23,42 @@ import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { cn } from "@/lib/utils";
 import { useUser } from "@/context/UserContext";
+import { useTranslations } from "next-intl";
+import { LanguageSection } from "./languageSection";
 
-type SectionId = "profile" | "security" | "notifications" | "appearance";
+type SectionId =
+	| "profile"
+	| "security"
+	| "notifications"
+	| "appearance"
+	| "language";
 
-const sidebarItems: Array<{ id: SectionId; label: string; icon: any }> = [
-	{ id: "profile", label: "Profile", icon: UserIcon },
-	{ id: "security", label: "Security", icon: Shield },
-	{ id: "notifications", label: "Notification", icon: Bell },
-	{ id: "appearance", label: "Appearance", icon: Palette },
+type SidebarItem = {
+	id: SectionId;
+	icon: any;
+};
+
+const sidebarItems: SidebarItem[] = [
+	{ id: "profile", icon: UserIcon },
+	{ id: "security", icon: Shield },
+	{ id: "notifications", icon: Bell },
+	{ id: "appearance", icon: Palette },
+	{ id: "language", icon: LanguagesIcon },
 ];
 
 export function SettingsPage() {
 	const router = useRouter();
 	const pathname = usePathname();
 	const searchParams = useSearchParams();
+	const { user } = useUser();
+
+	const tSidebar = useTranslations("settings.sidebar");
 
 	const initialSection =
 		(searchParams.get("section") as SectionId) ?? "profile";
 	const [activeSection, setActiveSection] =
 		useState<SectionId>(initialSection);
 	const [sidebarOpen, setSidebarOpen] = useState(false);
-
-	const { user } = useUser();
 
 	const data = {
 		user: {
@@ -92,6 +107,8 @@ export function SettingsPage() {
 				return <NotificationsSection />;
 			case "appearance":
 				return <AppearanceSection />;
+			case "language":
+				return <LanguageSection />;
 			default:
 				return <ProfileSection user={accoutSettingsUser} />;
 		}
@@ -129,7 +146,7 @@ export function SettingsPage() {
 							)}
 						>
 							<LayoutDashboard className="h-4 w-4" />
-							Dashboard
+							{tSidebar("dashboard")}
 						</button>
 
 						<hr className="my-2 border-border" />
@@ -150,7 +167,7 @@ export function SettingsPage() {
 									aria-current={isActive ? "page" : undefined}
 								>
 									<Icon className="h-4 w-4" />
-									{item.label}
+									{tSidebar(item.id)}
 								</button>
 							);
 						})}

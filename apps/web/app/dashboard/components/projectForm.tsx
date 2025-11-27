@@ -2,6 +2,7 @@
 
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
+import { useTranslations } from "next-intl";
 
 type ProjectFormProps = {
 	values: { name: string; description: string };
@@ -14,14 +15,16 @@ export function ProjectForm({
 	onChange,
 	loading = false,
 }: ProjectFormProps) {
+	const t = useTranslations("projectForm");
+
 	return (
 		<div className="flex flex-col gap-4">
 			<div className="flex flex-col gap-1.5">
-				<Label htmlFor="project-name">Project Name</Label>
+				<Label htmlFor="project-name">{t("nameLabel")}</Label>
 				<Input
 					id="project-name"
 					name="name"
-					placeholder="Incredible Project"
+					placeholder={t("namePlaceholder")}
 					value={values.name}
 					onChange={(e) => onChange("name", e.target.value)}
 					disabled={loading}
@@ -30,11 +33,13 @@ export function ProjectForm({
 			</div>
 
 			<div className="flex flex-col gap-1.5">
-				<Label htmlFor="project-description">Description</Label>
+				<Label htmlFor="project-description">
+					{t("descriptionLabel")}
+				</Label>
 				<Input
 					id="project-description"
 					name="description"
-					placeholder="Description of the project"
+					placeholder={t("descriptionPlaceholder")}
 					value={values.description}
 					onChange={(e) => onChange("description", e.target.value)}
 					disabled={loading}

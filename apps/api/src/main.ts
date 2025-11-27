@@ -25,6 +25,7 @@ async function bootstrap() {
     new ValidationPipe({
       transform: true,
       stopAtFirstError: true,
+      forbidUnknownValues: true,
     }),
   );
 

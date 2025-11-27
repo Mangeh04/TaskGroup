@@ -1,4 +1,4 @@
-import { IsBoolean, IsEnum, IsOptional } from 'class-validator';
+import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
 import { Theme, Status } from '@repo/database';
 
 export class UpdatePreferenceDto {
@@ -6,15 +6,19 @@ export class UpdatePreferenceDto {
   @IsEnum(Theme, {
     message: `Mode must be one of the following values: ${Object.values(Theme).join(', ')}`,
   })
-  theme: Theme;
+  theme?: Theme;
 
   @IsOptional()
   @IsEnum(Status, {
     message: `Status must be one of the following values: ${Object.values(Status).join(', ')}`,
   })
-  status: Status;
+  status?: Status;
 
   @IsOptional()
   @IsBoolean()
-  notifications: Boolean;
+  notifications?: Boolean;
+
+  @IsString()
+  @IsOptional()
+  language?: String;
 }

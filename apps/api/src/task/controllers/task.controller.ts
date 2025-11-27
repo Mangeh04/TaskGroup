@@ -9,7 +9,6 @@ import {
   Patch,
   Delete,
 } from '@nestjs/common';
-import { Task } from '@repo/database';
 
 import { SERVICES } from 'src/utils/constants';
 
@@ -18,6 +17,8 @@ import type { ITaskService } from '../interfaces/task.interface';
 import { ProjectMemberGuard } from 'src/project/guards/projectMember.guard';
 import { TaskGuard } from '../guards/task.guard';
 import { TaskDtoUpdate } from '../dtos/taskDtoUpdate.dto';
+import { User } from 'src/auth/decorators/user.decorator';
+import type { JwtPayload } from 'src/auth/types/jwt-payload.type';
 
 @Controller('task')
 export class TaskController {
@@ -27,8 +28,8 @@ export class TaskController {
 
   @Post()
   @UseGuards(ProjectMemberGuard)
-  async createTask(@Body() taskDto: TaskDto) {
-    return this.taskService.createTask(taskDto);
+  async createTask(@Body() taskDto: TaskDto, @User() user: JwtPayload) {
+    return this.taskService.createTask(user.sub, taskDto);
   }
 
   @Get(':projectId')
@@ -42,8 +43,12 @@ export class TaskController {
   async updateTask(
     @Param('id') taskId: string,
     @Body() taskDtoUpdate: TaskDtoUpdate,
+    @User() user: JwtPayload,
   ) {
-    return this.taskService.updateTask({ ...taskDtoUpdate, id: taskId });
+    return this.taskService.updateTask(
+      { ...taskDtoUpdate, id: taskId },
+      user.sub,
+    );
   }
 
   @Delete(':id')

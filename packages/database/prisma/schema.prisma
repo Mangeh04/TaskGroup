@@ -37,7 +37,7 @@ model User {
   emailBi String @unique @db.VarChar(64)
 
   memberships ProjectMembership[]
-  assignments TaskAssignment[]
+  assignments Task[]
 
   config ProfileConfiguration?
 
@@ -73,7 +73,7 @@ model Project {
   descriptionIv String?
 
   members ProjectMembership[]
-  tasks   Task[]
+  assignedTasks Task[]
 
   createdAt                 DateTime                    @default(now())
   updatedAt                 DateTime                    @updatedAt
@@ -92,16 +92,6 @@ model ProjectMembership {
   @@id([userId, projectId])
 }
 
-model TaskAssignment {
-  userId String
-  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  taskId String
-  task   Task   @relation(fields: [taskId], references: [id], onDelete: Cascade)
-
-  @@id([userId, taskId])
-}
-
 model Task {
   id          String  @id @default(uuid())
   title       String
@@ -115,7 +105,8 @@ model Task {
   projectId String
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
 
-  assignments TaskAssignment[]
+  assignedUserId String? 
+  assignedUser   User?   @relation(fields: [assignedUserId], references: [id], onDelete: SetNull)
 
   createdAt                DateTime                   @default(now())
   updatedAt                DateTime                   @updatedAt

@@ -46,7 +46,7 @@ type NavUserProps = {
 };
 
 const DEFAULT_AVATAR =
-	"https://github.com/Mangeh04/Storage/blob/main/dragonite.jpeg";
+	"https://raw.githubusercontent.com/Mangeh04/Storage/main/dragonite.jpeg";
 
 function NavUserInner({ user }: NavUserProps) {
 	const { isMobile } = useSidebar();
@@ -146,7 +146,7 @@ function NavUserInner({ user }: NavUserProps) {
 									)}
 								/>
 								<span className="text-xs text-muted-foreground">
-									{currentStatus.text}
+									{currentStatus.key}
 								</span>
 							</div>
 							<ChevronsUpDown className="ml-auto size-4" />
@@ -201,7 +201,7 @@ function NavUserInner({ user }: NavUserProps) {
 													info.color
 												)}
 											/>
-											<span>{info.text}</span>
+											<span>{info.key}</span>
 										</DropdownMenuItem>
 									)
 								)}

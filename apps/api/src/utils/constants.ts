@@ -8,8 +8,3 @@ export enum SERVICES {
   CONFIG = 'CONFIG_SERVICE',
   NOTIFICATION = 'NOTIFICATION_SERVICE',
 }
-
-export enum EVENTS {
-  TASK_ASSIGNED = 'task.assigned',
-  PROJECT_INVITED = 'project.invited',
-}

@@ -22,6 +22,7 @@ import { Input } from "@/components/ui/input";
 
 import placeholder from "@/public/images/binchillin.jpeg";
 import { toast } from "sonner";
+import { useTranslations } from "next-intl";
 
 export function LoginForm({
 	className,
@@ -29,10 +30,11 @@ export function LoginForm({
 }: HTMLAttributes<HTMLDivElement>) {
 	const [loading, setLoading] = useState(false);
 	const router = useRouter();
+	const t = useTranslations("auth.login");
 
 	async function handleSubmit(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
-		if (loading) return; // avoids 2x submit.
+		if (loading) return;
 
 		setLoading(true);
 
@@ -62,7 +64,7 @@ export function LoginForm({
 			return;
 		}
 
-		toast.success(data?.message ?? "Logged in successfully!");
+		toast.success(data?.message ?? t("successToast"));
 		setLoading(false);
 
 		router.push("/dashboard");
@@ -76,20 +78,22 @@ export function LoginForm({
 						<FieldGroup>
 							<div className="flex flex-col items-center gap-2 text-center">
 								<h1 className="text-2xl font-bold">
-									Welcome back
+									{t("title")}
 								</h1>
 								<p className="text-balance text-muted-foreground">
-									Login to your Task Group account
+									{t("subtitle")}
 								</p>
 							</div>
 
 							<Field>
-								<FieldLabel htmlFor="email">Email</FieldLabel>
+								<FieldLabel htmlFor="email">
+									{t("emailLabel")}
+								</FieldLabel>
 								<Input
 									name="email"
 									id="email"
 									type="email"
-									placeholder="m@example.com"
+									placeholder={t("emailPlaceholder")}
 									autoComplete="email"
 									required
 								/>
@@ -98,7 +102,7 @@ export function LoginForm({
 							<Field>
 								<div className="flex items-center justify-between">
 									<FieldLabel htmlFor="password">
-										Password
+										{t("passwordLabel")}
 									</FieldLabel>
 								</div>
 								<Input
@@ -117,17 +121,19 @@ export function LoginForm({
 									aria-busy={loading}
 									className="w-full"
 								>
-									{loading ? "Logging in..." : "Login"}
+									{loading
+										? t("buttonLoading")
+										: t("buttonIdle")}
 								</Button>
 							</Field>
 
 							<FieldDescription className="text-center">
-								Don&apos;t have an account?{" "}
+								{t("signupPrompt")}{" "}
 								<Link
 									href="/register"
 									className="font-medium underline underline-offset-4"
 								>
-									Sign up
+									{t("signupLink")}
 								</Link>
 							</FieldDescription>
 						</FieldGroup>
@@ -146,13 +152,13 @@ export function LoginForm({
 			</Card>
 
 			<FieldDescription className="px-6 text-center">
-				By clicking continue, you agree to our{" "}
+				{t("tosText")}{" "}
 				<Link href="#" className="underline underline-offset-4">
-					Terms of Service
+					{t("tosTerms")}
 				</Link>{" "}
-				and{" "}
+				{t("and")}{" "}
 				<Link href="#" className="underline underline-offset-4">
-					Privacy Policy
+					{t("tosPrivacy")}
 				</Link>
 				.
 			</FieldDescription>

@@ -1,7 +1,11 @@
 "use client";
 
-import Image from "next/image";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+
+import Image from "next/image";
+import { toast } from "sonner";
+import { fetcher } from "@/lib/api";
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { EmptyUser } from "@/components/nav/empty-users";
@@ -12,45 +16,53 @@ import { BreadCrumbCustom } from "@/components/custom/breadCrumbCustom";
 import { ScrollArea } from "@/components/ui/scroll-area";
 
 import buttonIcon from "@/public/images/add-member.webp";
-import { type Status, StatusEnum } from "@repo/types";
-import { MemberCard, MemberCardProps } from "./components/member";
+import { MemberCard } from "./components/member";
+import { useTranslations } from "next-intl";
+import type { ProjectMember } from "@repo/types";
 
-type UserData = MemberCardProps & { status: Status };
+const DEFAULT_AVATAR =
+	"https://raw.githubusercontent.com/Mangeh04/Storage/main/binchilling.png";
 
 export default function MembersPage() {
-	const users: Array<UserData> = [
-		{
-			name: "mangeh04",
-			email: "mapsantamaria@esei.uvigo.es",
-			avatar: "https://raw.githubusercontent.com/Mangeh04/Storage/main/dragonite.jpeg",
-			status: StatusEnum.ONLINE,
-		},
-		{
-			name: "blackfox099",
-			email: "urgonzalez@esei.uvigo.es",
-			avatar: "https://raw.githubusercontent.com/Mangeh04/Storage/main/mike.jpg",
-			status: StatusEnum.ONLINE,
-		},
-		{
-			name: "axiur",
-			email: "axiur@esei.uvigo.es",
-			avatar: "https://raw.githubusercontent.com/Mangeh04/Storage/main/speed.webp",
-			status: StatusEnum.DO_NOT_DISTURB,
-		},
-		{
-			name: "alejandropxrez",
-			email: "apmosquera@esei.uvigo.es",
-			avatar: "https://raw.githubusercontent.com/Mangeh04/Storage/main/miketyson.jpg",
-			status: StatusEnum.AWAY,
-		},
-	];
+	const t = useTranslations("members.page");
+
 	const params = useParams();
 	const projectId = params.projectId as string;
 
-	const hasMembers = users.length > 1;
+	const [users, setUsers] = useState<ProjectMember[]>([]);
+	const [isFetching, setIsFetching] = useState(false);
+
+	const fetchMembers = useCallback(async () => {
+		if (!projectId) return;
+
+		setIsFetching(true);
+		const { data, error } = await fetcher<ProjectMember[]>(
+			`/project/${projectId}/members`,
+			{
+				method: "GET",
+				needsAuth: true,
+			}
+		);
+
+		if (error) {
+			toast.error(error);
+		} else {
+			setUsers(data ?? []);
+		}
+		setIsFetching(false);
+	}, [projectId]);
+
+	useEffect(() => {
+		void fetchMembers();
+	}, [fetchMembers]);
+
+	const hasMembers = users.length > 0;
 	const breadcrumbItems = [
-		{ label: "Home", href: "/dashboard" },
-		{ label: "Project", href: `/dashboard/projectdetails/${projectId}` },
+		{ label: t("breadcrumbHome"), href: "/dashboard" },
+		{
+			label: t("breadcrumbProject"),
+			href: `/dashboard/projectdetails/${projectId}`,
+		},
 	];
 
 	return (
@@ -59,7 +71,7 @@ export default function MembersPage() {
 				<SidebarTrigger />
 				<BreadCrumbCustom
 					items={breadcrumbItems}
-					currentPage="Members"
+					currentPage={t("breadcrumbCurrent")}
 				/>
 			</header>
 
@@ -68,38 +80,39 @@ export default function MembersPage() {
 					<div className="p-4 space-y-4">
 						<div>
 							<CustomDialog
-								buttonString="Invite Members"
-								title="Invite a new User"
-								subtitle="Invite a person here. Enter their email to send an invite."
+								buttonString={t("inviteButton")}
+								title={t("inviteTitle")}
+								subtitle={t("inviteSubtitle")}
 								confirmIcon={
 									<Image
 										src={buttonIcon}
 										width={15}
 										height={15}
-										alt="Add new members to the project"
+										alt={t("inviteIconAlt")}
 										className="dark:invert dark:brightness-100"
 									/>
 								}
 							>
 								<Label htmlFor="user-email-inv">
-									User Email
+									{t("inviteEmailLabel")}
 								</Label>
 								<Input
 									id="user-email-inv"
 									name="User Email Invitation"
-									placeholder="a@example.com"
+									placeholder={t("inviteEmailPlaceholder")}
 								/>
 							</CustomDialog>
 						</div>
 
 						<div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-							{users.map((user, index) => (
+							{users.map((member, index) => (
 								<MemberCard
 									key={index}
-									name={user.name}
-									email={user.email}
-									avatar={user.avatar}
-									status={user.status}
+									name={member.user.alias}
+									email={member.user.email}
+									avatar={DEFAULT_AVATAR}
+									role={member.role}
+									status={member.user.config.status}
 								/>
 							))}
 						</div>

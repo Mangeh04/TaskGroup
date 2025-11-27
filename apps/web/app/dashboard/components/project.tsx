@@ -1,7 +1,11 @@
+"use client";
+
 import { Card } from "@/components/ui/card";
-import { Users, CheckCircle2 } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+
+import { Users, CheckCircle2 } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export type ProjectCardProps = {
 	title: string;
@@ -16,6 +20,8 @@ export function ProjectCard({
 	numTasks,
 	numUsers,
 }: ProjectCardProps) {
+	const t = useTranslations("projects.card");
+
 	return (
 		<Card className="w-full flex flex-row items-center justify-between p-4 rounded-2xl border border-border/40 bg-card shadow-sm hover:shadow-md transition-all duration-300 cursor-pointer">
 			<div className="flex flex-col justify-center">
@@ -31,7 +37,9 @@ export function ProjectCard({
 					<span className="font-medium text-foreground">
 						{numTasks}
 					</span>
-					<Badge variant="destructive">Tasks</Badge>
+					<Badge variant="destructive">
+						{t("tasksBadge", { count: numTasks })}
+					</Badge>
 				</div>
 
 				<div className="flex items-center gap-2">
@@ -39,7 +47,9 @@ export function ProjectCard({
 					<span className="font-medium text-foreground">
 						{numUsers}
 					</span>
-					<Badge variant="blue">Users</Badge>
+					<Badge variant="blue">
+						{t("usersBadge", { count: numUsers })}
+					</Badge>
 				</div>
 			</div>
 		</Card>
@@ -63,13 +73,13 @@ export function SkeletonCard() {
 
 			<div className="flex flex-row items-center gap-8 text-sm">
 				<div className="flex items-center gap-2">
-					<Skeleton className="h-4 w-4 rounded-[4px] animate-pulse" />
+					<Skeleton className="h-4 w-4 rounded-lg animate-pulse" />
 					<Skeleton className="h-4 w-10 rounded-md animate-pulse" />
 					<Skeleton className="h-5 w-16 rounded-full animate-pulse" />
 				</div>
 
 				<div className="flex items-center gap-2">
-					<Skeleton className="h-4 w-4 rounded-[4px] animate-pulse" />
+					<Skeleton className="h-4 w-4 rounded-lg animate-pulse" />
 					<Skeleton className="h-4 w-10 rounded-md animate-pulse" />
 					<Skeleton className="h-5 w-16 rounded-full animate-pulse" />
 				</div>

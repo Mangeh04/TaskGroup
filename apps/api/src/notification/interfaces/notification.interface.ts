@@ -1,21 +1,19 @@
-import { Observable } from 'rxjs';
-import { NotificationPayload } from '../services/notification.service';
-
 export interface INotificationService {
-  subscribe(userId: string): Observable<any>;
-  sendNotificationToUser(
-    userId: string,
-    notification: NotificationPayload,
-  ): void;
   handleProjectInvited(payload: {
     invitedUserId: string;
-    inviterName: string;
+    inviterId: string;
     projectName: string;
     projectId: string;
+    inviterAlias: string;
   }): void;
   handleTaskAssigned(payload: {
     assignedUserId: string;
-    assignerName: string;
-    taskName: string;
+    taskId: string;
+    assignerId: string;
   }): void;
+  checkExistingInvite(
+    projectId: string,
+    holderId: string,
+    inviterId: string,
+  ): Promise<boolean>;
 }

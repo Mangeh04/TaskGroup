@@ -55,9 +55,10 @@ export class TaskGuard implements CanActivate {
       return true;
     }
 
-    const assignment = await this.prismaService.taskAssignment.findUnique({
+    const assignment = await this.prismaService.task.findFirst({
       where: {
-        userId_taskId: { userId, taskId },
+        assignedUserId: userId,
+        projectId,
       },
     });
 

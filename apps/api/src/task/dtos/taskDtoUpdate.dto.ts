@@ -1,12 +1,4 @@
-import {
-  ArrayMinSize,
-  IsArray,
-  IsNotEmpty,
-  IsOptional,
-  IsString,
-} from 'class-validator';
-
-import { TaskDto } from './taskDto.dto';
+import { IsBoolean, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 
 export class TaskDtoUpdate {
   @IsNotEmpty()
@@ -21,9 +13,11 @@ export class TaskDtoUpdate {
   @IsString()
   description?: string;
 
-  @IsArray()
-  @ArrayMinSize(1)
-  @IsString({ each: true })
   @IsOptional()
-  userIds?: string[];
+  @IsString()
+  assignedUserId?: string;
+
+  @IsNotEmpty()
+  @IsBoolean()
+  isCompleted?: boolean;
 }

@@ -11,11 +11,15 @@ import { Button } from "@/components/ui/button";
 
 import { fetcher } from "@/lib/api";
 import { ThemeEnum } from "@repo/types";
+import { useTranslations } from "next-intl";
 
 export function AppearanceSection() {
 	const { theme, setTheme, resolvedTheme } = useTheme();
 	const current = theme ?? resolvedTheme ?? "system";
 	const [mounted, setMounted] = useState(false);
+
+	const t = useTranslations("settings.appearance");
+	const tg = useTranslations("generic");
 
 	useEffect(() => setMounted(true), []);
 	if (!mounted) return null;
@@ -33,45 +37,45 @@ export function AppearanceSection() {
 	return (
 		<div className="space-y-6">
 			<div>
-				<h1 className="text-2xl font-semibold">Appearance</h1>
-				<p className="text-muted-foreground mt-1">
-					Choose how the app looks. The “System” mode follows your
-					device’s preference.
-				</p>
+				<h1 className="text-2xl font-semibold">{t("title")}</h1>
+				<p className="text-muted-foreground mt-1">{t("description")}</p>
 			</div>
 
 			<Card>
 				<CardContent className="space-y-6 p-6">
 					<div className="space-y-4">
-						<h3 className="font-medium">Theme</h3>
+						<h3 className="font-medium">{t("themeTitle")}</h3>
 						<RadioGroup
 							value={current}
 							onValueChange={async (v) => {
-								setTheme(v);
+								const nextTheme = v.toLocaleLowerCase();
+								if (v === nextTheme) return;
+
+								setTheme(nextTheme); // Needed for NextJS theme provider to work properly.
 								await updateThemePreference(v);
 							}}
 							className="grid gap-3 sm:grid-cols-3"
 						>
 							<ThemeOption
 								id={ThemeEnum.SYSTEM}
-								label="System"
+								label={t("themeSystem")}
 								icon={<Monitor className="h-4 w-4" />}
 							/>
 							<ThemeOption
 								id={ThemeEnum.LIGHT}
-								label="Light"
+								label={t("themeLight")}
 								icon={<Sun className="h-4 w-4" />}
 							/>
 							<ThemeOption
 								id={ThemeEnum.DARK}
-								label="Dark"
+								label={t("themeDark")}
 								icon={<Moon className="h-4 w-4" />}
 							/>
 						</RadioGroup>
 					</div>
 
 					<div className="space-y-3">
-						<Label className="text-sm">Preview</Label>
+						<Label className="text-sm">{t("previewLabel")}</Label>
 						<div className="rounded-lg border p-4 space-y-3">
 							<div className="flex gap-2">
 								<Swatch className="bg-primary" />
@@ -79,9 +83,9 @@ export function AppearanceSection() {
 								<Swatch className="bg-muted" />
 							</div>
 							<div className="flex gap-2">
-								<Button size="sm">Primary</Button>
+								<Button size="sm">{tg("primary")}</Button>
 								<Button size="sm" variant="secondary">
-									Secondary
+									{tg("secondary")}
 								</Button>
 							</div>
 						</div>

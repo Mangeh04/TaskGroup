@@ -1,5 +1,6 @@
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import createNextIntlPlugin from "next-intl/plugin";
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -12,4 +13,5 @@ const nextConfig = {
 	productionBrowserSourceMaps: true, // esto desactivarlo
 };
 
-export default nextConfig;
+const withNextIntl = createNextIntlPlugin();
+export default withNextIntl(nextConfig);

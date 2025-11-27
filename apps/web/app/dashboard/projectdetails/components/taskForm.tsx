@@ -1,6 +1,5 @@
 "use client";
 
-import { z } from "zod";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
@@ -12,15 +11,8 @@ import {
 } from "@/components/ui/select";
 import { Switch } from "@/components/ui/switch";
 import type { ProjectMember } from "@repo/types";
-
-export const TaskFormSchema = z.object({
-	title: z.string().min(1, "Title is required").max(60),
-	description: z.string().optional(),
-	userId: z.string().min(1, "You must assign the task to a user"),
-	isCompleted: z.boolean().default(false),
-});
-
-export type TaskFormValues = z.infer<typeof TaskFormSchema>;
+import type { TaskFormValues } from "@/lib/schemas";
+import { useTranslations } from "next-intl";
 
 export type TaskFormProps = {
 	values: TaskFormValues;
@@ -30,53 +22,67 @@ export type TaskFormProps = {
 };
 
 export function TaskForm({ values, users, loading, onChange }: TaskFormProps) {
+	const t = useTranslations("tasks.form");
+
 	return (
 		<div className="flex flex-col gap-4">
+			{/* Title */}
 			<div className="flex flex-col gap-1.5">
-				<Label htmlFor="task-name">Task name</Label>
+				<Label htmlFor="task-name">{t("titleLabel")}</Label>
 				<Input
 					id="task-name"
 					name="title"
-					placeholder="Incredible Task"
+					placeholder={t("titlePlaceholder")}
 					value={values.title}
 					onChange={(e) => onChange("title", e.target.value)}
 					disabled={loading}
 				/>
 			</div>
 
+			{/* Description */}
 			<div className="flex flex-col gap-1.5">
-				<Label htmlFor="task-description">Task description</Label>
+				<Label htmlFor="task-description">
+					{t("descriptionLabel")}
+				</Label>
 				<Input
 					id="task-description"
 					name="description"
-					placeholder="Description of the Task"
+					placeholder={t("descriptionPlaceholder")}
 					value={values.description ?? ""}
 					onChange={(e) => onChange("description", e.target.value)}
 					disabled={loading}
 				/>
 			</div>
 
+			{/* Assigned User */}
 			<div className="flex flex-col gap-1.5">
-				<Label htmlFor="task-user">Assigned User</Label>
+				<Label htmlFor="task-user">{t("assignedUserLabel")}</Label>
 				<Select
 					name="userId"
 					onValueChange={(val) => onChange("userId", val)}
 					value={values.userId}
 					disabled={loading}
+					required
 				>
 					<SelectTrigger className="w-full">
-						<SelectValue placeholder="Assign Task" />
+						<SelectValue
+							placeholder={t("assignedUserPlaceholder")}
+						/>
 					</SelectTrigger>
 					<SelectContent>
-						{users.map((user) => (
-							<SelectItem key={user.userId} value={user.userId}>
-								{user.alias}
+						{users.map((member) => (
+							<SelectItem
+								key={member.userId}
+								value={member.userId}
+							>
+								{member.user.alias}
 							</SelectItem>
 						))}
 					</SelectContent>
 				</Select>
 			</div>
 
+			{/* Completed */}
 			<div className="flex items-center space-x-2 pt-2">
 				<Switch
 					id="task-state"
@@ -85,7 +91,7 @@ export function TaskForm({ values, users, loading, onChange }: TaskFormProps) {
 					onCheckedChange={(val) => onChange("isCompleted", val)}
 					disabled={loading}
 				/>
-				<Label htmlFor="task-state">Marcar como completada</Label>
+				<Label htmlFor="task-state">{t("isCompletedLabel")}</Label>
 			</div>
 		</div>
 	);

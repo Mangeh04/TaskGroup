@@ -1,0 +1,233 @@
+{
+	"generic": {
+		"loading": "Cargando…",
+		"primary": "Primario",
+		"secondary": "Secundario"
+	},
+	"dashboard": {
+		"header": {
+			"title": "Inicio"
+		},
+		"createProjectDialog": {
+			"button": "Crear proyecto",
+			"title": "Crea un nuevo proyecto",
+			"subtitle": "Crea tus nuevos proyectos aquí. Haz clic en guardar cuando termines"
+		},
+		"emptyState": {
+			"title": "Todavía no tienes proyectos",
+			"subtitle": "Crea tus nuevos proyectos aquí. Haz clic en guardar cuando termines",
+			"button": "Crear proyecto",
+			"noDescription": "Sin descripción disponible"
+		}
+	},
+	"settings": {
+		"appearance": {
+			"title": "Apariencia",
+			"description": "Elige cómo se ve la aplicación. El modo “Sistema” sigue la preferencia de tu dispositivo.",
+			"themeTitle": "Tema",
+			"themeSystem": "Sistema",
+			"themeLight": "Claro",
+			"themeDark": "Oscuro",
+			"previewLabel": "Vista previa"
+		},
+		"notifications": {
+			"title": "Notificaciones",
+			"desktopTitle": "Activar notificaciones de escritorio",
+			"desktopDescription": "Decide si quieres recibir notificaciones de nuevos mensajes y actualizaciones"
+		},
+		"profile": {
+			"title": "Información personal",
+			"uploadImage": "Subir imagen",
+			"removeImage": "Eliminar",
+			"userNameLabel": "Nombre de usuario",
+			"emailLabel": "Correo electrónico"
+		},
+		"security": {
+			"title": "Contraseña",
+			"description": "Recuerda, tu contraseña es la llave digital de tu cuenta. ¡Mantenla segura!",
+			"currentPassword": "Contraseña actual",
+			"newPassword": "Nueva contraseña",
+			"confirmPassword": "Confirmar nueva contraseña",
+			"updateButton": "Actualizar",
+			"toastError": "No se pudo cambiar la contraseña.",
+			"toastSuccess": "Contraseña cambiada con éxito."
+		},
+		"sidebar": {
+			"dashboard": "Dashboard",
+			"profile": "Perfil",
+			"security": "Seguridad",
+			"notifications": "Notificaciones",
+			"appearance": "Apariencia",
+			"language": "Lenguaje"
+		},
+		"language": {
+			"title": "Cambia idiomas",
+			"description": "Cambia al lenguaje que quieras tener.",
+			"languageTitle": "idiomas"
+		}
+	},
+	"groupInformation": {
+		"title": "Equipo de desarrollo",
+		"heroTitle": "Conoce al equipo",
+		"heroDescription": "Somos un grupo de estudiantes de la ESEI (Universidade de Vigo) desarrollando TaskGroup para la asignatura de TSW."
+	},
+	"notifications": {
+		"card": {
+			"invitationTitle": "Nueva invitación",
+			"invitationBody": "Has sido invitado por {user} a unirte a {project}",
+			"taskTitle": "Nueva tarea asignada",
+			"taskBody": "Tienes una nueva tarea asignada por {user} en {project}"
+		}
+	},
+	"inbox": {
+		"title": "Bandeja de entrada",
+		"emptyTitle": "Tu bandeja de entrada está vacía",
+		"emptyButton": "Recargar"
+	},
+	"auth": {
+		"login": {
+			"title": "Bienvenido de nuevo",
+			"subtitle": "Inicia sesión en tu cuenta de Task Group",
+			"emailLabel": "Correo electrónico",
+			"emailPlaceholder": "m@ejemplo.com",
+			"passwordLabel": "Contraseña",
+			"buttonIdle": "Iniciar sesión",
+			"buttonLoading": "Iniciando sesión...",
+			"signupPrompt": "¿No tienes cuenta?",
+			"signupLink": "Regístrate",
+			"tosText": "Al continuar, aceptas nuestros",
+			"tosTerms": "Términos de servicio",
+			"tosPrivacy": "Política de privacidad",
+			"successToast": "¡Has iniciado sesión correctamente!",
+			"and": "y"
+		},
+		"register": {
+			"title": "Crea tu cuenta",
+			"subtitle": "Introduce tus datos para crear tu cuenta",
+			"aliasLabel": "Alias",
+			"aliasPlaceholder": "Miguel",
+			"emailLabel": "Correo electrónico",
+			"emailPlaceholder": "m@ejemplo.com",
+			"emailDescription": "Usaremos este correo para contactar contigo. No lo compartiremos con nadie.",
+			"passwordLabel": "Contraseña",
+			"confirmPasswordLabel": "Confirmar contraseña",
+			"passwordDescription": "Debe tener al menos 8 caracteres.",
+			"buttonIdle": "Crear cuenta",
+			"buttonLoading": "Creando cuenta...",
+			"loginPrompt": "¿Ya tienes cuenta?",
+			"loginLink": "Inicia sesión",
+			"tosText": "Al continuar, aceptas nuestros",
+			"tosTerms": "Términos de servicio",
+			"tosPrivacy": "Política de privacidad",
+			"successToast": "¡Cuenta creada correctamente!"
+		}
+	},
+	"tasks": {
+		"form": {
+			"titleLabel": "Nombre de la tarea",
+			"titlePlaceholder": "Tarea increíble",
+			"descriptionLabel": "Descripción de la tarea",
+			"descriptionPlaceholder": "Descripción de la tarea",
+			"assignedUserLabel": "Usuario asignado",
+			"assignedUserPlaceholder": "Asignar tarea",
+			"isCompletedLabel": "Marcar como completada"
+		},
+		"card": {
+			"stateDone": "Completada",
+			"statePending": "Pendiente",
+			"notAssigned": "Sin asignar",
+			"createdPrefix": "Creada:",
+			"editTitle": "Editando tarea: \"{title}\"",
+			"editSubtitle": "Modifica los campos y guarda los cambios",
+			"toastUpdated": "Tarea actualizada",
+			"toastDeleted": "Tarea eliminada",
+			"deleteConfirmationText": "La tarea \"{title}\" se eliminará permanentemente.",
+			"deleteObjective": "tarea"
+		}
+	},
+	"members": {
+		"card": {
+			"actions": "Acciones",
+			"remove": "Eliminar"
+		},
+		"page": {
+			"breadcrumbHome": "Inicio",
+			"breadcrumbProject": "Proyecto",
+			"breadcrumbCurrent": "Miembros",
+			"inviteButton": "Invitar miembros",
+			"inviteTitle": "Invitar a un nuevo usuario",
+			"inviteSubtitle": "Invita a una persona aquí. Introduce su correo para enviarle una invitación.",
+			"inviteEmailLabel": "Correo del usuario",
+			"inviteEmailPlaceholder": "a@ejemplo.com",
+			"inviteIconAlt": "Añadir nuevos miembros al proyecto"
+		}
+	},
+	"status": {
+		"online": "En línea",
+		"offline": "Desconectado",
+		"away": "Ausente",
+		"dnd": "No Molestar"
+	},
+	"projectSettings": {
+		"page": {
+			"breadcrumbHome": "Inicio",
+			"breadcrumbProject": "Proyecto",
+			"breadcrumbCurrent": "Configuración",
+			"membersBadge": "{count, plural, one {# miembro} other {# miembros}}",
+			"adminsBadge": "{count, plural, one {# admin} other {# admins}}",
+			"tabGeneral": "General",
+			"tabTeam": "Equipo",
+			"toastDeleted": "Proyecto eliminado",
+			"toastUpdated": "Proyecto actualizado"
+		},
+		"team": {
+			"cardTitle": "Equipo",
+			"cardDescription": "Gestiona roles e invitaciones.",
+			"inviteButton": "Invitar miembros",
+			"inviteTitle": "Invitar a un nuevo usuario",
+			"inviteSubtitle": "Invita a alguien aquí. Introduce su correo para enviarle una invitación.",
+			"inviteEmailLabel": "Correo del usuario",
+			"inviteEmailPlaceholder": "a@ejemplo.com",
+			"inviteIconAlt": "Añadir nuevos miembros al proyecto",
+			"removeObjective": "miembro",
+			"removeButton": "Eliminar",
+			"removeConfirmText": "¿Eliminar a @{alias} del proyecto?"
+		},
+		"overview": {
+			"title": "Resumen del proyecto",
+			"created": "Creado",
+			"notAvailable": "N/D"
+		},
+		"general": {
+			"title": "General",
+			"projectName": "Nombre del proyecto",
+			"projectNamePlaceholder": "Nombre del proyecto",
+			"description": "Descripción",
+			"descriptionPlaceholder": "Descripción del proyecto",
+			"save": "Guardar"
+		},
+		"danger": {
+			"title": "Eliminar proyecto",
+			"description": "Una vez eliminado, esta acción no se puede deshacer.",
+			"confirmText": "Esta acción eliminará permanentemente el proyecto y todos sus datos.",
+			"button": "Eliminar proyecto"
+		}
+	},
+	"roles": {
+		"ADMIN": "Admin",
+		"MEMBER": "Miembro",
+		"OWNER": "Propietario"
+	},
+	"projects": {
+		"card": {
+			"tasksBadge": "{count, plural, one {Tarea} other {Tareas}}",
+			"usersBadge": "{count, plural, one {Usuario} other {Usuarios}}"
+		}
+	},
+	"projectForm": {
+		"nameLabel": "Nombre del proyecto",
+		"namePlaceholder": "Proyecto increíble",
+		"descriptionLabel": "Descripción",
+		"descriptionPlaceholder": "Descripción del proyecto"
+	}
+}

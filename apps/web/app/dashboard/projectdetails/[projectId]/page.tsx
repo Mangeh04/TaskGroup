@@ -2,8 +2,10 @@
 
 import { useRef, useMemo, useCallback, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
-import { SidebarTrigger } from "@/components/ui/sidebar";
+import { PlusIcon, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
+import { SidebarTrigger } from "@/components/ui/sidebar";
 import {
 	Pagination,
 	PaginationContent,
@@ -20,17 +22,13 @@ import { BreadCrumbCustom } from "@/components/custom/breadCrumbCustom";
 import { usePaginatedView } from "@/hooks/usePaginatedView";
 
 import emptyImage from "@/public/images/empty-task.webp";
-import type { TaskWithAssignments, ProjectMember, Task } from "@repo/types";
-import { fetcher } from "@/lib/api";
+import type { TaskEndpoint, ProjectMember, Task } from "@repo/types";
 
-import { PlusIcon, Loader2 } from "lucide-react";
+import { fetcher } from "@/lib/api";
+import { TaskFormSchema, type TaskFormValues } from "@/lib/schemas";
+
 import { TaskCard, SkeletonCard } from "../components/task";
-import {
-	TaskForm,
-	TaskFormSchema,
-	TaskFormValues,
-} from "../components/taskForm";
-import { toast } from "sonner";
+import { TaskForm } from "../components/taskForm";
 
 export default function ProjectPage() {
 	const params = useParams();
@@ -46,7 +44,7 @@ export default function ProjectPage() {
 	const listContainerRef = useRef<HTMLDivElement>(null);
 	const gridRef = useRef<HTMLDivElement>(null);
 
-	const [tasks, setTasks] = useState<TaskWithAssignments[]>([]);
+	const [tasks, setTasks] = useState<TaskEndpoint[]>([]);
 	const [users, setUsers] = useState<ProjectMember[]>([]);
 	const [isFetching, setIsFetching] = useState(true);
 
@@ -62,7 +60,7 @@ export default function ProjectPage() {
 		if (!projectId) return;
 
 		setIsFetching(true);
-		const { data, error } = await fetcher<TaskWithAssignments[]>(
+		const { data, error } = await fetcher<TaskEndpoint[]>(
 			`/task/${projectId}`,
 			{
 				method: "GET",
@@ -198,7 +196,7 @@ export default function ProjectPage() {
 			title: parsed.data.title,
 			description: parsed.data.description,
 			isCompleted: parsed.data.isCompleted,
-			userIds: [parsed.data.userId],
+			assignedUserId: parsed.data.userId,
 			projectId,
 		};
 
@@ -366,7 +364,7 @@ export default function ProjectPage() {
 											className="min-h-40"
 										>
 											<TaskCard
-												{...task}
+												task={task}
 												projectMembers={users}
 												onUpdate={fetchTasks}
 											/>

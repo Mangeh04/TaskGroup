@@ -1,12 +1,4 @@
-import { Type } from 'class-transformer';
-import {
-  IsNotEmpty,
-  IsString,
-  MaxLength,
-  IsBoolean,
-  IsArray,
-  ArrayMinSize,
-} from 'class-validator';
+import { IsNotEmpty, IsString, MaxLength, IsBoolean } from 'class-validator';
 
 export class TaskDto {
   @IsNotEmpty()
@@ -26,8 +18,6 @@ export class TaskDto {
   @IsString()
   projectId: string;
 
-  @IsArray()
-  @ArrayMinSize(1)
-  @IsString({ each: true })
-  userIds: string[];
+  @IsString()
+  assignedUserId?: string;
 }

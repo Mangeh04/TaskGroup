@@ -21,7 +21,9 @@ export class DecryptResponseInterceptor implements NestInterceptor {
   ) {}
 
   intercept(context: ExecutionContext, next: CallHandler): Observable<any> {
-    if (context.getType() !== 'http') {
+    const type = context.getType<'http' | 'ws' | 'rpc'>();
+
+    if (type !== 'http' && type !== 'ws') {
       return next.handle();
     }
 

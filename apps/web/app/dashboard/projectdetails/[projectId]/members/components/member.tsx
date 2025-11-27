@@ -1,27 +1,29 @@
+"use client";
+
 import { Card } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import {
-	DropdownMenu,
-	DropdownMenuContent,
-	DropdownMenuItem,
-	DropdownMenuLabel,
-	DropdownMenuSeparator,
-	DropdownMenuTrigger,
-} from "@/components/ui/dropdown-menu";
-import { MoreHorizontal, UserX } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import type { Status } from "@repo/types";
+import type { Status, RoleEnum } from "@repo/types";
 import { statusStyles } from "@/components/nav/status";
+import { useTranslations } from "next-intl";
 
 export type MemberCardProps = {
 	name: string;
 	email: string;
 	avatar: string;
 	status: Status;
+	role: RoleEnum;
 };
 
-export function MemberCard({ name, email, avatar, status }: MemberCardProps) {
+export function MemberCard({
+	name,
+	email,
+	avatar,
+	status,
+	role,
+}: MemberCardProps) {
+	const tStatus = useTranslations("status");
+
 	const currentStatus = statusStyles[status];
 
 	return (
@@ -34,6 +36,7 @@ export function MemberCard({ name, email, avatar, status }: MemberCardProps) {
 							{name.charAt(0).toLocaleUpperCase()}
 						</AvatarFallback>
 					</Avatar>
+
 					<div className="grid flex-1 text-left text-sm leading-tight">
 						<span className="truncate font-medium">{name}</span>
 						<span className="truncate text-xs text-muted-foreground">
@@ -41,36 +44,22 @@ export function MemberCard({ name, email, avatar, status }: MemberCardProps) {
 						</span>
 					</div>
 				</div>
-				<DropdownMenu>
-					<DropdownMenuTrigger asChild>
-						<Button
-							variant="ghost"
-							size="icon"
-							className="h-6 w-6 flex-shrink-0"
-						>
-							<MoreHorizontal className="h-4 w-4" />
-						</Button>
-					</DropdownMenuTrigger>
-					<DropdownMenuContent align="end">
-						<DropdownMenuLabel>Actions</DropdownMenuLabel>
-						<DropdownMenuSeparator />
-						<DropdownMenuItem className="text-destructive focus:text-destructive focus:bg-destructive/10">
-							<UserX className="mr-2 h-4 w-4" />
-							<span>Remove</span>
-						</DropdownMenuItem>
-					</DropdownMenuContent>
-				</DropdownMenu>
 			</div>
 
-			<div className="flex items-center gap-2">
-				<span
-					className={cn(
-						"flex h-2 w-2 rounded-full",
-						currentStatus.color
-					)}
-				/>
-				<span className="text-xs text-muted-foreground">
-					{currentStatus.text}
+			<div className="flex items-center justify-between gap-2">
+				<div className="flex items-center gap-2">
+					<span
+						className={cn(
+							"flex h-2 w-2 rounded-full",
+							currentStatus.color
+						)}
+					/>
+					<span className="text-xs text-muted-foreground">
+						{tStatus(currentStatus.key)}
+					</span>
+				</div>
+				<span className="text-xs font-semibold text-muted-foreground">
+					{role}
 				</span>
 			</div>
 		</Card>

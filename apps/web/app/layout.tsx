@@ -1,8 +1,10 @@
 import "./globals.css";
 
 import type { Metadata } from "next";
+import { ReactNode } from "react";
 import { ThemeProvider } from "next-themes";
-import { type ReactNode } from "react";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale } from "next-intl/server";
 
 import { UserProvider } from "@/context/UserContext";
 import { Toaster } from "@/components/ui/sonner";
@@ -13,27 +15,27 @@ export const metadata: Metadata = {
 	description: "A lightweight task management app",
 };
 
-export default async function RootLayout({
-	children,
-}: Readonly<{
-	children: ReactNode;
-}>) {
-	const user = await getUserServer();
+type Props = { children: ReactNode };
+
+export default async function RootLayout({ children }: Props) {
+	const [user, locale] = await Promise.all([getUserServer(), getLocale()]);
 
 	return (
-		<html lang="en" suppressHydrationWarning>
+		<html lang={locale} suppressHydrationWarning>
 			<body>
-				<ThemeProvider
-					attribute="class"
-					defaultTheme="system"
-					enableSystem
-					disableTransitionOnChange
-				>
-					<UserProvider initialUser={user}>
-						{children}
-						<Toaster richColors position="top-right" />
-					</UserProvider>
-				</ThemeProvider>
+				<NextIntlClientProvider>
+					<ThemeProvider
+						attribute="class"
+						defaultTheme="system"
+						enableSystem
+						disableTransitionOnChange
+					>
+						<UserProvider initialUser={user}>
+							{children}
+							<Toaster richColors position="top-right" />
+						</UserProvider>
+					</ThemeProvider>
+				</NextIntlClientProvider>
 			</body>
 		</html>
 	);

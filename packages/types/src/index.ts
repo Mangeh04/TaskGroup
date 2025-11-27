@@ -6,6 +6,8 @@ import {
 	Role,
 	Theme,
 	ProfileConfiguration as DataBaseProfileConfiguration,
+	TaskAssignedNotification,
+	ProjectInviteNotification,
 } from "@repo/database";
 
 export type User = Omit<
@@ -17,17 +19,26 @@ export type Status = DatabaseStatus;
 export { DatabaseStatus as StatusEnum };
 
 export type Task = Omit<DatabaseTask, "descriptionIv" | "titleIv">;
-export type Project = Omit<DataBaseProject, "descriptionIv" | "nameIv">;
+export type Project = Omit<
+	DataBaseProject,
+	"descriptionIv" | "nameIv" | "updatedAt"
+>;
 
 export type ProjectMember = {
 	role: Role;
 	userId: string;
-} & Omit<User, "password" | "emailBi" | "createdAt" | "updatedAt" | "id">;
+	user: Omit<
+		User,
+		"password" | "emailBi" | "createdAt" | "updatedAt" | "id"
+	> & {
+		config: {
+			status: Status;
+		};
+	};
+};
 
-export type TaskWithAssignments = Task & {
-	assignments: {
-		user: ProjectMember;
-	}[];
+export type TaskEndpoint = Task & {
+	assignedUser: Omit<User, "createdAt" | "updatedAt" | "id">;
 };
 
 export { Role as RoleEnum };
@@ -38,3 +49,26 @@ export type ProfileConfiguration = Omit<
 >;
 
 export type ProfileEndpoint = User & ProfileConfiguration;
+
+export type Notification = TaskAssignedNotification | ProjectInviteNotification;
+export type NotificationPayload =
+	| InviteNotificationPayload
+	| AssignNotificationPayload;
+
+export interface InviteNotificationPayload {
+	invitedUserId: string;
+	projectName: string;
+	projectId: string;
+	inviterAlias: string;
+}
+
+export interface AssignNotificationPayload {
+	assignedUserId: string;
+	assignerName: string;
+	taskName: string;
+}
+
+export enum EVENTS {
+	TASK_ASSIGNED = "task.assigned",
+	PROJECT_INVITED = "project.invited",
+}

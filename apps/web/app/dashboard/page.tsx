@@ -26,6 +26,7 @@ import Link from "next/link";
 import { toast } from "sonner";
 
 import { ProjectForm } from "./components/projectForm";
+import { useTranslations } from "next-intl";
 
 export type ProjectResponse = Project & {
 	membersCount: number;
@@ -148,17 +149,20 @@ export default function DashboardPage() {
 		void fetchData();
 	}, [fetchData, formValues, isCreating]);
 
+	const t = useTranslations("dashboard");
+	const genericT = useTranslations("generic");
+
 	return (
 		<>
 			<header className="flex h-14 shrink-0 items-center gap-2 px-4">
 				<SidebarTrigger />
-				<h1 className="text-lg font-semibold">Home</h1>
+				<h1 className="text-lg font-semibold">{t("header.title")}</h1>
 
 				{(isFetching || isPaginating) && (
 					<div className="ml-auto flex items-center gap-2">
 						<Loader2 className="h-4 w-4 animate-spin text-muted-foreground/80" />
 						<span className="text-xs text-muted-foreground">
-							Loading…
+							{genericT("loading")}
 						</span>
 					</div>
 				)}
@@ -168,9 +172,9 @@ export default function DashboardPage() {
 				<div className="flex flex-col gap-4 flex-1 min-h-0 px-4 py-6 overflow-hidden">
 					<div className="shrink-0">
 						<CustomDialog
-							buttonString="Create Project"
-							title="Create a new Project"
-							subtitle="Create your new projects here. Click save when you're done"
+							buttonString={t("createProjectDialog.button")}
+							title={t("createProjectDialog.title")}
+							subtitle={t("createProjectDialog.subtitle")}
 							confirmIcon={
 								isCreating ? (
 									<Loader2 className="h-4 w-4 animate-spin" />
@@ -227,7 +231,9 @@ export default function DashboardPage() {
 													title={item.name}
 													description={
 														item.description ??
-														"No description available"
+														t(
+															"emptyState.noDescription"
+														)
 													}
 													numTasks={item.tasksCount}
 													numUsers={item.membersCount}
@@ -292,14 +298,13 @@ export default function DashboardPage() {
 			) : (
 				<div className="flex flex-1 items-center justify-center p-6 overflow-hidden">
 					<EmptyPage
-						title="You don't have any projects yet"
-						buttonString="Create Project"
+						title={t("emptyState.title")}
+						buttonString={t("emptyState.button")}
 						imageSrc={emptyImage}
 						imageAlt="Empty projects illustration"
 						customDialog={{
-							title: "You don't have any projects yet",
-							subtitle:
-								"Create your new projects here. Click save when you're done",
+							title: t("emptyState.title"),
+							subtitle: t("emptyState.subtitle"),
 							confirmIcon: isCreating ? (
 								<Loader2 className="h-4 w-4 animate-spin" />
 							) : (

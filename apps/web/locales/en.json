@@ -1,0 +1,233 @@
+{
+	"generic": {
+		"loading": "Loading…",
+		"primary": "Primary",
+		"secondary": "Secondary"
+	},
+	"dashboard": {
+		"header": {
+			"title": "Home"
+		},
+		"createProjectDialog": {
+			"button": "Create project",
+			"title": "Create a new project",
+			"subtitle": "Create your new projects here. Click save when you're done"
+		},
+		"emptyState": {
+			"title": "You don't have any projects yet",
+			"subtitle": "Create your new projects here. Click save when you're done",
+			"button": "Create project",
+			"noDescription": "No description available"
+		}
+	},
+	"settings": {
+		"appearance": {
+			"title": "Appearance",
+			"description": "Choose how the app looks. The “System” mode follows your device’s preference.",
+			"themeTitle": "Theme",
+			"themeSystem": "System",
+			"themeLight": "Light",
+			"themeDark": "Dark",
+			"previewLabel": "Preview"
+		},
+		"notifications": {
+			"title": "Notification",
+			"desktopTitle": "Enable desktop notification",
+			"desktopDescription": "Decide whether you want to be notified of new messages & updates"
+		},
+		"profile": {
+			"title": "Personal information",
+			"uploadImage": "Upload image",
+			"removeImage": "Remove",
+			"userNameLabel": "User name",
+			"emailLabel": "Email"
+		},
+		"security": {
+			"title": "Password",
+			"description": "Remember, your password is your digital key to your account. Keep it safe, keep it secure!",
+			"currentPassword": "Current password",
+			"newPassword": "New password",
+			"confirmPassword": "Confirm new password",
+			"updateButton": "Update",
+			"toastError": "Failed to change password.",
+			"toastSuccess": "Password changed successfully."
+		},
+		"sidebar": {
+			"dashboard": "Dashboard",
+			"profile": "Profile",
+			"security": "Security",
+			"notifications": "Notifications",
+			"appearance": "Appearance",
+			"language": "Language"
+		},
+		"language": {
+			"title": "Change language",
+			"description": "Change to the language you want to have.",
+			"languageTitle": "Languages"
+		}
+	},
+	"groupInformation": {
+		"title": "Development team",
+		"heroTitle": "Meet the team",
+		"heroDescription": "We are a group of students from ESEI (University of Vigo) developing TaskGroup for the TSW course."
+	},
+	"notifications": {
+		"card": {
+			"invitationTitle": "New invitation",
+			"invitationBody": "You have been invited by {user} to join {project}",
+			"taskTitle": "New assigned task",
+			"taskBody": "You have a new assignment posted by {user} in {project}"
+		}
+	},
+	"inbox": {
+		"title": "Inbox",
+		"emptyTitle": "Your inbox is empty",
+		"emptyButton": "Refresh"
+	},
+	"auth": {
+		"login": {
+			"title": "Welcome back",
+			"subtitle": "Login to your Task Group account",
+			"emailLabel": "Email",
+			"emailPlaceholder": "m@example.com",
+			"passwordLabel": "Password",
+			"buttonIdle": "Login",
+			"buttonLoading": "Logging in...",
+			"signupPrompt": "Don't have an account?",
+			"signupLink": "Sign up",
+			"tosText": "By clicking continue, you agree to our",
+			"tosTerms": "Terms of Service",
+			"tosPrivacy": "Privacy Policy",
+			"successToast": "Logged in successfully!",
+			"and": "and"
+		},
+		"register": {
+			"title": "Create your account",
+			"subtitle": "Enter your details below to create your account",
+			"aliasLabel": "Alias",
+			"aliasPlaceholder": "Miguel",
+			"emailLabel": "Email",
+			"emailPlaceholder": "m@example.com",
+			"emailDescription": "We'll use this to contact you. We will not share your email with anyone else.",
+			"passwordLabel": "Password",
+			"confirmPasswordLabel": "Confirm password",
+			"passwordDescription": "Must be at least 8 characters long.",
+			"buttonIdle": "Create account",
+			"buttonLoading": "Creating account...",
+			"loginPrompt": "Already have an account?",
+			"loginLink": "Sign in",
+			"tosText": "By clicking continue, you agree to our",
+			"tosTerms": "Terms of Service",
+			"tosPrivacy": "Privacy Policy",
+			"successToast": "Account created successfully!"
+		}
+	},
+	"tasks": {
+		"form": {
+			"titleLabel": "Task name",
+			"titlePlaceholder": "Incredible task",
+			"descriptionLabel": "Task description",
+			"descriptionPlaceholder": "Description of the task",
+			"assignedUserLabel": "Assigned user",
+			"assignedUserPlaceholder": "Assign task",
+			"isCompletedLabel": "Mark as completed"
+		},
+		"card": {
+			"stateDone": "Done",
+			"statePending": "Pending",
+			"notAssigned": "Not assigned",
+			"createdPrefix": "Created:",
+			"editTitle": "Editing task: \"{title}\"",
+			"editSubtitle": "Modify the fields and save the changes",
+			"toastUpdated": "Task updated",
+			"toastDeleted": "Task deleted",
+			"deleteConfirmationText": "Task \"{title}\" will be permanently deleted.",
+			"deleteObjective": "task"
+		}
+	},
+	"members": {
+		"card": {
+			"actions": "Actions",
+			"remove": "Remove"
+		},
+		"page": {
+			"breadcrumbHome": "Home",
+			"breadcrumbProject": "Project",
+			"breadcrumbCurrent": "Members",
+			"inviteButton": "Invite members",
+			"inviteTitle": "Invite a new user",
+			"inviteSubtitle": "Invite a person here. Enter their email to send an invite.",
+			"inviteEmailLabel": "User email",
+			"inviteEmailPlaceholder": "a@example.com",
+			"inviteIconAlt": "Add new members to the project"
+		}
+	},
+	"status": {
+		"online": "Online",
+		"offline": "Offline",
+		"away": "Away",
+		"dnd": "Do Not Disturb"
+	},
+	"projectSettings": {
+		"page": {
+			"breadcrumbHome": "Home",
+			"breadcrumbProject": "Project",
+			"breadcrumbCurrent": "Settings",
+			"membersBadge": "{count, plural, one {# member} other {# members}}",
+			"adminsBadge": "{count, plural, one {# admin} other {# admins}}",
+			"tabGeneral": "General",
+			"tabTeam": "Team",
+			"toastDeleted": "Project deleted",
+			"toastUpdated": "Project updated"
+		},
+		"team": {
+			"cardTitle": "Team",
+			"cardDescription": "Manage roles and invitations.",
+			"inviteButton": "Invite members",
+			"inviteTitle": "Invite a new user",
+			"inviteSubtitle": "Invite a person here. Enter their email to send an invite.",
+			"inviteEmailLabel": "User email",
+			"inviteEmailPlaceholder": "a@example.com",
+			"inviteIconAlt": "Add new members to the project",
+			"removeObjective": "member",
+			"removeButton": "Remove",
+			"removeConfirmText": "Remove @{alias} from project?"
+		},
+		"overview": {
+			"title": "Project overview",
+			"created": "Created",
+			"notAvailable": "N/A"
+		},
+		"general": {
+			"title": "General",
+			"projectName": "Project name",
+			"projectNamePlaceholder": "Project name",
+			"description": "Description",
+			"descriptionPlaceholder": "Project description",
+			"save": "Save"
+		},
+		"danger": {
+			"title": "Delete Project",
+			"description": "Once deleted, this action cannot be undone.",
+			"confirmText": "This action will permanently delete the project and all its data.",
+			"button": "Delete project"
+		}
+	},
+	"roles": {
+		"ADMIN": "Admin",
+		"MEMBER": "Member",
+		"OWNER": "Owner"
+	},
+	"projects": {
+		"card": {
+			"tasksBadge": "{count, plural, one {Task} other {Tasks}}",
+			"usersBadge": "{count, plural, one {User} other {Users}}"
+		}
+	},
+	"projectForm": {
+		"nameLabel": "Project Name",
+		"namePlaceholder": "Incredible Project",
+		"descriptionLabel": "Description",
+		"descriptionPlaceholder": "Description of the project"
+	}
+}

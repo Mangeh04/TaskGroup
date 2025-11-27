@@ -1,3 +1,5 @@
+"use client";
+
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
@@ -6,6 +8,7 @@ import { Input } from "@/components/ui/input";
 import type { User } from "@repo/types";
 
 import { Upload } from "lucide-react";
+import { useTranslations } from "next-intl";
 
 export function ProfileSection({
 	user,
@@ -14,11 +17,13 @@ export function ProfileSection({
 		avatar: string;
 	};
 }) {
+	const t = useTranslations("settings.profile");
+
 	return (
 		<div className="space-y-6">
 			<div>
 				<h1 className="text-2xl font-semibold text-balance">
-					Personal information
+					{t("title")}
 				</h1>
 			</div>
 
@@ -33,22 +38,24 @@ export function ProfileSection({
 							<div className="flex gap-2">
 								<Button size="sm">
 									<Upload />
-									Upload image
+									{t("uploadImage")}
 								</Button>
 								<Button variant="outline" size="sm">
-									Remove
+									{t("removeImage")}
 								</Button>
 							</div>
 						</div>
 
 						{/* Personal info form */}
 						<div className="space-y-2">
-							<Label htmlFor="userName">User name</Label>
+							<Label htmlFor="userName">
+								{t("userNameLabel")}
+							</Label>
 							<Input id="userName" defaultValue={user.alias} />
 						</div>
 
 						<div className="space-y-2">
-							<Label htmlFor="email">Email</Label>
+							<Label htmlFor="email">{t("emailLabel")}</Label>
 							<Input
 								id="email"
 								type="email"

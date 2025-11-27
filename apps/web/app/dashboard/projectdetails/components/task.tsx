@@ -1,44 +1,52 @@
 "use client";
 
 import { useState } from "react";
-import { Card } from "@/components/ui/card";
+import { toast } from "sonner";
 import { CalendarDays, User, Edit, Loader2 } from "lucide-react";
+
+import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 import { ConfirmationDialog } from "@/components/custom/confirmation";
 import { CustomDialog } from "@/components/custom/dialog";
-import { toast } from "sonner";
 
 import { fetcher } from "@/lib/api";
-import type { TaskWithAssignments, ProjectMember, Task } from "@repo/types";
+import { TaskFormSchema, type TaskFormValues } from "@/lib/schemas";
+import type { ProjectMember, TaskEndpoint } from "@repo/types";
 
-import { TaskForm, TaskFormValues, TaskFormSchema } from "./taskForm";
+import { TaskForm } from "./taskForm";
+import { useFormatter, useTranslations } from "next-intl";
 
-export type TaskCardProps = TaskWithAssignments & {
+export type TaskCardProps = {
+	task: TaskEndpoint;
 	projectMembers: ProjectMember[];
 	onUpdate: () => void;
 };
 
-export function TaskCard({
-	id,
-	title,
-	description,
-	isCompleted,
-	createdAt,
-	assignments,
-	projectId,
-	projectMembers,
-	onUpdate,
-}: TaskCardProps) {
-	const state = isCompleted ? "Done" : "Pending";
-	const badgeVariant = state === "Done" ? "green" : "destructive";
+export function TaskCard({ task, projectMembers, onUpdate }: TaskCardProps) {
+	const {
+		id,
+		title,
+		description,
+		isCompleted,
+		createdAt,
+		assignedUser,
+		assignedUserId,
+	} = task;
 
-	const primaryUser = assignments[0]?.user.alias || "Sin asignar";
+	const t = useTranslations("tasks.card");
+	const format = useFormatter();
+
+	const stateKey = isCompleted ? "stateDone" : "statePending";
+	const state = t(stateKey);
+	const badgeVariant = isCompleted ? "green" : "destructive";
+
+	const primaryUser = assignedUser.alias ?? t("notAssigned");
 
 	const [editValues, setEditValues] = useState<TaskFormValues>({
 		title,
 		description: description ?? "",
-		userId: assignments[0]?.user.userId ?? "",
+		userId: assignedUserId ?? "",
 		isCompleted,
 	});
 	const [isSaving, setIsSaving] = useState(false);
@@ -67,17 +75,21 @@ export function TaskCard({
 		}
 
 		const apiBody = {
+			id,
 			title: parsed.data.title,
 			description: parsed.data.description,
 			isCompleted: parsed.data.isCompleted,
-			userIds: [parsed.data.userId],
+			assignedUserId: parsed.data.userId,
 		};
 
-		const { error } = await fetcher<Task, typeof apiBody>(`/task/${id}`, {
-			method: "PATCH",
-			body: apiBody,
-			needsAuth: true,
-		});
+		const { error } = await fetcher<TaskEndpoint, typeof apiBody>(
+			`/task/${id}`,
+			{
+				method: "PATCH",
+				body: apiBody,
+				needsAuth: true,
+			}
+		);
 
 		if (error) {
 			toast.error(error);
@@ -85,7 +97,7 @@ export function TaskCard({
 			return;
 		}
 
-		toast.success("Task updated");
+		toast.success(t("toastUpdated"));
 		setIsSaving(false);
 		onUpdate();
 	}
@@ -99,7 +111,7 @@ export function TaskCard({
 		if (error) {
 			toast.error(error);
 		} else {
-			toast.success("Task deleted");
+			toast.success(t("toastDeleted"));
 			onUpdate();
 		}
 	}
@@ -129,26 +141,24 @@ export function TaskCard({
 					<div className="flex items-center text-xs text-muted-foreground mt-1">
 						<CalendarDays className="size-3.5 mr-1" />
 						<span>
-							Created: {new Date(createdAt).toLocaleDateString()}
+							{t("createdPrefix")}{" "}
+							{format.dateTime(new Date(createdAt), {
+								dateStyle: "medium",
+							})}
 						</span>
 					</div>
 
 					<div className="flex items-center text-xs text-muted-foreground mt-1">
 						<User className="size-3.5 mr-1" />
 						<span>{primaryUser}</span>
-						{assignments.length > 1 && (
-							<span className="ml-1 font-medium text-muted-foreground/80">
-								(+{assignments.length - 1} más)
-							</span>
-						)}
 					</div>
 				</div>
 			</div>
 
 			<div className="absolute bottom-3 right-3 flex items-center gap-2">
 				<CustomDialog
-					title={`Editando tarea: "${title}"`}
-					subtitle="Modify the fields and save the changes"
+					title={t("editTitle", { title })}
+					subtitle={t("editSubtitle")}
 					confirmIcon={
 						isSaving ? (
 							<Loader2 className="h-4 w-4 animate-spin" />
@@ -169,8 +179,8 @@ export function TaskCard({
 
 				<ConfirmationDialog
 					dialogAction="delete"
-					text={`Task "${title}" will be permantently deleted.`}
-					objective={"task"}
+					text={t("deleteConfirmationText", { title })}
+					objective={t("deleteObjective")}
 					onConfirm={handleDelete}
 				/>
 			</div>

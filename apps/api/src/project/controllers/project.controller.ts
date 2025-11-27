@@ -24,11 +24,7 @@ import { ProjectDtoUpdate } from '../dtos/projectDtoUpdate.dto';
 import { BadRequestException } from '@nestjs/common/exceptions';
 import { SanitaizedUser } from 'src/user/interfaces/user.interface';
 import { ProjectAdminGuard } from '../guards/projectAdmin.guard';
-
-type ResultArray = {
-  userId: string;
-  role: Role;
-} & Omit<SanitaizedUser, 'id'>;
+import { ProjectMember } from '@repo/types';
 
 @Controller('project')
 export class ProjectController {
@@ -90,7 +86,7 @@ export class ProjectController {
     @Body('email') email: string,
     @User() user: JwtPayload,
   ) {
-    return this.projectService.inviteMember(projectId, email, user.alias);
+    return this.projectService.inviteMember(projectId, email, user.sub);
   }
 
   @Post(':id/accept')
@@ -104,13 +100,13 @@ export class ProjectController {
   @Get(':id/members')
   async getMembers(@Param('id') projectId: string) {
     const members = await this.projectService.getMembersbyProjectId(projectId);
-    const result: Array<ResultArray> = [];
+    const result: Array<ProjectMember> = [];
 
     for (const member of members) {
       result.push({
         userId: member.userId,
         role: member.role,
-        ...member.user,
+        user: member.user,
       });
     }
 

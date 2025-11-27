@@ -1,30 +1,29 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { PrismaClient, type Task, type Prisma } from '@repo/database';
+import { EVENTS, type TaskEndpoint } from '@repo/types';
 
 import { SERVICES } from 'src/utils/constants';
 import { CryptoService } from 'src/crypto/services/crypto.service';
 
 import { TaskDto } from '../dtos/taskDto.dto';
-import type { ITaskService, TasksArray } from '../interfaces/task.interface';
+import type { ITaskService } from '../interfaces/task.interface';
 import { TaskDtoUpdate } from '../dtos/taskDtoUpdate.dto';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class TaskService implements ITaskService {
   constructor(
     @Inject(SERVICES.PRISMA) private readonly prismaService: PrismaClient,
     @Inject(SERVICES.CRYPTO) private readonly cryptoService: CryptoService,
+    private eventEmitter: EventEmitter2,
   ) {}
 
   private async mapDtoToCreateInput(
+    createdByUserId: string,
     taskDto: TaskDto,
   ): Promise<Prisma.TaskCreateInput> {
     const encryptedName = await this.cryptoService.encrypt(taskDto.title);
-
-    const userAssignments = taskDto.userIds.map((id) => ({
-      user: {
-        connect: { id: id },
-      },
-    }));
+    const assignedId = taskDto.assignedUserId ?? createdByUserId;
 
     const data: Prisma.TaskCreateInput = {
       title: encryptedName.ciphertext,
@@ -33,8 +32,10 @@ export class TaskService implements ITaskService {
       project: {
         connect: { id: taskDto.projectId },
       },
-      assignments: {
-        create: userAssignments,
+      assignedUser: {
+        connect: {
+          id: assignedId,
+        },
       },
     };
 
@@ -49,13 +50,22 @@ export class TaskService implements ITaskService {
     return data;
   }
 
-  public async createTask(taskDto: TaskDto) {
-    const data = await this.mapDtoToCreateInput(taskDto);
+  public async createTask(createdByUserId: string, taskDto: TaskDto) {
+    const data = await this.mapDtoToCreateInput(createdByUserId, taskDto);
+
     await this.prismaService.task.create({ data });
+
+    if (createdByUserId != data.assignedUser) {
+      this.eventEmitter.emit(EVENTS.TASK_ASSIGNED, {
+        assignedUserId: data.assignedUser,
+        taskId: data.id,
+        assignerId: createdByUserId,
+      });
+    }
     return true;
   }
 
-  public async updateTask(taskDto: TaskDtoUpdate) {
+  public async updateTask(taskDto: TaskDtoUpdate, updatedByUser: string) {
     const dataToUpdate: Prisma.TaskUpdateInput = {};
 
     if (taskDto.title) {
@@ -63,6 +73,7 @@ export class TaskService implements ITaskService {
       dataToUpdate.title = encryptedName.ciphertext;
       dataToUpdate.titleIv = encryptedName.iv;
     }
+
     if (taskDto.description) {
       const encryptedDescription = await this.cryptoService.encrypt(
         taskDto.description,
@@ -71,12 +82,23 @@ export class TaskService implements ITaskService {
       dataToUpdate.descriptionIv = encryptedDescription.iv;
     }
 
-    if (taskDto.userIds) {
-      dataToUpdate.assignments = {
-        create: taskDto.userIds.map((id) => ({
-          user: { connect: { id } },
-        })),
+    if (taskDto.assignedUserId) {
+      dataToUpdate.assignedUser = {
+        connect: {
+          id: taskDto.assignedUserId,
+        },
       };
+      if (taskDto.assignedUserId != updatedByUser) {
+        this.eventEmitter.emit(EVENTS.TASK_ASSIGNED, {
+          assignedUserId: taskDto.assignedUserId,
+          taskId: taskDto.id,
+          assignerId: updatedByUser,
+        });
+      }
+    }
+
+    if (dataToUpdate.isCompleted != null) {
+      dataToUpdate.isCompleted = taskDto.isCompleted;
     }
 
     await this.prismaService.task.update({
@@ -103,19 +125,16 @@ export class TaskService implements ITaskService {
     return this.prismaService.task.findMany({
       where: { projectId: projectId },
       include: {
-        assignments: {
-          include: {
-            user: {
-              select: {
-                alias: true,
-                aliasIv: true,
-                email: true,
-                emailIv: true,
-              },
-            },
+        assignedUser: {
+          select: {
+            id: true,
+            alias: true,
+            aliasIv: true,
+            email: true,
+            emailIv: true,
           },
         },
       },
-    }) as unknown as Promise<TasksArray>;
+    }) as unknown as Promise<TaskEndpoint[]>;
   }
 }
