@@ -44,7 +44,7 @@ export class UserService implements IUserService {
         ...data,
         config: {
           create: {
-            darkMode: 'SYSTEM',
+            theme: 'SYSTEM',
             language: 'en',
             preference: true,
           },

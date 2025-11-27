@@ -55,7 +55,7 @@ model ProfileConfiguration {
   userId String @id
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  darkMode   Theme   @default(SYSTEM)
+  theme      Theme   @default(SYSTEM)
   language   String  @default("en")
   preference Boolean @default(true)
   status     Status  @default(ONLINE)
