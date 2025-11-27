@@ -1,3 +1,4 @@
+import { Type } from 'class-transformer';
 import {
   IsNotEmpty,
   IsString,
@@ -17,6 +18,7 @@ export class TaskDto {
   @MaxLength(255)
   description: string;
 
+  @IsNotEmpty()
   @IsBoolean()
   isCompleted: boolean;
 

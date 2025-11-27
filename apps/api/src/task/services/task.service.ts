@@ -29,6 +29,7 @@ export class TaskService implements ITaskService {
     const data: Prisma.TaskCreateInput = {
       title: encryptedName.ciphertext,
       titleIv: encryptedName.iv,
+      isCompleted: taskDto.isCompleted,
       project: {
         connect: { id: taskDto.projectId },
       },
