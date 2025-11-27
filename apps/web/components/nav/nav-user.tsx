@@ -39,10 +39,14 @@ import { statusStyles } from "./status";
 import { useUser } from "@/context/UserContext";
 
 type NavUserProps = {
-	user: ProfileEndpoint & {
-		avatar: string;
-	};
+	user: Omit<
+		ProfileEndpoint,
+		"createdAt" | "language" | "theme" | "preference" | "updatedAt"
+	>;
 };
+
+const DEFAULT_AVATAR =
+	"https://github.com/Mangeh04/Storage/blob/main/dragonite.jpeg";
 
 function NavUserInner({ user }: NavUserProps) {
 	const { isMobile } = useSidebar();
@@ -51,9 +55,7 @@ function NavUserInner({ user }: NavUserProps) {
 	const [status, setStatus] = useState<StatusEnum>(user.status);
 
 	useEffect(() => {
-		if (user.status) {
-			setStatus(user.status);
-		}
+		setStatus(user.status);
 	}, [user.status]);
 
 	const currentStatus =
@@ -112,8 +114,6 @@ function NavUserInner({ user }: NavUserProps) {
 		return str.charAt(0).toUpperCase() + str.slice(1);
 	}
 
-	if (!user) return null;
-
 	return (
 		<SidebarMenu>
 			<SidebarMenuItem>
@@ -125,7 +125,7 @@ function NavUserInner({ user }: NavUserProps) {
 						>
 							<Avatar>
 								<AvatarImage
-									src={user.avatar}
+									src={DEFAULT_AVATAR}
 									alt={user.alias}
 								/>
 								<AvatarFallback>{initial}</AvatarFallback>
@@ -162,7 +162,7 @@ function NavUserInner({ user }: NavUserProps) {
 							<div className="flex items-center gap-2 px-1 py-1.5 text-left text-sm">
 								<Avatar>
 									<AvatarImage
-										src={user.avatar}
+										src={DEFAULT_AVATAR}
 										alt={user.alias}
 									/>
 									<AvatarFallback>{initial}</AvatarFallback>
@@ -234,12 +234,17 @@ function NavUserInner({ user }: NavUserProps) {
 	);
 }
 
-export const NavUser = React.memo(
+const NavUserMemo = React.memo(
 	NavUserInner,
 	(prev, next) =>
 		prev.user.id === next.user.id &&
 		prev.user.status === next.user.status &&
-		prev.user.avatar === next.user.avatar &&
 		prev.user.alias === next.user.alias &&
 		prev.user.email === next.user.email
 );
+
+export function NavUser({ user }: NavUserProps) {
+	if (!user) return null;
+
+	return <NavUserMemo user={user} />;
+}

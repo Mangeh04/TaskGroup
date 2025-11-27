@@ -128,7 +128,16 @@ export default function AppSidebar(props: SidebarProps) {
 
 			<SidebarFooter>
 				{isProject && !hasMembers && <EmptyUser />}
-				<NavUser user={sidebarUser as any} />
+				{user && (
+					<NavUser
+						user={{
+							id: user.id,
+							alias: user.alias,
+							email: user.email,
+							status: user.status,
+						}}
+					/>
+				)}
 			</SidebarFooter>
 		</Sidebar>
 	);
