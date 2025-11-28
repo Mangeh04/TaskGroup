@@ -73,6 +73,10 @@ services:
                 NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
                 PORT: ${PORT}
                 NODE_ENV: ${NODE_ENV}
+                NEXT_PUBLIC_API_SERVER_URL: ${NEXT_PUBLIC_API_SERVER_URL}
+        environment:
+            NEXT_PUBLIC_API_URL: ${NEXT_PUBLIC_API_URL}
+            NEXT_PUBLIC_API_SERVER_URL: ${NEXT_PUBLIC_API_SERVER_URL}
         depends_on:
             api:
                 condition: service_started

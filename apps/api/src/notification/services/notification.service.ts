@@ -1,29 +1,17 @@
-import { Inject, Injectable, UseInterceptors } from '@nestjs/common';
-import { OnEvent } from '@nestjs/event-emitter';
-import { Subject, Observable } from 'rxjs';
-import { finalize } from 'rxjs/operators';
+import { ConflictException, Inject, Injectable } from '@nestjs/common';
+import type {
+  PrismaClient,
+  ProjectInviteNotification,
+  TaskAssignedNotification,
+} from '@repo/database';
 
-import type { PrismaClient } from '@repo/database';
-import { EVENTS } from '@repo/types';
-
-import { NotificationGateway } from '../gateway/notification.gateway';
 import { SERVICES } from 'src/utils/constants';
 import type { IUserService } from 'src/user/interfaces/user.interface';
-import type { IProjectService } from 'src/project/interfaces/project.interface';
 import type { ITaskService } from 'src/task/interfaces/task.interface';
 import type { INotificationService } from '../interfaces/notification.interface';
 import { NotificationPayloadWithIv } from '../types/notification.types';
-import { DecryptResponseInterceptor } from 'src/crypto/interceptors/decrypt-reponse.interceptor';
-
-type UserChannel = Subject<NotificationPayloadWithIv>;
-
-interface UserChannelEntry {
-  channel: UserChannel;
-  subscribers: number;
-}
 
 @Injectable()
-@UseInterceptors(DecryptResponseInterceptor)
 export class NotificationService implements INotificationService {
   constructor(
     @Inject(SERVICES.PRISMA)
@@ -34,20 +22,25 @@ export class NotificationService implements INotificationService {
 
     @Inject(SERVICES.TASK)
     private readonly taskService: ITaskService,
-
-    private readonly notificationGateway: NotificationGateway,
   ) {}
 
-  private userChannels = new Map<string, UserChannelEntry>();
-
-  @OnEvent(EVENTS.PROJECT_INVITED)
-  public async handleProjectInvited(payload: {
+  public async createProjectInviteNotification(payload: {
     invitedUserId: string;
     inviterId: string;
     projectName: string;
     projectId: string;
     inviterAlias: string;
-  }) {
+  }): Promise<NotificationPayloadWithIv | null> {
+    if (
+      await this.checkExistingInvite(
+        payload.invitedUserId,
+        payload.inviterId,
+        payload.projectId,
+      )
+    ) {
+      throw new ConflictException('This invitation is already created');
+    }
+
     await this.prismaService.projectInviteNotification.create({
       data: {
         holderId: payload.invitedUserId,
@@ -63,7 +56,7 @@ export class NotificationService implements INotificationService {
       },
     });
 
-    if (!project) return;
+    if (!project) return null;
 
     const notification: NotificationPayloadWithIv = {
       invitedUserId: payload.invitedUserId,
@@ -74,19 +67,14 @@ export class NotificationService implements INotificationService {
       projectId: payload.projectId,
     };
 
-    this.notificationGateway.sendToUser(
-      payload.invitedUserId,
-      EVENTS.PROJECT_INVITED,
-      notification,
-    );
+    return notification;
   }
 
-  @OnEvent(EVENTS.TASK_ASSIGNED)
-  public async handleTaskAssigned(payload: {
+  public async createTaskAssignedNotification(payload: {
     assignedUserId: string;
     taskId: string;
     assignerId: string;
-  }) {
+  }): Promise<NotificationPayloadWithIv> {
     await this.prismaService.taskAssignedNotification.create({
       data: {
         holderId: payload.assignedUserId,
@@ -104,13 +92,10 @@ export class NotificationService implements INotificationService {
       assignerNameIv: assigner.aliasIv,
       taskName: task.title,
       taskNameIv: task.titleIv,
+      projectId: task.projectId,
     };
 
-    this.notificationGateway.sendToUser(
-      payload.assignedUserId,
-      EVENTS.TASK_ASSIGNED,
-      notification,
-    );
+    return notification;
   }
 
   public async checkExistingInvite(
@@ -128,5 +113,71 @@ export class NotificationService implements INotificationService {
       });
 
     return notification != null;
+  }
+
+  public async clearNotifications() {
+    await this.prismaService.projectInviteNotification.deleteMany({});
+  }
+
+  public async getAllNotifications(
+    user: string,
+  ): Promise<[ProjectInviteNotification[], TaskAssignedNotification[]]> {
+    const invitesPromise =
+      this.prismaService.projectInviteNotification.findMany({
+        where: { holderId: user },
+        include: {
+          holder: {
+            select: {
+              alias: true,
+              aliasIv: true,
+            },
+          },
+          project: {
+            select: {
+              name: true,
+              nameIv: true,
+            },
+          },
+          inviter: {
+            select: {
+              alias: true,
+              aliasIv: true,
+            },
+          },
+        },
+      });
+    const assignsPromise = this.prismaService.taskAssignedNotification.findMany(
+      {
+        where: { holderId: user },
+        include: {
+          holder: {
+            select: {
+              alias: true,
+              aliasIv: true,
+            },
+          },
+          task: {
+            select: {
+              title: true,
+              titleIv: true,
+              project: {
+                select: {
+                  name: true,
+                  nameIv: true,
+                },
+              },
+            },
+          },
+          inviter: {
+            select: {
+              alias: true,
+              aliasIv: true,
+            },
+          },
+        },
+      },
+    );
+
+    return await Promise.all([invitesPromise, assignsPromise]);
   }
 }

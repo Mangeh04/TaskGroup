@@ -7,6 +7,7 @@ import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 
 import { UserProvider } from "@/context/UserContext";
+import { WebSocketProvider } from "@/context/WebSocketContext";
 import { Toaster } from "@/components/ui/sonner";
 import { getUserServer } from "@/lib/getUserServer";
 
@@ -31,8 +32,10 @@ export default async function RootLayout({ children }: Props) {
 						disableTransitionOnChange
 					>
 						<UserProvider initialUser={user}>
-							{children}
-							<Toaster richColors position="top-right" />
+							<WebSocketProvider>
+								{children}
+								<Toaster richColors position="top-right" />
+							</WebSocketProvider>
 						</UserProvider>
 					</ThemeProvider>
 				</NextIntlClientProvider>

@@ -15,6 +15,7 @@ export interface TaskAssignedPayloadWithIv {
   assignerNameIv: string;
   taskName: string;
   taskNameIv: string;
+  projectId: string;
 }
 
 export type NotificationPayloadWithIv =

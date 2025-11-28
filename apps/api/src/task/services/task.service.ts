@@ -137,4 +137,15 @@ export class TaskService implements ITaskService {
       },
     }) as unknown as Promise<TaskEndpoint[]>;
   }
+
+  public async checkTask(taskId: string, userId: string) {
+    await this.prismaService.taskAssignedNotification.deleteMany({
+      where: {
+        taskId: taskId,
+        holderId: userId,
+      },
+    });
+
+    return true;
+  }
 }

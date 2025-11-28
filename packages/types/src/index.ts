@@ -50,7 +50,26 @@ export type ProfileConfiguration = Omit<
 
 export type ProfileEndpoint = User & ProfileConfiguration;
 
+export type ProjectInviteDTO = ProjectInviteNotification & {
+	holder: Pick<User, "alias">;
+	inviter: Pick<User, "alias">;
+	project: Pick<Project, "name">;
+};
+
+export type TaskAssignedDTO = TaskAssignedNotification & {
+	holder: Pick<User, "alias">;
+	inviter: Pick<User, "alias">;
+	project: Pick<Project, "name">;
+	task: Pick<Task, "title">;
+};
+
+export type NotificationsEndpoint = readonly [
+	ProjectInviteDTO[],
+	TaskAssignedDTO[],
+];
+
 export type Notification = TaskAssignedNotification | ProjectInviteNotification;
+
 export type NotificationPayload =
 	| InviteNotificationPayload
 	| AssignNotificationPayload;
@@ -66,9 +85,11 @@ export interface AssignNotificationPayload {
 	assignedUserId: string;
 	assignerName: string;
 	taskName: string;
+	projectId: string;
 }
 
 export enum EVENTS {
 	TASK_ASSIGNED = "task.assigned",
 	PROJECT_INVITED = "project.invited",
+	AUTH_ERROR = "auth_error",
 }

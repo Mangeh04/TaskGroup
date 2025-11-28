@@ -1,7 +1,13 @@
 {
 	"$schema": "https://turborepo.com/schema.json",
 
-	"globalEnv": ["NODE_ENV", "PUBLIC_API_URL", "API_PORT", "NEXT_PORT"],
+	"globalEnv": [
+		"NODE_ENV",
+		"PUBLIC_API_URL",
+		"API_PORT",
+		"NEXT_PORT",
+		"NEXT_PUBLIC_API_SERVER_URL"
+	],
 
 	"ui": "tui",
 

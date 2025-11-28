@@ -16,64 +16,62 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 import emptyInboxImage from "@/public/images/empty-inbox.webp";
 
 import {
-	type NotificationCardProps,
 	NotificationCard,
 	SkeletonNotificationCard,
 } from "@/app/inbox/components/notification";
 import { useTranslations } from "next-intl";
-
-const data: Array<NotificationCardProps> = [
-	{
-		user: "mangeh04",
-		project: "TaskGroup",
-		type: "Invitation",
-	},
-	{
-		user: "axiur",
-		project: "Website Redesign",
-		type: "AddedTask",
-	},
-	{
-		user: "blackfox099",
-		project: "API Development",
-		type: "AddedTask",
-	},
-	{
-		user: "alejandropxrez",
-		project: "TaskGroup",
-		type: "AddedTask",
-	},
-	{
-		user: "mangeh04",
-		project: "Mobile App",
-		type: "Invitation",
-	},
-	{
-		user: "blackfox099",
-		project: "Mobile App",
-		type: "Invitation",
-	},
-	{
-		user: "axiur",
-		project: "Mobile App",
-		type: "Invitation",
-	},
-];
+import { fetcher } from "@/lib/api";
+import { toast } from "sonner";
+import type {
+	NotificationsEndpoint,
+	ProjectInviteDTO,
+	TaskAssignedDTO,
+} from "@repo/types";
 
 export default function InboxPage() {
 	const [isLoading, setIsLoading] = useState(true);
 
+	const [notifications, setNotis] = useState<NotificationsEndpoint[]>([]);
+	const [isFetching, setIsFetching] = useState(false);
+
+	const fetchData = useCallback(async () => {
+		setIsFetching(true);
+
+		const { data, error } = await fetcher<NotificationsEndpoint[]>(
+			`/notification/`,
+			{
+				method: "GET",
+				needsAuth: true,
+			}
+		);
+
+		if (error) {
+			toast.error(error);
+			setNotis([]);
+			setIsFetching(false);
+			return;
+		}
+
+		setNotis(data!);
+		setIsFetching(false);
+	}, []);
+
+	useEffect(() => {
+		void fetchData();
+	}, [fetchData]);
+
 	const t = useTranslations("inbox");
 	const tg = useTranslations("generic");
 
-	// This value is now calculated only once.
-	const hasNotifications = useMemo(() => data.length > 0, []);
+	const hasNotifications = useMemo(
+		() => notifications.some((e) => e.length > 0),
+		[notifications]
+	);
 
-	// Simplified logic: just run a timer on mount.
 	useEffect(() => {
 		const timer = setTimeout(() => {
 			setIsLoading(false);
-		}, 500); // Set loading to false after 500ms
+		}, 500);
 
 		return () => clearTimeout(timer);
 	}, []);
@@ -117,12 +115,27 @@ export default function InboxPage() {
 								</div>
 							) : (
 								<ScrollArea className="h-full p-4 lg:p-6">
-									{data.map((item, index) => (
+									{(
+										notifications[0] as unknown as ProjectInviteDTO[]
+									).map((item, index) => (
 										<NotificationCard
 											key={index}
-											user={item.user}
-											project={item.project}
-											type={item.type}
+											user={item.inviter.alias}
+											project={item.project.name}
+											type={"Invitation"}
+											onConfirm={handleConfirm}
+											onReject={handleReject}
+										/>
+									))}
+									{(
+										notifications[1] as unknown as TaskAssignedDTO[]
+									).map((item, index) => (
+										<NotificationCard
+											key={index}
+											user={item.inviter.alias}
+											project={item.project.name}
+											task={item.task.title}
+											type={"AddedTask"}
 											onConfirm={handleConfirm}
 											onReject={handleReject}
 										/>

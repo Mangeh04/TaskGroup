@@ -6,17 +6,18 @@ import { NotificationService } from './services/notification.service';
 import { TaskModule } from 'src/task/task.module';
 import { UserModule } from 'src/user/user.module';
 import { CryptoModule } from 'src/crypto/crypto.module';
+import { NotificationController } from './controllers/notification.controller';
 
 @Module({
   imports: [PrismaModule, CryptoModule, UserModule, TaskModule],
   providers: [
-    NotificationService,
     {
       provide: SERVICES.NOTIFICATION,
-      useExisting: NotificationService,
+      useClass: NotificationService,
     },
     NotificationGateway,
   ],
-  exports: [SERVICES.NOTIFICATION],
+  exports: [SERVICES.NOTIFICATION, NotificationGateway],
+  controllers: [NotificationController],
 })
 export class NotificationModule {}

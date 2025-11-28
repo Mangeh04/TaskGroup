@@ -4,59 +4,118 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from '@nestjs/websockets';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
+import { Inject, Injectable, Logger } from '@nestjs/common';
+import { OnEvent } from '@nestjs/event-emitter';
+
+import { EVENTS } from '@repo/types';
+
+import { SERVICES } from 'src/utils/constants';
+import type { INotificationService } from '../interfaces/notification.interface';
+import type { JwtPayload } from 'src/auth/types/jwt-payload.type';
 
 import { Server, Socket } from 'socket.io';
+import { JwtService } from '@nestjs/jwt';
+
+import * as cookie from 'cookie';
 
 @WebSocketGateway({
   cors: {
     origin: process.env.FRONTEND_URL,
+    credentials: true,
   },
   namespace: 'notification',
 })
+@Injectable()
 export class NotificationGateway
   implements OnGatewayConnection, OnGatewayDisconnect
 {
   @WebSocketServer()
   server: Server;
 
+  private readonly logger = new Logger(NotificationGateway.name);
+
   constructor(
+    @Inject(SERVICES.NOTIFICATION)
+    private readonly notificationService: INotificationService,
     private jwtService: JwtService,
-    private configService: ConfigService,
   ) {}
 
   async handleConnection(client: Socket) {
     try {
-      const token =
-        client.handshake.auth.token || client.handshake.headers.authorization;
-
-      if (!token) {
-        console.log('Cliente sin token rechazado');
+      const rawCookie = client.handshake.headers.cookie;
+      if (!rawCookie) {
+        client.emit(EVENTS.AUTH_ERROR, 'no_cookie');
         client.disconnect();
         return;
       }
 
-      const cleanToken = token.replace('Bearer ', '');
-      const payload = await this.jwtService.verifyAsync(cleanToken, {
-        secret: this.configService.get<string>('JWT_SECRET'),
-      });
+      const cookies = cookie.parse(rawCookie);
+      const token = cookies['access_token'];
 
-      const userId = payload.sub || payload.id;
-      client.join(userId);
+      if (!token) {
+        client.emit(EVENTS.AUTH_ERROR, 'no_token');
+        client.disconnect();
+        return;
+      }
 
-      console.log(`Usuario ${userId} conectado al socket ${client.id}`);
+      const payload = await this.jwtService.verifyAsync<JwtPayload>(token);
+
+      const userId = payload.sub;
+      if (!userId) {
+        client.emit(EVENTS.AUTH_ERROR, 'invalid_token');
+        client.disconnect();
+        return;
+      }
+
+      await client.join(userId);
     } catch (e) {
-      console.log('Token inválido en socket');
+      this.logger.error(`[CRITICAL] Error validating token: ${e.message}`);
       client.disconnect();
     }
   }
 
   handleDisconnect(client: Socket) {
-    console.log(`Socket ${client.id} desconectado`);
+    this.logger.log(`Socket ${client.id} disconnected`);
   }
 
   sendToUser(userId: string, event: string, data: any) {
     this.server.to(userId).emit(event, data);
+  }
+
+  @OnEvent(EVENTS.PROJECT_INVITED)
+  public async onProjectInvited(payload: {
+    invitedUserId: string;
+    inviterId: string;
+    projectName: string;
+    projectId: string;
+    inviterAlias: string;
+  }) {
+    const notification =
+      await this.notificationService.createProjectInviteNotification(payload);
+
+    if (!notification) {
+      this.logger.warn(
+        `Could not send invitation for project: ${payload.projectId}`,
+      );
+      return;
+    }
+
+    this.sendToUser(
+      payload.invitedUserId,
+      EVENTS.PROJECT_INVITED,
+      notification,
+    );
+  }
+
+  @OnEvent(EVENTS.TASK_ASSIGNED)
+  public async onTaskAssigned(payload: {
+    assignedUserId: string;
+    taskId: string;
+    assignerId: string;
+  }) {
+    const notification =
+      await this.notificationService.createTaskAssignedNotification(payload);
+
+    this.sendToUser(payload.assignedUserId, EVENTS.TASK_ASSIGNED, notification);
   }
 }

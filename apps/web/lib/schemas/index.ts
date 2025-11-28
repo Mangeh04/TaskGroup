@@ -21,6 +21,8 @@ export const TaskFormSchema = z.object({
 	isCompleted: z.boolean().default(false),
 });
 
+// TODO: Add more schemas as needed
+
 export type UserRegister = z.infer<typeof UserRegisterSchema>;
 export type UserLogin = z.infer<typeof UserLoginSchema>;
 export type TaskFormValues = z.infer<typeof TaskFormSchema>;

@@ -7,6 +7,8 @@ import {
 	ChevronsUpDown,
 	LogOut,
 	CircleSmall,
+	LanguagesIcon,
+	PaletteIcon,
 } from "lucide-react";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -37,6 +39,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { statusStyles } from "./status";
 import { useUser } from "@/context/UserContext";
+import { useTranslations } from "next-intl";
 
 type NavUserProps = {
 	user: Omit<
@@ -49,6 +52,9 @@ const DEFAULT_AVATAR =
 	"https://raw.githubusercontent.com/Mangeh04/Storage/main/dragonite.jpeg";
 
 function NavUserInner({ user }: NavUserProps) {
+	const t = useTranslations("sidebar");
+	const tStatus = useTranslations("status");
+
 	const { isMobile } = useSidebar();
 	const router = useRouter();
 
@@ -146,7 +152,7 @@ function NavUserInner({ user }: NavUserProps) {
 									)}
 								/>
 								<span className="text-xs text-muted-foreground">
-									{currentStatus.key}
+									{tStatus(currentStatus.key)}
 								</span>
 							</div>
 							<ChevronsUpDown className="ml-auto size-4" />
@@ -181,7 +187,7 @@ function NavUserInner({ user }: NavUserProps) {
 						<DropdownMenuSub>
 							<DropdownMenuSubTrigger>
 								<CircleSmall className="mr-2 h-4 w-4 text-gray-500" />
-								<span>Status</span>
+								<span>{t("user.status")}</span>
 							</DropdownMenuSubTrigger>
 							<DropdownMenuSubContent>
 								{Object.entries(statusStyles).map(
@@ -201,7 +207,7 @@ function NavUserInner({ user }: NavUserProps) {
 													info.color
 												)}
 											/>
-											<span>{info.key}</span>
+											<span>{tStatus(info.key)}</span>
 										</DropdownMenuItem>
 									)
 								)}
@@ -212,20 +218,32 @@ function NavUserInner({ user }: NavUserProps) {
 							<Link href="/account-settings?section=account">
 								<DropdownMenuItem>
 									<BadgeCheck className="mr-2 h-4 w-4" />
-									Account
+									{t("user.account")}
 								</DropdownMenuItem>
 							</Link>
 							<Link href="/account-settings?section=notifications">
 								<DropdownMenuItem>
 									<Bell className="mr-2 h-4 w-4" />
-									Notifications
+									{t("user.notifications")}
+								</DropdownMenuItem>
+							</Link>
+							<Link href="/account-settings?section=appearance">
+								<DropdownMenuItem>
+									<PaletteIcon className="mr-2 h-4 w-4" />
+									{t("user.appearance")}
+								</DropdownMenuItem>
+							</Link>
+							<Link href="/account-settings?section=language">
+								<DropdownMenuItem>
+									<LanguagesIcon className="mr-2 h-4 w-4" />
+									{t("user.language")}
 								</DropdownMenuItem>
 							</Link>
 						</DropdownMenuGroup>
 						<DropdownMenuSeparator />
 						<DropdownMenuItem onClick={handleLogout}>
 							<LogOut className="mr-2 h-4 w-4" />
-							Log out
+							{t("user.logOut")}
 						</DropdownMenuItem>
 					</DropdownMenuContent>
 				</DropdownMenu>

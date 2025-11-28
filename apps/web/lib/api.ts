@@ -9,7 +9,10 @@ export type FetcherOptions<TBody> = {
 	needsAuth?: boolean;
 };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL;
+const API_URL =
+	typeof window === "undefined"
+		? process.env.NEXT_PUBLIC_API_SERVER_URL
+		: process.env.NEXT_PUBLIC_API_URL;
 
 async function safeJsonParse(response: Response) {
 	const text = await response.text();

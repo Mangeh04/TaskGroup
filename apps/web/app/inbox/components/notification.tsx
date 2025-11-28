@@ -9,13 +9,14 @@ import { useTranslations } from "next-intl";
 export type NotificationCardProps = {
 	user: string;
 	project: string;
+	task?: string;
 	type: "Invitation" | "AddedTask";
 	onConfirm?: () => void;
 	onReject?: () => void;
 };
 
 export function NotificationCard(props: NotificationCardProps) {
-	const { user, project, type, onConfirm, onReject } = props;
+	const { user, project, task, type, onConfirm, onReject } = props;
 	const isInvitation = type === "Invitation";
 
 	const t = useTranslations("notifications.card");
@@ -32,7 +33,7 @@ export function NotificationCard(props: NotificationCardProps) {
 						<h3 className="font-semibold text-foreground tracking-tight">
 							{isInvitation
 								? t("invitationTitle")
-								: t("taskTitle")}
+								: t("taskTitle", { task: task! })}
 						</h3>
 						<p className="text-sm text-muted-foreground">
 							{isInvitation

@@ -75,14 +75,18 @@
 		"card": {
 			"invitationTitle": "New invitation",
 			"invitationBody": "You have been invited by {user} to join {project}",
-			"taskTitle": "New assigned task",
+			"taskTitle": "New assigned task: {task}",
 			"taskBody": "You have a new assignment posted by {user} in {project}"
 		}
 	},
 	"inbox": {
 		"title": "Inbox",
 		"emptyTitle": "Your inbox is empty",
-		"emptyButton": "Refresh"
+		"emptyButton": "Refresh",
+		"bread": {
+			"breadcrumbHome": "Home",
+			"breadcrumbInbox": "Inbox"
+		}
 	},
 	"auth": {
 		"login": {
@@ -123,6 +127,21 @@
 		}
 	},
 	"tasks": {
+		"page": {
+			"breadcrumbHome": "Home",
+			"breadcrumbProject": "Project",
+			"button": "Create Task",
+			"formTitle": "Create a new Task",
+			"formDesc": "Create your new tasks here. Click save when you're done",
+			"toast": "Task created"
+		},
+		"progress": {
+			"total": "Total",
+			"pending": "Pending",
+			"completed": "Completed",
+			"progress": "Progress",
+			"taskPro": "Task Progress"
+		},
 		"form": {
 			"titleLabel": "Task name",
 			"titlePlaceholder": "Incredible task",
@@ -143,6 +162,11 @@
 			"toastDeleted": "Task deleted",
 			"deleteConfirmationText": "Task \"{title}\" will be permanently deleted.",
 			"deleteObjective": "task"
+		},
+		"emptyTasks": {
+			"title": "You don't have any tasks yet",
+			"buttonString": "Create Task",
+			"alt": "Empty Task Ilustration"
 		}
 	},
 	"members": {
@@ -162,11 +186,50 @@
 			"inviteIconAlt": "Add new members to the project"
 		}
 	},
+	"sidebar": {
+		"groupInfo": {
+			"name": "Task Group",
+			"info": "TSW Team 1"
+		},
+		"projects": {
+			"main": "Main",
+			"inbox": "Inbox"
+		},
+		"projectDetail": {
+			"settings": "Project Settings",
+			"members": "Members"
+		},
+		"user": {
+			"status": "State",
+			"account": "Account",
+			"notifications": "Notifications",
+			"appearance": "Appearance",
+			"language": "Language",
+			"logOut": "Log Out"
+		},
+		"emptyMember": {
+			"title": "No Team Members",
+			"description": "Invite your team to collaborate on this project.",
+			"button": "Invite Members",
+			"form": {
+				"title": "Invite a new User",
+				"subtitle": "Invite a person here. Introduce his email to invite.",
+				"alt": "Add new members to the project",
+				"email": "User Email",
+				"example": "a@example.com"
+			}
+		}
+	},
 	"status": {
 		"online": "Online",
 		"offline": "Offline",
 		"away": "Away",
 		"dnd": "Do Not Disturb"
+	},
+	"pagination": {
+		"previous": "Previous",
+		"next": "Next",
+		"more": "More Pages"
 	},
 	"projectSettings": {
 		"page": {

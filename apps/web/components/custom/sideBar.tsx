@@ -24,10 +24,12 @@ import { NavConfiguration } from "@/components/nav/nav-configuration";
 
 import { type Status, StatusEnum } from "@repo/types";
 import { useUser } from "@/context/UserContext";
+import { useTranslations } from "next-intl";
 
 export type SidebarProps = React.ComponentProps<typeof Sidebar>;
 
 export default function AppSidebar(props: SidebarProps) {
+	const t = useTranslations("sidebar");
 	const pathname = usePathname();
 	const params = useParams() as { projectId?: string };
 
@@ -45,12 +47,12 @@ export default function AppSidebar(props: SidebarProps) {
 			},
 			projects: [
 				{
-					name: "Main",
+					name: t("projects.main"),
 					url: "/dashboard",
 					icon: Home,
 				},
 				{
-					name: "Inbox",
+					name: t("projects.inbox"),
 					url: "/inbox",
 					icon: InboxIcon,
 				},
@@ -59,19 +61,19 @@ export default function AppSidebar(props: SidebarProps) {
 				projectId != null
 					? [
 							{
-								name: "Settings",
+								name: t("projectDetail.settings"),
 								url: `/dashboard/projectdetails/${projectId}/settings`,
 								icon: Settings2,
 							},
 							{
-								name: "Members",
+								name: t("projectDetail.members"),
 								url: `/dashboard/projectdetails/${projectId}/members`,
 								icon: PersonStandingIcon,
 							},
 						]
 					: [],
 		}),
-		[projectId]
+		[projectId, t]
 	);
 
 	const { user } = useUser();
@@ -100,10 +102,10 @@ export default function AppSidebar(props: SidebarProps) {
 								/>
 								<div className="grid flex-1 text-left text-sm leading-tight">
 									<span className="truncate font-medium">
-										Task Group
+										{t("groupInfo.name")}
 									</span>
 									<span className="truncate text-xs">
-										TSW Equipo 1
+										{t("groupInfo.info")}
 									</span>
 								</div>
 							</Link>

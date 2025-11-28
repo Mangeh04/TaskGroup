@@ -9,10 +9,9 @@ import { ProjectService } from './services/project.service';
 import { ProjectController } from './controllers/project.controller';
 
 import { ProjectMemberGuard } from './guards/projectMember.guard';
-import { NotificationModule } from 'src/notification/notification.module';
 
 @Module({
-  imports: [PrismaModule, CryptoModule, UserModule, NotificationModule],
+  imports: [PrismaModule, CryptoModule, UserModule],
   providers: [
     {
       provide: SERVICES.PROJECT,

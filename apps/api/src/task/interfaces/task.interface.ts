@@ -13,4 +13,5 @@ export interface ITaskService {
     updatedByUser: string,
   ): Promise<boolean>;
   getTasks(projectId: string): Promise<TaskEndpoint[]>;
+  checkTask(taskId: string, userId: string): Promise<Boolean>;
 }

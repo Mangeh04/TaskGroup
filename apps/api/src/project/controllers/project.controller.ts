@@ -97,6 +97,14 @@ export class ProjectController {
     return this.projectService.acceptInvitation(projectId, user.sub);
   }
 
+  @Post(':id/decline')
+  async declineInvitation(
+    @Param('id') projectId: string,
+    @User() user: JwtPayload,
+  ) {
+    return this.projectService.declineInvitation(projectId, user.sub);
+  }
+
   @Get(':id/members')
   async getMembers(@Param('id') projectId: string) {
     const members = await this.projectService.getMembersbyProjectId(projectId);

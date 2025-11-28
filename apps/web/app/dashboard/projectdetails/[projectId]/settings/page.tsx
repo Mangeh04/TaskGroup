@@ -9,12 +9,7 @@ import { OverviewCard } from "./components/overviewCard";
 import { GeneralSettings } from "./components/generalSettings";
 import { TeamSettings } from "./components/teamSettings";
 
-import {
-	SidebarProvider,
-	SidebarTrigger,
-	SidebarInset,
-} from "@/components/ui/sidebar";
-import AppSidebar from "@/components/custom/sideBar";
+import { SidebarTrigger, SidebarInset } from "@/components/ui/sidebar";
 import { BreadCrumbCustom } from "@/components/custom/breadCrumbCustom";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Badge } from "@/components/ui/badge";
@@ -132,79 +127,71 @@ export default function ProjectSettingsPage() {
 
 	return (
 		<div className="flex h-dvh overflow-hidden bg-white dark:bg-neutral-950">
-			<SidebarProvider>
-				<AppSidebar />
-				<SidebarInset className="flex flex-1 min-h-0 flex-col bg-white dark:bg-neutral-950">
-					<header className="relative flex h-14 shrink-0 items-center gap-6 px-4 border-b">
-						<SidebarTrigger />
-						<BreadCrumbCustom
-							items={breadcrumbItems}
-							currentPage={t("breadcrumbCurrent")}
-						/>
+			<SidebarInset className="flex flex-1 min-h-0 flex-col bg-white dark:bg-neutral-950">
+				<header className="relative flex h-14 shrink-0 items-center gap-6 px-4 border-b">
+					<SidebarTrigger />
+					<BreadCrumbCustom
+						items={breadcrumbItems}
+						currentPage={t("breadcrumbCurrent")}
+					/>
 
-						<div className="ml-auto flex items-center gap-4">
-							<Badge variant="secondary" className="rounded-xl">
-								{t("membersBadge", { count: memberCount })}
-							</Badge>
-							<Badge variant="outline" className="rounded-xl">
-								{t("adminsBadge", { count: adminCount })}
-							</Badge>
+					<div className="ml-auto flex items-center gap-4">
+						<Badge variant="secondary" className="rounded-xl">
+							{t("membersBadge", { count: memberCount })}
+						</Badge>
+						<Badge variant="outline" className="rounded-xl">
+							{t("adminsBadge", { count: adminCount })}
+						</Badge>
+					</div>
+				</header>
+
+				<div className="flex-1 overflow-y-auto px-4 py-6">
+					<div className="mx-auto max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6">
+						<div className="lg:col-span-4 space-y-4">
+							<OverviewCard projectDate={project?.createdAt} />
+							<DangerZone onSubmit={handleDelete} />
 						</div>
-					</header>
 
-					<div className="flex-1 overflow-y-auto px-4 py-6">
-						<div className="mx-auto max-w-6xl grid grid-cols-1 lg:grid-cols-12 gap-6">
-							<div className="lg:col-span-4 space-y-4">
-								<OverviewCard
-									projectDate={project?.createdAt}
-								/>
-								<DangerZone onSubmit={handleDelete} />
-							</div>
+						<div className="lg:col-span-8">
+							<Tabs defaultValue="general" className="w-full">
+								<TabsList className="grid grid-cols-2 w-full">
+									<TabsTrigger value="general">
+										{t("tabGeneral")}
+									</TabsTrigger>
+									<TabsTrigger value="team">
+										{t("tabTeam")}
+									</TabsTrigger>
+								</TabsList>
 
-							<div className="lg:col-span-8">
-								<Tabs defaultValue="general" className="w-full">
-									<TabsList className="grid grid-cols-2 w-full">
-										<TabsTrigger value="general">
-											{t("tabGeneral")}
-										</TabsTrigger>
-										<TabsTrigger value="team">
-											{t("tabTeam")}
-										</TabsTrigger>
-									</TabsList>
+								<TabsContent
+									value="general"
+									className="space-y-6"
+								>
+									{project && (
+										<GeneralSettings
+											project={project}
+											onSubmit={(data) => {
+												handleUpdateProject({
+													id: projectId,
+													name: data.name,
+													description:
+														data.description,
+													createdAt:
+														project.createdAt,
+												});
+											}}
+										/>
+									)}
+								</TabsContent>
 
-									<TabsContent
-										value="general"
-										className="space-y-6"
-									>
-										{project && (
-											<GeneralSettings
-												project={project}
-												onSubmit={(data) => {
-													handleUpdateProject({
-														id: projectId,
-														name: data.name,
-														description:
-															data.description,
-														createdAt:
-															project.createdAt,
-													});
-												}}
-											/>
-										)}
-									</TabsContent>
-
-									<TabsContent
-										value="team"
-										className="space-y-6"
-									>
-										<TeamSettings users={users} />
-									</TabsContent>
-								</Tabs>
-							</div>
+								<TabsContent value="team" className="space-y-6">
+									<TeamSettings users={users} />
+								</TabsContent>
+							</Tabs>
 						</div>
 					</div>
-				</SidebarInset>
-			</SidebarProvider>
+				</div>
+			</SidebarInset>
 		</div>
 	);
 }

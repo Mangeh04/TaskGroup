@@ -56,4 +56,9 @@ export class TaskController {
   async deleteTask(@Param('id') taskId: string) {
     return this.taskService.deleteTask(taskId);
   }
+
+  @Post('id/cheked')
+  async checkTask(@Param('id') taskId: string, @User() user: JwtPayload) {
+    return await this.taskService.checkTask(taskId, user.sub);
+  }
 }

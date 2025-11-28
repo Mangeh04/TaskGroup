@@ -20,10 +20,12 @@ import { fetcher } from "@/lib/api";
 import { toast } from "sonner";
 import { useCallback, useState } from "react";
 import { useParams } from "next/navigation";
+import { useTranslations } from "next-intl";
 
 export function EmptyUser() {
 	const params = useParams();
 	const projectId = params.projectId as string;
+	const t = useTranslations("sidebar");
 
 	const [email, setEmail] = useState("");
 
@@ -42,7 +44,7 @@ export function EmptyUser() {
 		if (error) {
 			toast.error("Failed to send invite: " + error);
 		} else {
-			toast.success("Invitation sent to" + "");
+			toast.success("Invitation sent to" + email);
 		}
 	}, [email, projectId]);
 
@@ -74,32 +76,34 @@ export function EmptyUser() {
 						</Avatar>
 					</div>
 				</EmptyMedia>
-				<EmptyTitle>No Team Members</EmptyTitle>
+				<EmptyTitle>{t("emptyMember.title")}</EmptyTitle>
 				<EmptyDescription>
-					Invite your team to collaborate on this project.
+					{t("emptyMember.description")}
 				</EmptyDescription>
 			</EmptyHeader>
 			<EmptyContent>
 				<CustomDialog
-					buttonString="Invite Members"
-					title="Invite a new User"
-					subtitle="Invite a person here. Introduce his email to invite."
+					buttonString={t("emptyMember.button")}
+					title={t("emptyMember.form.title")}
+					subtitle={t("emptyMember.form.subtitle")}
 					confirmIcon={
 						<Image
 							src={buttonIcon}
 							width={15}
 							height={15}
-							alt="Add new members to the project"
+							alt={t("emptyMember.form.alt")}
 							className="dark:invert dark:brightness-100"
 						/>
 					}
 					onSubmit={onSubmit}
 				>
-					<Label htmlFor="user-email-inv">User Email</Label>
+					<Label htmlFor="user-email-inv">
+						{t("emptyMember.form.email")}
+					</Label>
 					<Input
 						id="user-email-inv"
 						name="User Email Invitation"
-						placeholder="a@example.com"
+						placeholder={t("emptyMember.form.example")}
 						onChange={(e) => setEmail(e.target.value)}
 					/>
 				</CustomDialog>

@@ -51,7 +51,11 @@ export function ProfileSection({
 							<Label htmlFor="userName">
 								{t("userNameLabel")}
 							</Label>
-							<Input id="userName" defaultValue={user.alias} />
+							<Input
+								id="userName"
+								defaultValue={user.alias}
+								disabled
+							/>
 						</div>
 
 						<div className="space-y-2">
@@ -60,6 +64,7 @@ export function ProfileSection({
 								id="email"
 								type="email"
 								defaultValue={user.email}
+								disabled
 							/>
 						</div>
 					</div>

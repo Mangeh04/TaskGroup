@@ -1,4 +1,9 @@
-import { Injectable, Inject } from '@nestjs/common';
+import {
+  Injectable,
+  Inject,
+  ConflictException,
+  NotFoundException,
+} from '@nestjs/common';
 import { PrismaClient, type Project, type Prisma, Role } from '@repo/database';
 import { ProjectMembership } from '@repo/database';
 
@@ -11,7 +16,6 @@ import { ProjectDto } from '../dtos/projectDto.dto';
 import type { IProjectService } from '../interfaces/project.interface';
 import { ProjectDtoUpdate } from '../dtos/projectDtoUpdate.dto';
 import type { IUserService } from 'src/user/interfaces/user.interface';
-import type { INotificationService } from 'src/notification/interfaces/notification.interface';
 
 @Injectable()
 export class ProjectService implements IProjectService {
@@ -19,8 +23,6 @@ export class ProjectService implements IProjectService {
     @Inject(SERVICES.PRISMA) private readonly prismaService: PrismaClient,
     @Inject(SERVICES.CRYPTO) private readonly cryptoService: ICryptoService,
     @Inject(SERVICES.USER) private readonly userService: IUserService,
-    @Inject(SERVICES.NOTIFICATION)
-    private readonly notificationService: INotificationService,
     private eventEmitter: EventEmitter2,
   ) {}
 
@@ -167,7 +169,7 @@ export class ProjectService implements IProjectService {
     const userToInvite =
       await this.userService.findUserByEmail(userEmailToInvite);
     if (!userToInvite) {
-      throw new Error('User with this email does not exist');
+      throw new NotFoundException('User with this email does not exist');
     }
 
     const inviter = await this.userService.findUser(inviterId);
@@ -175,21 +177,26 @@ export class ProjectService implements IProjectService {
     const project = await this.findProject(projectId);
 
     if (!project) {
-      throw new Error('Project does not exist');
+      throw new NotFoundException('Project does not exist');
     }
 
-    if (
-      await this.notificationService.checkExistingInvite(
-        projectId,
-        userToInvite.id,
-        inviterId,
-      )
-    ) {
-      throw new Error('This user is already invited');
+    const existingMembership =
+      await this.prismaService.projectInviteNotification.findFirst({
+        where: {
+          projectId,
+          holderId: inviterId,
+          inviterId,
+        },
+      });
+
+    if (existingMembership != null) {
+      throw new ConflictException('This user is already invited');
     }
 
     if (await this.isUserInProject(userToInvite.id, projectId)) {
-      throw new Error('This user is already a member of this project');
+      throw new ConflictException(
+        'This user is already a member of this project',
+      );
     }
 
     this.eventEmitter.emit(EVENTS.PROJECT_INVITED, {
@@ -211,6 +218,19 @@ export class ProjectService implements IProjectService {
         role: Role.MEMBER,
       },
     });
+
+    await this.prismaService.projectInviteNotification.deleteMany({
+      where: { projectId: projectId, holderId: userId },
+    });
+
+    return true;
+  }
+
+  async declineInvitation(projectId: string, userId: string) {
+    await this.prismaService.projectInviteNotification.deleteMany({
+      where: { projectId: projectId, holderId: userId },
+    });
+
     return true;
   }
 

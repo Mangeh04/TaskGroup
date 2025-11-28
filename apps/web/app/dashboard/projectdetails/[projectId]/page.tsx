@@ -29,11 +29,15 @@ import { TaskFormSchema, type TaskFormValues } from "@/lib/schemas";
 
 import { TaskCard, SkeletonCard } from "../components/task";
 import { TaskForm } from "../components/taskForm";
+import { useTranslations } from "next-intl";
 
 export default function ProjectPage() {
 	const params = useParams();
 	const projectId = params.projectId as string;
 	const router = useRouter();
+
+	const t = useTranslations("tasks");
+	const genericT = useTranslations("generic");
 
 	useEffect(() => {
 		if (!projectId) {
@@ -122,7 +126,9 @@ export default function ProjectPage() {
 		}, [tasks]);
 
 	const hasTasks = totalTasks > 0;
-	const breadcrumbItems = [{ label: "Home", href: "/dashboard" }];
+	const breadcrumbItems = [
+		{ label: t("page.breadcrumbHome"), href: "/dashboard" },
+	];
 
 	const {
 		currentPage,
@@ -212,7 +218,7 @@ export default function ProjectPage() {
 			return;
 		}
 
-		toast.success("Task created");
+		toast.success(t("page.toast"));
 		setIsSavingTask(false);
 		setCreateValues({
 			title: "",
@@ -240,7 +246,7 @@ export default function ProjectPage() {
 				<SidebarTrigger />
 				<BreadCrumbCustom
 					items={breadcrumbItems}
-					currentPage="Project"
+					currentPage={t("page.breadcrumbProject")}
 				/>
 
 				{hasTasks && (
@@ -250,7 +256,7 @@ export default function ProjectPage() {
 								{totalTasks}
 							</span>
 							<span className="text-xs font-medium text-muted-foreground">
-								TOTAL
+								{t("progress.total")}
 							</span>
 						</div>
 						<div className="flex items-baseline gap-1">
@@ -258,7 +264,7 @@ export default function ProjectPage() {
 								{pendingTasks}
 							</span>
 							<span className="text-xs font-medium text-muted-foreground">
-								Pending
+								{t("progress.pending")}
 							</span>
 						</div>
 						<div className="flex items-baseline gap-1">
@@ -266,7 +272,7 @@ export default function ProjectPage() {
 								{completedTasks}
 							</span>
 							<span className="text-xs font-medium text-muted-foreground">
-								Completed
+								{t("progress.completed")}
 							</span>
 						</div>
 						<div className="flex items-baseline gap-1">
@@ -274,7 +280,7 @@ export default function ProjectPage() {
 								{Math.round(progressPercentage)}%
 							</span>
 							<span className="text-xs font-medium text-muted-foreground">
-								Progress
+								{t("progress.progress")}
 							</span>
 						</div>
 					</div>
@@ -284,7 +290,7 @@ export default function ProjectPage() {
 					<div className="ml-4 flex items-center gap-2">
 						<Loader2 className="h-4 w-4 animate-spin text-muted-foreground/80" />
 						<span className="text-xs text-muted-foreground">
-							Loading…
+							{genericT("loading")}
 						</span>
 					</div>
 				)}
@@ -294,9 +300,9 @@ export default function ProjectPage() {
 				<div className="flex items-center justify-between gap-4 px-4 py-4 border-b">
 					<div className="shrink-0">
 						<CustomDialog
-							buttonString="Create Task"
-							title="Create a new Task"
-							subtitle="Create your new tasks here. Click save when you're done"
+							buttonString={t("page.button")}
+							title={t("page.formTitle")}
+							subtitle={t("page.formDesc")}
 							confirmIcon={
 								isSavingTask ? (
 									<Loader2 className="h-4 w-4 animate-spin" />
@@ -317,7 +323,7 @@ export default function ProjectPage() {
 					<div className="flex-1 max-w-sm">
 						<div className="flex justify-between items-center mb-1">
 							<span className="text-sm font-medium">
-								Task Progress
+								{t("progress.taskPro")}
 							</span>
 							<span className="text-sm font-medium text-muted-foreground">
 								{Math.round(progressPercentage)}%
@@ -427,14 +433,13 @@ export default function ProjectPage() {
 			) : (
 				<div className="flex flex-1 items-center justify-center p-6 overflow-hidden">
 					<EmptyPage
-						title="You don't have any tasks yet"
-						buttonString="Create Task"
+						title={t("emptyTasks.title")}
+						buttonString={t("emptyTasks.buttonString")}
 						imageSrc={emptyImage}
-						imageAlt="Empty tasks illustration"
+						imageAlt={t("emptyTasks.alt")}
 						customDialog={{
-							title: "Create Task",
-							subtitle:
-								"Create your new tasks here. Click save when you're done",
+							title: t("page.formTitle"),
+							subtitle: t("page.formDesc"),
 							confirmIcon: isSavingTask ? (
 								<Loader2 className="h-4 w-4 animate-spin" />
 							) : (

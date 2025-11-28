@@ -61,9 +61,9 @@
 			"language": "Lenguaje"
 		},
 		"language": {
-			"title": "Cambia idiomas",
+			"title": "Cambiar el lenguaje",
 			"description": "Cambia al lenguaje que quieras tener.",
-			"languageTitle": "idiomas"
+			"languageTitle": "Idiomas"
 		}
 	},
 	"groupInformation": {
@@ -75,14 +75,18 @@
 		"card": {
 			"invitationTitle": "Nueva invitación",
 			"invitationBody": "Has sido invitado por {user} a unirte a {project}",
-			"taskTitle": "Nueva tarea asignada",
+			"taskTitle": "Nueva tarea asignada: {task}",
 			"taskBody": "Tienes una nueva tarea asignada por {user} en {project}"
 		}
 	},
 	"inbox": {
 		"title": "Bandeja de entrada",
 		"emptyTitle": "Tu bandeja de entrada está vacía",
-		"emptyButton": "Recargar"
+		"emptyButton": "Recargar",
+		"bread": {
+			"breadcrumbHome": "Inicio",
+			"breadcrumbInbox": "Bandeja"
+		}
 	},
 	"auth": {
 		"login": {
@@ -123,6 +127,21 @@
 		}
 	},
 	"tasks": {
+		"page": {
+			"breadcrumbHome": "Inicio",
+			"breadcrumbProject": "Projecto",
+			"button": "Crear Tarea",
+			"formTitle": "Crea una nueva tarea",
+			"formDesc": "Crea tu nueva tarea aquí. Usa el boton de añadir cuando acabes",
+			"toast": "Tarea creada"
+		},
+		"progress": {
+			"total": "Total",
+			"pending": "Pendientes",
+			"completed": "Completadas",
+			"progress": "Progreso",
+			"taskPro": "Progreso de las Tareas"
+		},
 		"form": {
 			"titleLabel": "Nombre de la tarea",
 			"titlePlaceholder": "Tarea increíble",
@@ -143,6 +162,11 @@
 			"toastDeleted": "Tarea eliminada",
 			"deleteConfirmationText": "La tarea \"{title}\" se eliminará permanentemente.",
 			"deleteObjective": "tarea"
+		},
+		"emptyTasks": {
+			"title": "No tienes ninguna Tarea aún",
+			"buttonString": "Crear Tarea",
+			"alt": "Imagen de Tarea Vacia"
 		}
 	},
 	"members": {
@@ -162,11 +186,50 @@
 			"inviteIconAlt": "Añadir nuevos miembros al proyecto"
 		}
 	},
+	"sidebar": {
+		"groupInfo": {
+			"name": "Task Group",
+			"info": "TSW Equipo 1"
+		},
+		"projects": {
+			"main": "Inicio",
+			"inbox": "Bandeja de Entrada"
+		},
+		"projectDetail": {
+			"settings": "Ajustes del Proyecto",
+			"members": "Miembros"
+		},
+		"user": {
+			"status": "Estado",
+			"account": "Cuenta",
+			"notifications": "Notificaciones",
+			"appearance": "Apariencia",
+			"language": "Idioma",
+			"logOut": "Cerrar sesión"
+		},
+		"emptyMember": {
+			"title": "No hay miembros en el Equipo",
+			"description": "Invita a tu equipo para colaborar en el projecto.",
+			"button": "Invita miembros",
+			"form": {
+				"title": "Invita a un nuevo miembro",
+				"subtitle": "Invita a una persona aquí. Introduce su email para invitar.",
+				"alt": "Añade a un nuevo miembro al proyecto",
+				"email": "Email del usuario",
+				"example": "a@ejemplo.es"
+			}
+		}
+	},
 	"status": {
 		"online": "En línea",
 		"offline": "Desconectado",
 		"away": "Ausente",
 		"dnd": "No Molestar"
+	},
+	"pagination": {
+		"previous": "Anterior",
+		"next": "Siguiente",
+		"more": "Más páginas"
 	},
 	"projectSettings": {
 		"page": {
@@ -214,7 +277,7 @@
 		}
 	},
 	"roles": {
-		"ADMIN": "Admin",
+		"ADMIN": "Administrador",
 		"MEMBER": "Miembro",
 		"OWNER": "Propietario"
 	},

@@ -107,9 +107,9 @@ export function TeamSettings({ users }: TeamSettingsProps) {
 									disabled={m.role === "OWNER"}
 								>
 									<SelectTrigger className="w-full md:w-48">
-										<SelectValue
-											placeholder={tRoles(m.role)}
-										/>
+										<SelectValue>
+											{tRoles(m.role)}
+										</SelectValue>
 									</SelectTrigger>
 									<SelectContent>
 										<SelectItem value={RoleEnum.ADMIN}>

@@ -23,6 +23,7 @@ export interface IProjectService {
     inviterName: string,
   ): Promise<boolean>;
   acceptInvitation(projectId: string, userId: string): Promise<boolean>;
+  declineInvitation(projectId: string, userId: string): Promise<boolean>;
   getNumUsersInProject(projectId: string): Promise<number>;
   getNumTasksForProject(projectId: string): Promise<number>;
   getNumUsersPerProject(): Promise<Record<string, number>>;
