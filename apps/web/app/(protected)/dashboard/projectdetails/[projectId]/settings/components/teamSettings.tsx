@@ -14,31 +14,32 @@ import {
 import { ConfirmationDialog } from "@/components/custom/confirmation";
 import { Button } from "@/components/ui/button";
 import { ProjectMember, RoleEnum } from "@repo/types";
-import { CustomDialog } from "@/components/custom/dialog";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
-import Image from "next/image";
-import buttonIcon from "@/public/images/add-member.webp";
+import { InviteMember } from "@/components/custom/inviteMember";
 import { useTranslations } from "next-intl";
 
 export type TeamSettingsProps = {
 	users: Array<ProjectMember>;
+	onChange: (memberId: string, newRole: RoleEnum) => Promise<void>;
+	onRemove: (memberId: string) => Promise<void>;
 };
 
-export function TeamSettings({ users }: TeamSettingsProps) {
+export function TeamSettings({ users, onChange, onRemove }: TeamSettingsProps) {
 	const [members, setMembers] = useState(users);
 
 	const t = useTranslations("projectSettings.team");
 	const tRoles = useTranslations("roles");
 
-	const updateRole = (id: string, role: RoleEnum) => {
+	const updateRole = async (id: string, role: RoleEnum) => {
 		setMembers((prev) =>
 			prev.map((m) => (m.userId === id ? { ...m, role } : m))
 		);
+		await onChange(id, role);
 	};
 
-	const removeMember = (id: string) =>
+	const removeMember = async (id: string) => {
 		setMembers((prev) => prev.filter((m) => m.userId !== id));
+		await onRemove(id);
+	};
 
 	return (
 		<Card className="rounded-2xl shadow-sm">
@@ -52,29 +53,7 @@ export function TeamSettings({ users }: TeamSettingsProps) {
 					<div className="text-sm text-muted-foreground">
 						{t("cardDescription")}
 					</div>
-					<CustomDialog
-						buttonString={t("inviteButton")}
-						title={t("inviteTitle")}
-						subtitle={t("inviteSubtitle")}
-						confirmIcon={
-							<Image
-								src={buttonIcon}
-								width={15}
-								height={15}
-								alt={t("inviteIconAlt")}
-								className="dark:invert dark:brightness-100"
-							/>
-						}
-					>
-						<Label htmlFor="user-email-inv">
-							{t("inviteEmailLabel")}
-						</Label>
-						<Input
-							id="user-email-inv"
-							name="User Email Invitation"
-							placeholder={t("inviteEmailPlaceholder")}
-						/>
-					</CustomDialog>
+					<InviteMember />
 				</div>
 				<Separator />
 
@@ -131,14 +110,12 @@ export function TeamSettings({ users }: TeamSettingsProps) {
 										text={t("removeConfirmText", {
 											alias: m.user.alias,
 										})}
+										onConfirm={() => removeMember(m.userId)}
 									>
 										<Button
 											variant="destructive"
 											size="sm"
 											className="gap-2"
-											onClick={() =>
-												removeMember(m.userId)
-											}
 										>
 											<Trash2 className="size-4" />{" "}
 											{t("removeButton")}

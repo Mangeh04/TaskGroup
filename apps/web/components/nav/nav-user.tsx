@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { use, useEffect, useState } from "react";
 import {
 	BadgeCheck,
 	Bell,
@@ -53,6 +53,8 @@ const DEFAULT_AVATAR =
 
 function NavUserInner({ user }: NavUserProps) {
 	const t = useTranslations("sidebar");
+	const tAuth = useTranslations("auth");
+	const tNavUser = useTranslations("navUser");
 	const tStatus = useTranslations("status");
 
 	const { isMobile } = useSidebar();
@@ -84,40 +86,29 @@ function NavUserInner({ user }: NavUserProps) {
 		});
 
 		if (error) {
-			toast.error("Failed to update status: " + error);
+			toast.error(tNavUser("statusUpdateErrorToast", { error }));
 			setStatus(user.status);
 		} else {
-			toast.success(
-				`Status set to ${capitalize(
-					newStatus.toLowerCase().replaceAll("_", " ")
-				)}`
-			);
+			toast.success(tNavUser("statusUpdateSuccessToast"));
 		}
 
 		refetchUser();
 	}
 
 	async function handleLogout() {
-		const { data, error } = await fetcher<{ message?: string }>(
-			"/auth/log-out",
-			{
-				method: "POST",
-				needsAuth: true,
-			}
-		);
+		const { error } = await fetcher<{ message?: string }>("/auth/log-out", {
+			method: "POST",
+			needsAuth: true,
+		});
 
 		if (error) {
 			toast.error(error);
 			return;
 		}
 
-		toast.success(data?.message ?? "Logged out successfully!");
+		toast.success(tAuth("loggedOutToast"));
 
 		router.push("/login");
-	}
-
-	function capitalize(str: string) {
-		return str.charAt(0).toUpperCase() + str.slice(1);
 	}
 
 	return (

@@ -22,9 +22,9 @@ import type { IProjectService } from '../interfaces/project.interface';
 import { ProjectDto } from '../dtos/projectDto.dto';
 import { ProjectDtoUpdate } from '../dtos/projectDtoUpdate.dto';
 import { BadRequestException } from '@nestjs/common/exceptions';
-import { SanitaizedUser } from 'src/user/interfaces/user.interface';
 import { ProjectAdminGuard } from '../guards/projectAdmin.guard';
 import { ProjectMember } from '@repo/types';
+import { MemberDto } from '../dtos/projectMember.dto';
 
 @Controller('project')
 export class ProjectController {
@@ -79,8 +79,18 @@ export class ProjectController {
     return this.projectService.removeMember(projectId, userIdToKick);
   }
 
+  @Patch(':id/update/member/:memberId')
+  @UseGuards(ProjectAdminGuard)
+  async updateMemberRole(
+    @Param('id') projectId: string,
+    @Param('memberId') memberId: string,
+    @Body() body: MemberDto,
+  ): Promise<boolean> {
+    return this.projectService.updateMembership(memberId, projectId, body.role);
+  }
+
   @Post(':id/invite')
-  @UseGuards(ProjectOwnerGuard, ProjectAdminGuard)
+  @UseGuards(ProjectAdminGuard)
   async inviteMember(
     @Param('id') projectId: string,
     @Body('email') email: string,
@@ -103,6 +113,14 @@ export class ProjectController {
     @User() user: JwtPayload,
   ) {
     return this.projectService.declineInvitation(projectId, user.sub);
+  }
+
+  @Post(':id/clear')
+  async clearNotification(
+    @Param('id') taskId: string,
+    @User() user: JwtPayload,
+  ) {
+    return this.projectService.clearAssignedNotification(taskId, user.sub);
   }
 
   @Get(':id/members')

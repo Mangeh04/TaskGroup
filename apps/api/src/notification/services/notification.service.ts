@@ -4,12 +4,16 @@ import type {
   ProjectInviteNotification,
   TaskAssignedNotification,
 } from '@repo/database';
+import {
+  AssignNotificationPayload,
+  InviteNotificationPayload,
+} from '@repo/types';
 
 import { SERVICES } from 'src/utils/constants';
 import type { IUserService } from 'src/user/interfaces/user.interface';
 import type { ITaskService } from 'src/task/interfaces/task.interface';
 import type { INotificationService } from '../interfaces/notification.interface';
-import { NotificationPayloadWithIv } from '../types/notification.types';
+import type { NotificationPayloadWithIv } from '../types/notification.types';
 
 @Injectable()
 export class NotificationService implements INotificationService {
@@ -24,18 +28,14 @@ export class NotificationService implements INotificationService {
     private readonly taskService: ITaskService,
   ) {}
 
-  public async createProjectInviteNotification(payload: {
-    invitedUserId: string;
-    inviterId: string;
-    projectName: string;
-    projectId: string;
-    inviterAlias: string;
-  }): Promise<NotificationPayloadWithIv | null> {
+  public async createProjectInviteNotification(
+    payload: InviteNotificationPayload,
+  ): Promise<NotificationPayloadWithIv | null> {
     if (
       await this.checkExistingInvite(
+        payload.projectId,
         payload.invitedUserId,
         payload.inviterId,
-        payload.projectId,
       )
     ) {
       throw new ConflictException('This invitation is already created');
@@ -60,30 +60,40 @@ export class NotificationService implements INotificationService {
 
     const notification: NotificationPayloadWithIv = {
       invitedUserId: payload.invitedUserId,
-      projectName: payload.projectName,
+      projectName: project.name,
       projectNameIv: project.nameIv,
-      inviterAlias: payload.inviterAlias,
+      inviterAlias: inviter.alias,
       inviterAliasIv: inviter.aliasIv,
-      projectId: payload.projectId,
+      projectId: project.id,
     };
 
     return notification;
   }
 
-  public async createTaskAssignedNotification(payload: {
-    assignedUserId: string;
-    taskId: string;
-    assignerId: string;
-  }): Promise<NotificationPayloadWithIv> {
+  public async createTaskAssignedNotification(
+    payload: AssignNotificationPayload,
+  ): Promise<NotificationPayloadWithIv> {
     await this.prismaService.taskAssignedNotification.create({
       data: {
-        holderId: payload.assignedUserId,
-        inviterId: payload.assignerId,
-        taskId: payload.taskId,
+        holder: {
+          connect: {
+            id: payload.assignedUserId,
+          },
+        },
+        inviter: {
+          connect: {
+            id: payload.assignedUserId,
+          },
+        },
+        task: {
+          connect: {
+            id: payload.taskId,
+          },
+        },
       },
     });
 
-    const assigner = await this.userService.findUser(payload.assignerId);
+    const assigner = await this.userService.findUser(payload.assignerUserId);
     const task = await this.taskService.findTask(payload.taskId);
 
     const notification: NotificationPayloadWithIv = {

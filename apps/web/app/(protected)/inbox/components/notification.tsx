@@ -11,8 +11,8 @@ export type NotificationCardProps = {
 	project: string;
 	task?: string;
 	type: "Invitation" | "AddedTask";
-	onConfirm?: () => void;
-	onReject?: () => void;
+	onConfirm?: () => Promise<void>;
+	onReject?: () => Promise<void>;
 };
 
 export function NotificationCard(props: NotificationCardProps) {

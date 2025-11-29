@@ -15,9 +15,4 @@ export class NotificationController {
   async getNotifications(@User() user: JwtPayload) {
     return await this.notificationService.getAllNotifications(user.sub);
   }
-
-  @Delete('clear')
-  async clearNotifications() {
-    await this.notificationService.clearNotifications();
-  }
 }

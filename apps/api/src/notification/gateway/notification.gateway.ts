@@ -7,7 +7,11 @@ import {
 import { Inject, Injectable, Logger } from '@nestjs/common';
 import { OnEvent } from '@nestjs/event-emitter';
 
-import { EVENTS } from '@repo/types';
+import {
+  EVENTS,
+  type InviteNotificationPayload,
+  type AssignNotificationPayload,
+} from '@repo/types';
 
 import { SERVICES } from 'src/utils/constants';
 import type { INotificationService } from '../interfaces/notification.interface';
@@ -17,6 +21,7 @@ import { Server, Socket } from 'socket.io';
 import { JwtService } from '@nestjs/jwt';
 
 import * as cookie from 'cookie';
+import type { IDecryptService } from 'src/decrypt/interfaces/decrypt.interface';
 
 @WebSocketGateway({
   cors: {
@@ -37,6 +42,7 @@ export class NotificationGateway
   constructor(
     @Inject(SERVICES.NOTIFICATION)
     private readonly notificationService: INotificationService,
+    @Inject(SERVICES.DECRYPT) private readonly decryptService: IDecryptService,
     private jwtService: JwtService,
   ) {}
 
@@ -78,18 +84,13 @@ export class NotificationGateway
     this.logger.log(`Socket ${client.id} disconnected`);
   }
 
-  sendToUser(userId: string, event: string, data: any) {
-    this.server.to(userId).emit(event, data);
+  async sendToUser(userId: string, event: string, data: any) {
+    const decrypted = await this.decryptService.decryptDeep(data);
+    this.server.to(userId).emit(event, decrypted);
   }
 
   @OnEvent(EVENTS.PROJECT_INVITED)
-  public async onProjectInvited(payload: {
-    invitedUserId: string;
-    inviterId: string;
-    projectName: string;
-    projectId: string;
-    inviterAlias: string;
-  }) {
+  public async onProjectInvited(payload: InviteNotificationPayload) {
     const notification =
       await this.notificationService.createProjectInviteNotification(payload);
 
@@ -100,7 +101,7 @@ export class NotificationGateway
       return;
     }
 
-    this.sendToUser(
+    await this.sendToUser(
       payload.invitedUserId,
       EVENTS.PROJECT_INVITED,
       notification,
@@ -108,14 +109,14 @@ export class NotificationGateway
   }
 
   @OnEvent(EVENTS.TASK_ASSIGNED)
-  public async onTaskAssigned(payload: {
-    assignedUserId: string;
-    taskId: string;
-    assignerId: string;
-  }) {
+  public async onTaskAssigned(payload: AssignNotificationPayload) {
     const notification =
       await this.notificationService.createTaskAssignedNotification(payload);
 
-    this.sendToUser(payload.assignedUserId, EVENTS.TASK_ASSIGNED, notification);
+    await this.sendToUser(
+      payload.assignedUserId,
+      EVENTS.TASK_ASSIGNED,
+      notification,
+    );
   }
 }

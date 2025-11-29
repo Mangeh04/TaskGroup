@@ -2,22 +2,21 @@ import {
   ProjectInviteNotification,
   TaskAssignedNotification,
 } from '@repo/database';
+import type {
+  AssignNotificationPayload,
+  InviteNotificationPayload,
+} from '@repo/types';
+
 import { NotificationPayloadWithIv } from '../types/notification.types';
 
 export interface INotificationService {
-  createProjectInviteNotification(payload: {
-    invitedUserId: string;
-    inviterId: string;
-    projectName: string;
-    projectId: string;
-    inviterAlias: string;
-  }): Promise<NotificationPayloadWithIv | null>;
+  createProjectInviteNotification(
+    payload: InviteNotificationPayload,
+  ): Promise<NotificationPayloadWithIv | null>;
 
-  createTaskAssignedNotification(payload: {
-    assignedUserId: string;
-    taskId: string;
-    assignerId: string;
-  }): Promise<NotificationPayloadWithIv>;
+  createTaskAssignedNotification(
+    payload: AssignNotificationPayload,
+  ): Promise<NotificationPayloadWithIv>;
 
   checkExistingInvite(
     projectId: string,

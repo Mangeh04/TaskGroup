@@ -59,8 +59,9 @@ export type ProjectInviteDTO = ProjectInviteNotification & {
 export type TaskAssignedDTO = TaskAssignedNotification & {
 	holder: Pick<User, "alias">;
 	inviter: Pick<User, "alias">;
-	project: Pick<Project, "name">;
-	task: Pick<Task, "title">;
+	task: Pick<Task, "title"> & {
+		project: Pick<Project, "name">;
+	};
 };
 
 export type NotificationsEndpoint = readonly [
@@ -74,19 +75,22 @@ export type NotificationPayload =
 	| InviteNotificationPayload
 	| AssignNotificationPayload;
 
-export interface InviteNotificationPayload {
+export type InviteNotificationPayload = {
 	invitedUserId: string;
 	projectName: string;
 	projectId: string;
+	inviterId: string;
 	inviterAlias: string;
-}
+};
 
-export interface AssignNotificationPayload {
+export type AssignNotificationPayload = {
 	assignedUserId: string;
+	assignerUserId: string;
 	assignerName: string;
+	taskId: string;
 	taskName: string;
 	projectId: string;
-}
+};
 
 export enum EVENTS {
 	TASK_ASSIGNED = "task.assigned",

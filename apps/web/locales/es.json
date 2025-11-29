@@ -86,7 +86,10 @@
 		"bread": {
 			"breadcrumbHome": "Inicio",
 			"breadcrumbInbox": "Bandeja"
-		}
+		},
+		"invitationAcceptedToast": "Has aceptado la invitación para unirte al proyecto: {project}",
+		"invitationRejectedToast": "Has rechazado la invitación para unirte al proyecto: {project}",
+		"notificationClearedToast": "Notificación eliminada"
 	},
 	"auth": {
 		"login": {
@@ -124,7 +127,8 @@
 			"tosTerms": "Términos de servicio",
 			"tosPrivacy": "Política de privacidad",
 			"successToast": "¡Cuenta creada correctamente!"
-		}
+		},
+		"loggedOutToast": "¡Has cerrado sesión correctamente!"
 	},
 	"tasks": {
 		"page": {
@@ -187,6 +191,8 @@
 		}
 	},
 	"sidebar": {
+		"labelProject": "Projectos",
+		"labelConfiguration": "Configuración",
 		"groupInfo": {
 			"name": "Task Group",
 			"info": "TSW Equipo 1"
@@ -216,7 +222,10 @@
 				"subtitle": "Invita a una persona aquí. Introduce su email para invitar.",
 				"alt": "Añade a un nuevo miembro al proyecto",
 				"email": "Email del usuario",
-				"example": "a@ejemplo.es"
+				"example": "a@ejemplo.es",
+				"invitedToast": "Invitación enviada a {email}",
+				"emptyEmailToast": "El correo no puede estar vacío",
+				"invitationFailedToast": "Error al enviar la invitación a {email}"
 			}
 		}
 	},
@@ -241,7 +250,8 @@
 			"tabGeneral": "General",
 			"tabTeam": "Equipo",
 			"toastDeleted": "Proyecto eliminado",
-			"toastUpdated": "Proyecto actualizado"
+			"toastUpdated": "Proyecto actualizado",
+			"toastRoleUpdated": "Rol del miembro actualizado"
 		},
 		"team": {
 			"cardTitle": "Equipo",
@@ -292,5 +302,21 @@
 		"namePlaceholder": "Proyecto increíble",
 		"descriptionLabel": "Descripción",
 		"descriptionPlaceholder": "Descripción del proyecto"
+	},
+	"toast": {
+		"profileError": "Error al cargar el perfil"
+	},
+	"navUser": {
+		"statusUpdateErrorToast": "Error al actualizar el estado: {error}",
+		"statusUpdateSuccessToast": "Estado actualizado con éxito"
+	},
+	"webSocket": {
+		"connectionLostToast": "Conexión perdida",
+		"willRetryIn2MinutesToast": "Reintentando en 2 minutos",
+		"newProjectInvitationToast": "Nueva invitación al proyecto",
+		"invitedYouToProjectToast": "te ha invitado al proyecto \"{projectName}\"",
+		"authErrorToast": "Error de autenticación en WebSocket",
+		"assignedYouToTaskToast": "te ha asignado a la tarea \"{taskTitle}\"",
+		"newTaskAssignedToast": "Nueva tarea asignada"
 	}
 }

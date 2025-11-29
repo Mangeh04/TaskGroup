@@ -18,10 +18,11 @@ import emptyInboxImage from "@/public/images/empty-inbox.webp";
 import {
 	NotificationCard,
 	SkeletonNotificationCard,
-} from "@/app/inbox/components/notification";
+} from "./components/notification";
 import { useTranslations } from "next-intl";
 import { fetcher } from "@/lib/api";
 import { toast } from "sonner";
+import { useRouter } from "next/navigation";
 import type {
 	NotificationsEndpoint,
 	ProjectInviteDTO,
@@ -76,13 +77,72 @@ export default function InboxPage() {
 		return () => clearTimeout(timer);
 	}, []);
 
-	const handleConfirm = useCallback(() => {
-		console.log("Invitation Confirmed");
-	}, []);
+	const router = useRouter();
 
-	const handleReject = useCallback(() => {
-		console.log("Invitation Rejected");
-	}, []);
+	async function handleConfirm(
+		projectId: string,
+		userId: string,
+		projectName: string
+	) {
+		const { error } = await fetcher(`/project/${projectId}/accept`, {
+			method: "POST",
+			body: {
+				projectId,
+				userId,
+			},
+			needsAuth: true,
+		});
+
+		if (error) {
+			toast.error(error);
+			return;
+		}
+
+		toast.success(t("invitationAcceptedToast", { project: projectName }));
+		router.push(`/dashboard/projectdetails/${projectId}`);
+	}
+
+	async function handleReject(
+		projectId: string,
+		userId: string,
+		projectName: string
+	) {
+		const { error } = await fetcher(`/project/${projectId}/decline`, {
+			method: "POST",
+			body: {
+				projectId,
+				userId,
+			},
+			needsAuth: true,
+		});
+
+		if (error) {
+			toast.error(error);
+			return;
+		}
+
+		toast.success(t("invitationRejectedToast", { project: projectName }));
+		await fetchData();
+	}
+
+	async function handleClearNotification(taskId: string, userId: string) {
+		const { error } = await fetcher(`/project/${taskId}/clear`, {
+			method: "POST",
+			body: {
+				taskId,
+				userId,
+			},
+			needsAuth: true,
+		});
+
+		if (error) {
+			toast.error(error);
+			return;
+		}
+
+		toast.success(t("notificationClearedToast"));
+		await fetchData();
+	}
 
 	return (
 		<div className="flex h-dvh overflow-hidden bg-white">
@@ -123,8 +183,20 @@ export default function InboxPage() {
 											user={item.inviter.alias}
 											project={item.project.name}
 											type={"Invitation"}
-											onConfirm={handleConfirm}
-											onReject={handleReject}
+											onConfirm={() =>
+												handleConfirm(
+													item.projectId,
+													item.holderId,
+													item.project.name
+												)
+											}
+											onReject={() =>
+												handleReject(
+													item.projectId,
+													item.holderId,
+													item.project.name
+												)
+											}
 										/>
 									))}
 									{(
@@ -133,11 +205,15 @@ export default function InboxPage() {
 										<NotificationCard
 											key={index}
 											user={item.inviter.alias}
-											project={item.project.name}
+											project={item.task.project.name}
 											task={item.task.title}
 											type={"AddedTask"}
-											onConfirm={handleConfirm}
-											onReject={handleReject}
+											onReject={() =>
+												handleClearNotification(
+													item.taskId,
+													item.holderId
+												)
+											}
 										/>
 									))}
 								</ScrollArea>

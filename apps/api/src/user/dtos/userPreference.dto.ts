@@ -4,7 +4,7 @@ import { Theme, Status } from '@repo/database';
 export class UpdatePreferenceDto {
   @IsOptional()
   @IsEnum(Theme, {
-    message: `Mode must be one of the following values: ${Object.values(Theme).join(', ')}`,
+    message: `Theme must be one of the following values: ${Object.values(Theme).join(', ')}`,
   })
   theme?: Theme;
 

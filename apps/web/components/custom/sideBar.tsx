@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useCallback, useState, useEffect } from "react";
 import { usePathname, useParams } from "next/navigation";
 import { Settings2, InboxIcon, Home, PersonStandingIcon } from "lucide-react";
 import Image from "next/image";
@@ -9,7 +9,6 @@ import Link from "next/link";
 import { NavProjects } from "@/components/nav/nav-projects";
 import { NavUser } from "@/components/nav/nav-user";
 import { EmptyUser } from "@/components/nav/empty-users";
-
 import {
 	Sidebar,
 	SidebarContent,
@@ -19,12 +18,14 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
-
 import { NavConfiguration } from "@/components/nav/nav-configuration";
 
 import { type Status, StatusEnum } from "@repo/types";
 import { useUser } from "@/context/UserContext";
 import { useTranslations } from "next-intl";
+import { fetcher } from "@/lib/api";
+import { ProjectMember } from "@repo/types";
+import { toast } from "sonner";
 
 export type SidebarProps = React.ComponentProps<typeof Sidebar>;
 
@@ -33,10 +34,52 @@ export default function AppSidebar(props: SidebarProps) {
 	const pathname = usePathname();
 	const params = useParams() as { projectId?: string };
 
+	const { user } = useUser();
+
+	const loggedUserId = user ? (user as any).sub || user.id : undefined;
+
 	const isProject = pathname.startsWith("/dashboard/projectdetails");
 	const projectId = params.projectId;
 
-	const hasMembers = false;
+	const [users, setUsers] = useState<ProjectMember[]>([]);
+	const [isFetchingMembers, setIsFetchingMembers] = useState(true);
+
+	const fetchMembers = useCallback(async () => {
+		if (!isProject) return;
+		if (!projectId) return;
+
+		setIsFetchingMembers(true);
+		const { data, error } = await fetcher<ProjectMember[]>(
+			`/project/${projectId}/members`,
+			{
+				method: "GET",
+				needsAuth: true,
+			}
+		);
+
+		if (error) {
+			toast.error(error);
+		} else {
+			setUsers(data ?? []);
+		}
+		setIsFetchingMembers(false);
+	}, [projectId, isProject]);
+
+	useEffect(() => {
+		void fetchMembers();
+	}, [fetchMembers]);
+
+	const currentUser = useMemo(() => {
+		if (!users.length || !loggedUserId) return undefined;
+
+		return users.find((u) => String(u.userId) === String(loggedUserId));
+	}, [loggedUserId, users]);
+
+	const isMemberRole = currentUser?.role?.toUpperCase() === "MEMBER";
+
+	const isLoading = isProject && (isFetchingMembers || !user);
+
+	const hasMembers = users ? users.length > 1 : false;
 
 	const dataSideBar = useMemo(
 		() => ({
@@ -76,16 +119,6 @@ export default function AppSidebar(props: SidebarProps) {
 		[projectId, t]
 	);
 
-	const { user } = useUser();
-
-	const sidebarUser = user
-		? {
-				alias: user.alias,
-				email: user.email,
-				status: user.status,
-			}
-		: null;
-
 	return (
 		<Sidebar variant="inset" {...props}>
 			<SidebarHeader>
@@ -118,9 +151,24 @@ export default function AppSidebar(props: SidebarProps) {
 				<NavProjects projects={dataSideBar.projects} />
 
 				{isProject &&
+					!isLoading &&
 					dataSideBar.Configuration.length > 0 &&
 					(hasMembers ? (
-						<NavConfiguration config={dataSideBar.Configuration} />
+						currentUser ? (
+							isMemberRole ? (
+								<NavConfiguration
+									config={dataSideBar.Configuration.slice(1)}
+								/>
+							) : (
+								<NavConfiguration
+									config={dataSideBar.Configuration}
+								/>
+							)
+						) : (
+							<NavConfiguration
+								config={dataSideBar.Configuration.slice(1)}
+							/>
+						)
 					) : (
 						<NavConfiguration
 							config={dataSideBar.Configuration.slice(0, 1)}
@@ -133,10 +181,10 @@ export default function AppSidebar(props: SidebarProps) {
 				{user && (
 					<NavUser
 						user={{
-							id: user.id,
-							alias: user.alias,
-							email: user.email,
-							status: user.status,
+							id: loggedUserId || "unknown",
+							alias: user.alias || "User",
+							email: user.email || "",
+							status: user.status || StatusEnum.OFFLINE,
 						}}
 					/>
 				)}

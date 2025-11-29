@@ -57,6 +57,45 @@ export default function ProjectSettingsPage() {
 		router.push("/dashboard");
 	}
 
+	async function handleUpdateRole(memberId: string, newRole: RoleEnum) {
+		const { error } = await fetcher(
+			`/project/${projectId}/update/member/${memberId}`,
+			{
+				method: "PATCH",
+				body: {
+					role: newRole,
+				},
+				needsAuth: true,
+			}
+		);
+
+		if (error) {
+			toast.error(error);
+			return;
+		}
+
+		toast.success(t("toastRoleUpdated"));
+		router.refresh();
+	}
+
+	async function handleRemoveMember(memberId: string) {
+		const { error } = await fetcher(
+			`/project/${projectId}/member/${memberId}`,
+			{
+				method: "DELETE",
+				needsAuth: true,
+			}
+		);
+
+		if (error) {
+			toast.error(error);
+			return;
+		}
+
+		toast.success("Member removed from project");
+		router.refresh();
+	}
+
 	const [project, setProject] = useState<Project | null>();
 	const [users, setUsers] = useState<ProjectMember[]>([]);
 	const [isFetching, setIsFetching] = useState(false);
@@ -185,7 +224,11 @@ export default function ProjectSettingsPage() {
 								</TabsContent>
 
 								<TabsContent value="team" className="space-y-6">
-									<TeamSettings users={users} />
+									<TeamSettings
+										users={users}
+										onChange={handleUpdateRole}
+										onRemove={handleRemoveMember}
+									/>
 								</TabsContent>
 							</Tabs>
 						</div>

@@ -1,8 +1,6 @@
 "use client";
 
-import {
-	type LucideIcon,
-} from "lucide-react";
+import { type LucideIcon } from "lucide-react";
 
 import {
 	SidebarGroup,
@@ -11,6 +9,7 @@ import {
 	SidebarMenuButton,
 	SidebarMenuItem,
 } from "@/components/ui/sidebar";
+import { useTranslations } from "next-intl";
 
 export function NavProjects({
 	projects,
@@ -21,10 +20,10 @@ export function NavProjects({
 		icon: LucideIcon;
 	}[];
 }) {
-
+	const t = useTranslations("sidebar");
 	return (
 		<SidebarGroup className="group-data-[collapsible=icon]:hidden">
-			<SidebarGroupLabel>Projects</SidebarGroupLabel>
+			<SidebarGroupLabel>{t("labelProject")}</SidebarGroupLabel>
 			<SidebarMenu>
 				{projects.map((item) => (
 					<SidebarMenuItem key={item.name}>

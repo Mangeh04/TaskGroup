@@ -1,6 +1,10 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { PrismaClient, type Task, type Prisma } from '@repo/database';
-import { EVENTS, type TaskEndpoint } from '@repo/types';
+import {
+  AssignNotificationPayload,
+  EVENTS,
+  type TaskEndpoint,
+} from '@repo/types';
 
 import { SERVICES } from 'src/utils/constants';
 import { CryptoService } from 'src/crypto/services/crypto.service';
@@ -52,15 +56,18 @@ export class TaskService implements ITaskService {
 
   public async createTask(createdByUserId: string, taskDto: TaskDto) {
     const data = await this.mapDtoToCreateInput(createdByUserId, taskDto);
+    const task = await this.prismaService.task.create({ data });
 
-    await this.prismaService.task.create({ data });
-
-    if (createdByUserId != data.assignedUser) {
-      this.eventEmitter.emit(EVENTS.TASK_ASSIGNED, {
-        assignedUserId: data.assignedUser,
-        taskId: data.id,
-        assignerId: createdByUserId,
-      });
+    if (createdByUserId != task.assignedUserId) {
+      const taskAssignedPayload: AssignNotificationPayload = {
+        assignedUserId: task.assignedUserId!,
+        taskId: task.id,
+        taskName: '', // This field is not used in the event emitter
+        assignerUserId: createdByUserId,
+        assignerName: '', // This field is not used in the event emitter
+        projectId: taskDto.projectId,
+      };
+      this.eventEmitter.emit(EVENTS.TASK_ASSIGNED, taskAssignedPayload);
     }
     return true;
   }

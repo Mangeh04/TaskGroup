@@ -8,9 +8,11 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Role } from '@repo/database';
+
 import { SERVICES } from 'src/utils/constants';
-import type { IProjectService } from '../interfaces/project.interface';
 import type { JwtPayload } from 'src/auth/types/jwt-payload.type';
+
+import type { IProjectService } from '../interfaces/project.interface';
 
 @Injectable()
 export class ProjectAdminGuard implements CanActivate {

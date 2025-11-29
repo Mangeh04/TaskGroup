@@ -1,5 +1,5 @@
 import { Suspense } from "react";
-import { SettingsPage } from "@/app/account-settings/components/settingsPage";
+import { SettingsPage } from "@/app/(protected)/account-settings/components/settingsPage";
 import { useTranslations } from "next-intl";
 
 export default function AccountSettingsWrapper() {

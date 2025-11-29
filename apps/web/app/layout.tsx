@@ -6,10 +6,7 @@ import { ThemeProvider } from "next-themes";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 
-import { UserProvider } from "@/context/UserContext";
-import { WebSocketProvider } from "@/context/WebSocketContext";
 import { Toaster } from "@/components/ui/sonner";
-import { getUserServer } from "@/lib/getUserServer";
 
 export const metadata: Metadata = {
 	title: "Task Group",
@@ -19,7 +16,7 @@ export const metadata: Metadata = {
 type Props = { children: ReactNode };
 
 export default async function RootLayout({ children }: Props) {
-	const [user, locale] = await Promise.all([getUserServer(), getLocale()]);
+	const [locale] = await getLocale();
 
 	return (
 		<html lang={locale} suppressHydrationWarning>
@@ -31,12 +28,8 @@ export default async function RootLayout({ children }: Props) {
 						enableSystem
 						disableTransitionOnChange
 					>
-						<UserProvider initialUser={user}>
-							<WebSocketProvider>
-								{children}
-								<Toaster richColors position="top-right" />
-							</WebSocketProvider>
-						</UserProvider>
+						{children}
+						<Toaster richColors position="top-right" />
 					</ThemeProvider>
 				</NextIntlClientProvider>
 			</body>

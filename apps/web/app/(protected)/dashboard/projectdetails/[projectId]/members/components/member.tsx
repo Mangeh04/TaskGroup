@@ -6,6 +6,7 @@ import { cn } from "@/lib/utils";
 import type { Status, RoleEnum } from "@repo/types";
 import { statusStyles } from "@/components/nav/status";
 import { useTranslations } from "next-intl";
+import { use } from "react";
 
 export type MemberCardProps = {
 	name: string;
@@ -23,7 +24,7 @@ export function MemberCard({
 	role,
 }: MemberCardProps) {
 	const tStatus = useTranslations("status");
-
+	const tRole = useTranslations("roles");
 	const currentStatus = statusStyles[status];
 
 	return (
@@ -59,7 +60,7 @@ export function MemberCard({
 					</span>
 				</div>
 				<span className="text-xs font-semibold text-muted-foreground">
-					{role}
+					{tRole(`${role}`)}
 				</span>
 			</div>
 		</Card>

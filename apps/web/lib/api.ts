@@ -1,6 +1,6 @@
 export type ApiResponse<T> =
-	| { data: T; error: null }
-	| { data: null; error: string };
+	| { data: T; error: null; status: number }
+	| { data: null; error: string; status: number };
 
 export type FetcherOptions<TBody> = {
 	method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
@@ -51,20 +51,33 @@ export async function fetcher<TResponse, TBody = unknown>(
 				result?.message ||
 				result?.error ||
 				response.statusText ||
-				"An error occurred at the request";
+				"Request error";
 
-			return { data: null, error: message };
+			return {
+				data: null,
+				error: message,
+				status: response.status,
+			};
 		}
 
 		if (result === null) {
-			return { data: null, error: "Empty server response" };
+			return {
+				data: null,
+				error: "Empty server response",
+				status: response.status,
+			};
 		}
 
-		return { data: result as TResponse, error: null };
+		return {
+			data: result as TResponse,
+			error: null,
+			status: response.status,
+		};
 	} catch (err) {
 		return {
 			data: null,
 			error: err instanceof Error ? err.message : "Network error",
+			status: 0,
 		};
 	}
 }

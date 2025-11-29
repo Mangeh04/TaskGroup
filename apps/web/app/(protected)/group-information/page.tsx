@@ -9,7 +9,7 @@ import AppSidebar from "@/components/custom/sideBar";
 import {
 	MemberCard,
 	MemberCardProps,
-} from "@/app/dashboard/projectdetails/[projectId]/members/components/member";
+} from "@/app/(protected)/dashboard/projectdetails/[projectId]/members/components/member";
 import { type Status, StatusEnum } from "@repo/types";
 
 import { useTranslations } from "next-intl";

@@ -148,6 +148,22 @@ export class ProjectService implements IProjectService {
     });
   }
 
+  async updateMembership(userId: string, projectId: string, newRole: Role) {
+    await this.prismaService.projectMembership.update({
+      where: {
+        userId_projectId: {
+          userId,
+          projectId,
+        },
+      },
+      data: {
+        role: newRole,
+      },
+    });
+
+    return true;
+  }
+
   async removeMember(
     projectId: string,
     userIdToKick: string,
@@ -173,7 +189,6 @@ export class ProjectService implements IProjectService {
     }
 
     const inviter = await this.userService.findUser(inviterId);
-
     const project = await this.findProject(projectId);
 
     if (!project) {
@@ -204,14 +219,14 @@ export class ProjectService implements IProjectService {
       projectId: projectId,
       inviterId: inviterId,
       projectName: project.name,
-      inviterName: inviter!!.alias,
+      inviterAlias: inviter.alias,
     });
 
     return true;
   }
 
   async acceptInvitation(projectId: string, userId: string) {
-    await this.prismaService.projectMembership.create({
+    const createPromise = this.prismaService.projectMembership.create({
       data: {
         projectId: projectId,
         userId: userId,
@@ -219,10 +234,12 @@ export class ProjectService implements IProjectService {
       },
     });
 
-    await this.prismaService.projectInviteNotification.deleteMany({
-      where: { projectId: projectId, holderId: userId },
-    });
+    const deletePromise =
+      this.prismaService.projectInviteNotification.deleteMany({
+        where: { projectId: projectId, holderId: userId },
+      });
 
+    await Promise.all([createPromise, deletePromise]);
     return true;
   }
 
@@ -231,6 +248,13 @@ export class ProjectService implements IProjectService {
       where: { projectId: projectId, holderId: userId },
     });
 
+    return true;
+  }
+
+  async clearAssignedNotification(taskId: string, userId: string) {
+    await this.prismaService.taskAssignedNotification.deleteMany({
+      where: { taskId: taskId, holderId: userId },
+    });
     return true;
   }
 

@@ -1,4 +1,4 @@
-import type { Project } from '@repo/database';
+import type { Project, Role } from '@repo/database';
 import type { ProjectMembership } from '@repo/database';
 import type { ProjectMember } from '@repo/types';
 
@@ -16,6 +16,11 @@ export interface IProjectService {
     userId: string,
     projectId: string,
   ): Promise<ProjectMembership | null>;
+  updateMembership(
+    userId: string,
+    projectId: string,
+    newRole: Role,
+  ): Promise<boolean>;
   removeMember(projectId: string, userIdToKick: string): Promise<boolean>;
   inviteMember(
     projectId: string,
@@ -24,6 +29,7 @@ export interface IProjectService {
   ): Promise<boolean>;
   acceptInvitation(projectId: string, userId: string): Promise<boolean>;
   declineInvitation(projectId: string, userId: string): Promise<boolean>;
+  clearAssignedNotification(taskId: string, userId: string): Promise<boolean>;
   getNumUsersInProject(projectId: string): Promise<number>;
   getNumTasksForProject(projectId: string): Promise<number>;
   getNumUsersPerProject(): Promise<Record<string, number>>;

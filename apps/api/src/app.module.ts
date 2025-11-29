@@ -15,6 +15,7 @@ import { ProjectModule } from './project/project.module';
 import { TaskModule } from './task/task.module';
 import { DecryptResponseInterceptor } from './crypto/interceptors/decrypt-reponse.interceptor';
 import { AuthGuard } from './auth/guards/auth.guard';
+import { DecryptModule } from './decrypt/decrypt.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { AuthGuard } from './auth/guards/auth.guard';
     ProjectModule,
     TaskModule,
     NotificationModule,
+    DecryptModule,
   ],
   controllers: [],
   providers: [

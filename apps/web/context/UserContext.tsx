@@ -12,11 +12,13 @@ import { toast } from "sonner";
 
 import { fetcher } from "@/lib/api";
 import type { ProfileEndpoint } from "@repo/types";
+import { useTranslations } from "next-intl";
 
 type UserContextType = {
 	user: ProfileEndpoint | null;
 	loading: boolean;
 	refetchUser: () => Promise<void>;
+	logout: () => void;
 };
 
 const UserContext = createContext<UserContextType | null>(null);
@@ -29,13 +31,15 @@ export const UserProvider = ({
 	initialUser: ProfileEndpoint | null;
 }) => {
 	const [user, setUser] = useState<ProfileEndpoint | null>(initialUser);
-	const [loading, setLoading] = useState(false);
+	const [loading, setLoading] = useState<boolean>(true);
+
+	const t = useTranslations("toast");
 
 	const refetchUser = useCallback(async () => {
 		try {
 			setLoading(true);
 
-			const { data, error } = await fetcher<ProfileEndpoint>(
+			const { data, error, status } = await fetcher<ProfileEndpoint>(
 				"/user/profile",
 				{
 					method: "GET",
@@ -43,9 +47,14 @@ export const UserProvider = ({
 				}
 			);
 
+			if (status === 401) {
+				setUser(null);
+				return;
+			}
+
 			if (error || !data) {
-				toast.error("Failed to load user profile");
-				console.error(error);
+				console.error("Error loading profile:", error);
+				toast.error(t("profileError"));
 				return;
 			}
 
@@ -53,17 +62,30 @@ export const UserProvider = ({
 		} finally {
 			setLoading(false);
 		}
-	}, []);
+	}, [t]);
 
 	useEffect(() => {
-		if (!initialUser) {
-			void refetchUser();
+		if (initialUser) {
+			setLoading(false);
+			return;
 		}
+
+		void refetchUser();
 	}, [initialUser, refetchUser]);
 
+	const logout = useCallback(() => {
+		setUser(null);
+		setLoading(false);
+	}, []);
+
 	const value = useMemo(
-		() => ({ user, loading, refetchUser }),
-		[user, loading, refetchUser]
+		() => ({
+			user,
+			loading,
+			refetchUser,
+			logout,
+		}),
+		[user, loading, refetchUser, logout]
 	);
 
 	return (
