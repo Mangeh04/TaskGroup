@@ -197,7 +197,7 @@ export function SkeletonCard() {
 			<Skeleton className="absolute top-3 right-3 h-5 w-14 rounded-full bg-neutral-300/70 animate-pulse" />
 
 			<div className="flex items-start gap-4">
-				<Skeleton className="size-8 rounded-full bg-neutral-300/80 animate-pulse flex-shrink-0" />
+				<Skeleton className="size-8 rounded-full bg-neutral-300/80 animate-pulse shrink-0" />
 
 				<div className="flex flex-col gap-1 flex-1">
 					<Skeleton className="h-5 w-48 rounded-md bg-neutral-300/80 animate-pulse" />
