@@ -1,7 +1,6 @@
 # TaskGroup - Project Management Platform
 
 A modern project management platform built with Next.js and NestJS, using a monorepo architecture with Turborepo.
-Note: the .env uploaded here has not real credentials, it's a college project that runs only on local.
 
 ## Project Overview
 
