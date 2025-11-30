@@ -72,7 +72,7 @@ export class TaskService implements ITaskService {
     return true;
   }
 
-  public async updateTask(taskDto: TaskDtoUpdate, updatedByUser: string) {
+  public async updateTask(taskDto: TaskDtoUpdate, updatedByUserId: string) {
     const dataToUpdate: Prisma.TaskUpdateInput = {};
 
     if (taskDto.title) {
@@ -95,23 +95,29 @@ export class TaskService implements ITaskService {
           id: taskDto.assignedUserId,
         },
       };
-      if (taskDto.assignedUserId != updatedByUser) {
-        this.eventEmitter.emit(EVENTS.TASK_ASSIGNED, {
+
+      if (dataToUpdate.isCompleted != null) {
+        dataToUpdate.isCompleted = taskDto.isCompleted;
+      }
+
+      const updated = await this.prismaService.task.update({
+        where: { id: taskDto.id },
+        data: dataToUpdate,
+      });
+
+      if (taskDto.assignedUserId != updatedByUserId) {
+        const taskAssignedPayload: AssignNotificationPayload = {
           assignedUserId: taskDto.assignedUserId,
           taskId: taskDto.id,
-          assignerId: updatedByUser,
-        });
+          taskName: '', // This field is not used in the event emitter
+          assignerUserId: updatedByUserId,
+          assignerName: '', // This field is not used in the event emitter
+          projectId: updated.projectId,
+        };
+
+        this.eventEmitter.emit(EVENTS.TASK_ASSIGNED, taskAssignedPayload);
       }
     }
-
-    if (dataToUpdate.isCompleted != null) {
-      dataToUpdate.isCompleted = taskDto.isCompleted;
-    }
-
-    await this.prismaService.task.update({
-      where: { id: taskDto.id },
-      data: dataToUpdate,
-    });
     return true;
   }
 
