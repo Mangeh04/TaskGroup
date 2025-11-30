@@ -96,7 +96,7 @@ export class TaskService implements ITaskService {
         },
       };
 
-      if (dataToUpdate.isCompleted != null) {
+      if (taskDto.isCompleted != undefined) {
         dataToUpdate.isCompleted = taskDto.isCompleted;
       }
 
