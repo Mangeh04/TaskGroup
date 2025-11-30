@@ -1,4 +1,37 @@
 {
+	"landing": {
+		"header": {
+			"brand": "TaskGroup"
+		},
+		"hero": {
+			"badge": "Collaborate better with your team",
+			"title": "Organize tasks, teams, and projects in one place.",
+			"description": "<b>TaskGroup</b> is a platform designed for teams that want to stop wasting time on emails, messages, and spreadsheets. Create tasks, assign owners, and track your team's progress without complications.",
+			"startNow": "Start now",
+			"alreadyHaveAccount": "I already have an account",
+			"idealFor": "Ideal for startups, agencies, remote teams, and study groups."
+		},
+		"features": {
+			"title": "What can you do with TaskGroup?",
+			"subtitle": "A quick summary of how it helps you in your day-to-day.",
+			"manage": {
+				"title": "Manage tasks and projects",
+				"description": "Create task lists, group them by project, and keep everything synchronized with your team."
+			},
+			"assign": {
+				"title": "Assign owners",
+				"description": "Ensure every task has an owner."
+			},
+			"progress": {
+				"title": "View real-time progress",
+				"description": "Visualize what is in progress, what is blocked, and what is finished."
+			},
+			"developedBy": "Developed by:"
+		},
+		"footer": {
+			"rights": "All rights reserved."
+		}
+	},
 	"generic": {
 		"loading": "Loading…",
 		"primary": "Primary",
