@@ -62,7 +62,7 @@ export class TaskService implements ITaskService {
       const taskAssignedPayload: AssignNotificationPayload = {
         assignedUserId: task.assignedUserId!,
         taskId: task.id,
-        taskName: '', // This field is not used in the event emitter
+        taskName: task.title,
         assignerUserId: createdByUserId,
         assignerName: '', // This field is not used in the event emitter
         projectId: taskDto.projectId,
@@ -109,7 +109,7 @@ export class TaskService implements ITaskService {
         const taskAssignedPayload: AssignNotificationPayload = {
           assignedUserId: taskDto.assignedUserId,
           taskId: taskDto.id,
-          taskName: '', // This field is not used in the event emitter
+          taskName: updated.title,
           assignerUserId: updatedByUserId,
           assignerName: '', // This field is not used in the event emitter
           projectId: updated.projectId,
