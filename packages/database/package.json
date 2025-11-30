@@ -1,13 +1,13 @@
 {
 	"name": "@repo/database",
 	"version": "1.0.0",
-	"main": "./dist/prisma/index.js",
-	"types": "./dist/prisma/index.d.ts",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
 	"exports": {
 		".": {
-			"types": "./dist/prisma/index.d.ts",
-			"require": "./dist/prisma/index.js",
-			"default": "./dist/prisma/index.js"
+			"types": "./dist/index.d.ts",
+			"require": "./dist/index.js",
+			"default": "./dist/index.js"
 		}
 	},
 	"scripts": {
