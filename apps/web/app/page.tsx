@@ -72,7 +72,9 @@ export default function MainPage() {
 					<Card className="w-full max-w-md border-slate-800 bg-slate-900/60 backdrop-blur">
 						<CardHeader>
 							<CardTitle className="text-lg">
-								{t("features.title")}
+								<p className="text-white">
+									{t("features.title")}
+								</p>
 							</CardTitle>
 							<CardDescription>
 								{t("features.subtitle")}
