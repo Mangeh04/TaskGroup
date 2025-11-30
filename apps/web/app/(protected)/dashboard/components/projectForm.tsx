@@ -43,7 +43,6 @@ export function ProjectForm({
 					value={values.description}
 					onChange={(e) => onChange("description", e.target.value)}
 					disabled={loading}
-					required
 				/>
 			</div>
 		</div>
