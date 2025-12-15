@@ -9,7 +9,7 @@ import {
   Post,
   UseGuards,
 } from '@nestjs/common';
-import type { Project, Role } from '@repo/database';
+import type { Project } from '@repo/database';
 
 import { SERVICES } from 'src/utils/constants';
 import { User } from 'src/auth/decorators/user.decorator';
