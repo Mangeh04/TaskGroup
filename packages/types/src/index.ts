@@ -1,6 +1,8 @@
 import {
 	User as DatabaseUser,
 	Status as DatabaseStatus,
+	State as DatabaseState,
+	Priority as DatabasePriority,
 	Task as DatabaseTask,
 	Project as DataBaseProject,
 	Role,
@@ -8,6 +10,7 @@ import {
 	ProfileConfiguration as DataBaseProfileConfiguration,
 	TaskAssignedNotification,
 	ProjectInviteNotification,
+	ProjectCategory,
 } from "@repo/database";
 
 export type User = Omit<
@@ -17,6 +20,12 @@ export type User = Omit<
 
 export type Status = DatabaseStatus;
 export { DatabaseStatus as StatusEnum };
+
+export type State = DatabaseState;
+export { DatabaseState as StateEnum };
+
+export type Priority = DatabasePriority;
+export { DatabasePriority as PriorityEnum };
 
 export type Task = Omit<DatabaseTask, "descriptionIv" | "titleIv">;
 export type Project = Omit<
@@ -97,3 +106,5 @@ export enum EVENTS {
 	PROJECT_INVITED = "project.invited",
 	AUTH_ERROR = "auth_error",
 }
+
+export { ProjectCategory as ProjectCategoryEnum };

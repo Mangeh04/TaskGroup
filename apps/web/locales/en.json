@@ -109,7 +109,10 @@
 			"invitationTitle": "New invitation",
 			"invitationBody": "You have been invited by {user} to join {project}",
 			"taskTitle": "New assigned task: {task}",
-			"taskBody": "You have a new assignment posted by {user} in {project}"
+			"taskBody": "You have a new assignment posted by {user} in {project}",
+			"markCompleted": "Mark as completed",
+			"toastCompleted": "Task marked as completed",
+			"toastUncompleted": "Task marked as pending"
 		}
 	},
 	"inbox": {
@@ -186,7 +189,28 @@
 			"descriptionPlaceholder": "Description of the task",
 			"assignedUserLabel": "Assigned user",
 			"assignedUserPlaceholder": "Assign task",
-			"isCompletedLabel": "Mark as completed"
+
+			"stateLabel": "State",
+			"priorityLabel": "Priority",
+			"dueDateLabel": "Due date",
+			"initialDateLabel": "Initial date",
+
+			"state": {
+				"TODO": "To Do",
+				"IN_PROGRESS": "In Progress",
+				"DONE": "Done",
+				"REVIEW": "In Review",
+				"CANCELLED": "Cancelled",
+				"ARCHIVED": "Archived"
+			},
+
+			"priority": {
+				"LOW": "Low",
+				"MEDIUM": "Medium",
+				"HIGH": "High"
+			},
+			"dueDate": "Due date",
+			"initialDate": "Initial date"
 		},
 		"card": {
 			"stateDone": "Done",
@@ -198,7 +222,12 @@
 			"toastUpdated": "Task updated",
 			"toastDeleted": "Task deleted",
 			"deleteConfirmationText": "Task \"{title}\" will be permanently deleted.",
-			"deleteObjective": "task"
+			"deleteObjective": "task",
+			"statePlaceholder": "Change status",
+			"updatingState": "Updating…",
+			"toastStateUpdated": "Status updated",
+			"startDateLabel": "Start",
+			"dueDateLabel": "Due"
 		},
 		"emptyTasks": {
 			"title": "You don't have any tasks yet",
@@ -334,7 +363,24 @@
 		"nameLabel": "Project Name",
 		"namePlaceholder": "Incredible Project",
 		"descriptionLabel": "Description",
-		"descriptionPlaceholder": "Description of the project"
+		"descriptionPlaceholder": "Description of the project",
+		"category": "Category",
+		"categoryPlaceholder": "Select a category",
+		"categories": {
+			"WORK": "Work",
+			"PERSONAL": "Personal",
+			"HOBBY": "Hobby",
+			"OTHER": "Other"
+		},
+		"categoryLabel": "Category",
+		"filter": {
+			"placeholder": "Filter by category",
+			"all": "All",
+			"emptyTitle": "There are no projects for this category",
+			"clearButton": "See all",
+			"clearTitle": "Clear filter",
+			"clearSubtitle": "See all projects again"
+		}
 	},
 	"toast": {
 		"profileError": "Error loading profile"

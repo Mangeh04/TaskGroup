@@ -1,4 +1,4 @@
-import { Injectable, Inject } from '@nestjs/common';
+import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { PrismaClient, type Task, type Prisma } from '@repo/database';
 import {
   AssignNotificationPayload,
@@ -32,7 +32,10 @@ export class TaskService implements ITaskService {
     const data: Prisma.TaskCreateInput = {
       title: encryptedName.ciphertext,
       titleIv: encryptedName.iv,
-      isCompleted: taskDto.isCompleted,
+      state: taskDto.state,
+      priority: taskDto.priority,
+      initialDate: taskDto.initialDate,
+      dueDate: taskDto.dueDate,
       project: {
         connect: { id: taskDto.projectId },
       },
@@ -75,49 +78,133 @@ export class TaskService implements ITaskService {
   public async updateTask(taskDto: TaskDtoUpdate, updatedByUserId: string) {
     const dataToUpdate: Prisma.TaskUpdateInput = {};
 
-    if (taskDto.title) {
+    const current = await this.prismaService.task.findUnique({
+      where: { id: taskDto.id },
+      select: {
+        id: true,
+        title: true,
+        titleIv: true,
+        description: true,
+        descriptionIv: true,
+        state: true,
+        priority: true,
+        initialDate: true,
+        dueDate: true,
+        assignedUserId: true,
+        projectId: true,
+      },
+    });
+
+    if (!current) {
+      throw new BadRequestException('Task not found');
+    }
+
+    if (taskDto.title !== undefined) {
       const encryptedName = await this.cryptoService.encrypt(taskDto.title);
       dataToUpdate.title = encryptedName.ciphertext;
       dataToUpdate.titleIv = encryptedName.iv;
     }
 
-    if (taskDto.description) {
-      const encryptedDescription = await this.cryptoService.encrypt(
-        taskDto.description,
-      );
-      dataToUpdate.description = encryptedDescription.ciphertext;
-      dataToUpdate.descriptionIv = encryptedDescription.iv;
+    if (taskDto.description !== undefined) {
+      if (taskDto.description === '' || taskDto.description === null) {
+        dataToUpdate.description = null;
+        dataToUpdate.descriptionIv = null;
+      } else {
+        const encryptedDescription = await this.cryptoService.encrypt(
+          taskDto.description,
+        );
+        dataToUpdate.description = encryptedDescription.ciphertext;
+        dataToUpdate.descriptionIv = encryptedDescription.iv;
+      }
     }
 
-    if (taskDto.assignedUserId) {
-      dataToUpdate.assignedUser = {
-        connect: {
-          id: taskDto.assignedUserId,
-        },
+    if (taskDto.state !== undefined) {
+      dataToUpdate.state = taskDto.state;
+    }
+
+    if (taskDto.priority !== undefined) {
+      dataToUpdate.priority = taskDto.priority;
+    }
+
+    const nextAssignedUserId =
+      taskDto.assignedUserId !== undefined
+        ? taskDto.assignedUserId
+        : current.assignedUserId;
+
+    if (taskDto.assignedUserId !== undefined) {
+      dataToUpdate.assignedUser = taskDto.assignedUserId
+        ? { connect: { id: taskDto.assignedUserId } }
+        : { disconnect: true };
+    }
+
+    const nextInitialRaw =
+      taskDto.initialDate !== undefined
+        ? taskDto.initialDate
+        : current.initialDate;
+    const nextDueRaw =
+      taskDto.dueDate !== undefined ? taskDto.dueDate : current.dueDate;
+
+    const nextInitial =
+      nextInitialRaw == null
+        ? null
+        : nextInitialRaw instanceof Date
+          ? nextInitialRaw
+          : new Date(String(nextInitialRaw));
+
+    const nextDue =
+      nextDueRaw == null
+        ? null
+        : nextDueRaw instanceof Date
+          ? nextDueRaw
+          : new Date(String(nextDueRaw));
+
+    if (nextInitial && isNaN(nextInitial.getTime())) {
+      throw new BadRequestException('initialDate is not a valid date');
+    }
+
+    if (nextDue && isNaN(nextDue.getTime())) {
+      throw new BadRequestException('dueDate is not a valid date');
+    }
+
+    if (nextInitial && nextDue && nextDue.getTime() < nextInitial.getTime()) {
+      throw new BadRequestException(
+        'dueDate must be greater than or equal to initialDate',
+      );
+    }
+
+    if (taskDto.initialDate !== undefined) {
+      dataToUpdate.initialDate = nextInitial;
+    }
+    if (taskDto.dueDate !== undefined) {
+      dataToUpdate.dueDate = nextDue;
+    }
+
+    const updated = await this.prismaService.task.update({
+      where: { id: taskDto.id },
+      data: dataToUpdate,
+    });
+
+    const assignedChanged =
+      taskDto.assignedUserId !== undefined &&
+      taskDto.assignedUserId !== current.assignedUserId;
+
+    if (
+      assignedChanged &&
+      nextAssignedUserId &&
+      nextAssignedUserId !== updatedByUserId
+    ) {
+      const taskAssignedPayload: AssignNotificationPayload = {
+        assignedUserId: nextAssignedUserId,
+        taskId: taskDto.id,
+        taskName: updated.title,
+        assignerUserId: updatedByUserId,
+        assignerName: '',
+        projectId: updated.projectId,
       };
 
-      if (taskDto.isCompleted != undefined) {
-        dataToUpdate.isCompleted = taskDto.isCompleted;
-      }
-
-      const updated = await this.prismaService.task.update({
-        where: { id: taskDto.id },
-        data: dataToUpdate,
-      });
-
-      if (taskDto.assignedUserId != updatedByUserId) {
-        const taskAssignedPayload: AssignNotificationPayload = {
-          assignedUserId: taskDto.assignedUserId,
-          taskId: taskDto.id,
-          taskName: updated.title,
-          assignerUserId: updatedByUserId,
-          assignerName: '', // This field is not used in the event emitter
-          projectId: updated.projectId,
-        };
-
-        this.eventEmitter.emit(EVENTS.TASK_ASSIGNED, taskAssignedPayload);
-      }
+      this.eventEmitter.emit(EVENTS.TASK_ASSIGNED, taskAssignedPayload);
     }
+
     return true;
   }
 

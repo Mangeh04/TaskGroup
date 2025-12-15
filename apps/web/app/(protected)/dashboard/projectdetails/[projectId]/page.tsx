@@ -31,6 +31,8 @@ import { TaskCard, SkeletonCard } from "../components/task";
 import { TaskForm } from "../components/taskForm";
 import { useTranslations } from "next-intl";
 
+import { StateEnum, PriorityEnum } from "@repo/types";
+
 export default function ProjectPage() {
 	const params = useParams();
 	const projectId = params.projectId as string;
@@ -56,8 +58,12 @@ export default function ProjectPage() {
 		title: "",
 		description: "",
 		userId: "",
-		isCompleted: false,
+		state: StateEnum.TODO,
+		priority: PriorityEnum.MEDIUM,
+		initialDate: undefined,
+		dueDate: undefined,
 	});
+
 	const [isSavingTask, setIsSavingTask] = useState(false);
 
 	const fetchTasks = useCallback(async () => {
@@ -112,11 +118,12 @@ export default function ProjectPage() {
 		useMemo(() => {
 			const totalTasks = tasks.length;
 			const completedTasks = tasks.filter(
-				(task) => task.isCompleted
+				(task) => task.state === StateEnum.DONE
 			).length;
 			const pendingTasks = totalTasks - completedTasks;
 			const progressPercentage =
 				totalTasks > 0 ? (completedTasks / totalTasks) * 100 : 0;
+
 			return {
 				totalTasks,
 				completedTasks,
@@ -201,8 +208,11 @@ export default function ProjectPage() {
 		const apiBody = {
 			title: parsed.data.title,
 			description: parsed.data.description,
-			isCompleted: parsed.data.isCompleted,
-			assignedUserId: parsed.data.userId,
+			state: parsed.data.state,
+			priority: parsed.data.priority,
+			initialDate: parsed.data.initialDate,
+			dueDate: parsed.data.dueDate,
+			assignedUserId: parsed.data.userId || null,
 			projectId,
 		};
 
@@ -220,18 +230,24 @@ export default function ProjectPage() {
 
 		toast.success(t("page.toast"));
 		setIsSavingTask(false);
+
 		setCreateValues({
 			title: "",
 			description: "",
 			userId: "",
-			isCompleted: false,
+			state: StateEnum.TODO,
+			priority: PriorityEnum.MEDIUM,
+			initialDate: undefined,
+			dueDate: undefined,
 		});
+
 		void fetchTasks();
 	};
 
+	// ✅ ACTUALIZADO: ahora acepta Date | null
 	const handleCreateChange = (
 		field: keyof TaskFormValues,
-		value: string | boolean
+		value: string | boolean | Date | null
 	) => {
 		setCreateValues(
 			(prev) => ({ ...prev, [field]: value }) as TaskFormValues
@@ -320,6 +336,7 @@ export default function ProjectPage() {
 							/>
 						</CustomDialog>
 					</div>
+
 					<div className="flex-1 max-w-sm">
 						<div className="flex justify-between items-center mb-1">
 							<span className="text-sm font-medium">
@@ -352,17 +369,17 @@ export default function ProjectPage() {
 							className="grid grid-cols-1 md:grid-cols-2 gap-4"
 						>
 							{isInitialLoading
-								? Array.from({
-										length: visibleCount,
-									}).map((_, i) => (
-										<div
-											key={`skeleton_${i}`}
-											data-task-card
-											className="min-h-40"
-										>
-											<SkeletonCard />
-										</div>
-									))
+								? Array.from({ length: visibleCount }).map(
+										(_, i) => (
+											<div
+												key={`skeleton_${i}`}
+												data-task-card
+												className="min-h-40"
+											>
+												<SkeletonCard />
+											</div>
+										)
+									)
 								: currentData.map((task) => (
 										<div
 											key={task.id}

@@ -217,6 +217,7 @@ export default function ProjectSettingsPage() {
 														data.description,
 													createdAt:
 														project.createdAt,
+													category: project.category,
 												});
 											}}
 										/>

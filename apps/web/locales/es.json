@@ -109,7 +109,10 @@
 			"invitationTitle": "Nueva invitación",
 			"invitationBody": "Has sido invitado por {user} a unirte a {project}",
 			"taskTitle": "Nueva tarea asignada: {task}",
-			"taskBody": "Tienes una nueva tarea asignada por {user} en {project}"
+			"taskBody": "Tienes una nueva tarea asignada por {user} en {project}",
+			"markCompleted": "Marcar como completada",
+			"toastCompleted": "Tarea marcada como completada",
+			"toastUncompleted": "Tarea marcada como pendiente"
 		}
 	},
 	"inbox": {
@@ -186,7 +189,26 @@
 			"descriptionPlaceholder": "Descripción de la tarea",
 			"assignedUserLabel": "Usuario asignado",
 			"assignedUserPlaceholder": "Asignar tarea",
-			"isCompletedLabel": "Marcar como completada"
+			"isCompletedLabel": "Marcar como completada",
+
+			"stateLabel": "Estado",
+			"priorityLabel": "Prioridad",
+			"dueDateLabel": "Fecha límite",
+			"initialDateLabel": "Fecha de inicio",
+
+			"state": {
+				"TODO": "Por hacer",
+				"IN_PROGRESS": "En progreso",
+				"DONE": "Hecho",
+				"REVIEW": "En revisión",
+				"CANCELLED": "Cancelado",
+				"ARCHIVED": "Archivado"
+			},
+			"priority": {
+				"LOW": "Baja",
+				"MEDIUM": "Media",
+				"HIGH": "Alta"
+			}
 		},
 		"card": {
 			"stateDone": "Completada",
@@ -198,7 +220,12 @@
 			"toastUpdated": "Tarea actualizada",
 			"toastDeleted": "Tarea eliminada",
 			"deleteConfirmationText": "La tarea \"{title}\" se eliminará permanentemente.",
-			"deleteObjective": "tarea"
+			"deleteObjective": "tarea",
+			"statePlaceholder": "Cambiar estado",
+			"updatingState": "Actualizando…",
+			"toastStateUpdated": "Estado actualizado",
+			"startDateLabel": "Fecha de Inicio",
+			"dueDateLabel": "Fecha Límite"
 		},
 		"emptyTasks": {
 			"title": "No tienes ninguna Tarea aún",
@@ -334,7 +361,24 @@
 		"nameLabel": "Nombre del proyecto",
 		"namePlaceholder": "Proyecto increíble",
 		"descriptionLabel": "Descripción",
-		"descriptionPlaceholder": "Descripción del proyecto"
+		"descriptionPlaceholder": "Descripción del proyecto",
+		"category": "Categoría",
+		"categoryPlaceholder": "Selecciona una categoría",
+		"categories": {
+			"WORK": "Trabajo",
+			"PERSONAL": "Personal",
+			"HOBBY": "Hobby",
+			"OTHER": "Otro"
+		},
+		"categoryLabel": "Categoría",
+		"filter": {
+			"placeholder": "Filtrar por categoría",
+			"all": "Todas",
+			"emptyTitle": "No hay proyectos para esta categoría",
+			"clearButton": "Ver todas",
+			"clearTitle": "Quitar filtro",
+			"clearSubtitle": "Vuelve a ver todos los proyectos"
+		}
 	},
 	"toast": {
 		"profileError": "Error al cargar el perfil"

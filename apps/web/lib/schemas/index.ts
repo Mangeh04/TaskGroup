@@ -1,3 +1,4 @@
+import { StateEnum, PriorityEnum } from "@repo/types";
 import { z } from "zod";
 
 export const UserRegisterSchema = z.object({
@@ -18,10 +19,11 @@ export const TaskFormSchema = z.object({
 	title: z.string().min(1, "Title is required").max(60),
 	description: z.string().optional(),
 	userId: z.string().min(1, "You must assign the task to a user"),
-	isCompleted: z.boolean().default(false),
+	state: z.enum(StateEnum),
+	priority: z.enum(PriorityEnum),
+	dueDate: z.date().optional(),
+	initialDate: z.date().optional(),
 });
-
-// TODO: Add more schemas as needed
 
 export type UserRegister = z.infer<typeof UserRegisterSchema>;
 export type UserLogin = z.infer<typeof UserLoginSchema>;

@@ -45,6 +45,7 @@ export class ProjectService implements IProjectService {
           },
         },
       },
+      category: projectDto.category,
     };
 
     if (projectDto.description) {

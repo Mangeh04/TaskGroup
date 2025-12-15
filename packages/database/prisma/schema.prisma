@@ -19,11 +19,33 @@ enum Theme {
   LIGHT
 }
 
+enum Priority {
+  LOW
+  MEDIUM
+  HIGH
+}
+
+enum State {
+  TODO
+  IN_PROGRESS
+  REVIEW
+  CANCELLED
+  ARCHIVED
+  DONE
+}
+
 enum Status {
   ONLINE
   OFFLINE
   AWAY
   DO_NOT_DISTURB
+}
+
+enum ProjectCategory {
+  WORK
+  PERSONAL
+  HOBBY
+  OTHER
 }
 
 model User {
@@ -75,6 +97,8 @@ model Project {
   members       ProjectMembership[]
   assignedTasks Task[]
 
+  category ProjectCategory
+
   createdAt                 DateTime                    @default(now())
   updatedAt                 DateTime                    @updatedAt
   ProjectInviteNotification ProjectInviteNotification[]
@@ -100,7 +124,11 @@ model Task {
   titleIv       String
   descriptionIv String?
 
-  isCompleted Boolean @default(false)
+  state State @default(TODO)
+  priority Priority @default(MEDIUM)
+
+  initialDate DateTime?
+  dueDate DateTime?
 
   projectId String
   project   Project @relation(fields: [projectId], references: [id], onDelete: Cascade)
