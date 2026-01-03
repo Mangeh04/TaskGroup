@@ -5,19 +5,21 @@ import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-import { fetcher } from "@/lib/api";
 import { toast } from "sonner";
 import { useCallback } from "react";
 import { useTranslations } from "next-intl";
+import { useFetcherToast } from "@/hooks/useFetcherToast";
 
 export function SecuritySection({ email }: { email: string }) {
 	const t = useTranslations("settings.security");
 
+	const fetcherToast = useFetcherToast();
+
 	const onPasswordSubmit = useCallback(async () => {
-		const { error } = await fetcher<boolean>("/auth/changePassword", {
+		const { error } = await fetcherToast<boolean>("/auth/changePassword", {
 			method: "POST",
 			body: {
-				email: email,
+				email,
 				password: (
 					document.getElementById(
 						"currentPassword"
@@ -37,10 +39,10 @@ export function SecuritySection({ email }: { email: string }) {
 
 		if (error) {
 			toast.error(t("toastError"));
-			console.error(error);
-		} else {
-			toast.success(t("toastSuccess"));
+			return;
 		}
+
+		toast.success(t("toastSuccess"));
 	}, [email, t]);
 
 	return (

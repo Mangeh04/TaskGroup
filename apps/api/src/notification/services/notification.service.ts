@@ -9,7 +9,7 @@ import {
   InviteNotificationPayload,
 } from '@repo/types';
 
-import { SERVICES } from 'src/utils/constants';
+import { NOTIFICATION_ERROR_CODES, SERVICES } from 'src/utils/constants';
 import type { IUserService } from 'src/user/interfaces/user.interface';
 import type { ITaskService } from 'src/task/interfaces/task.interface';
 import type { INotificationService } from '../interfaces/notification.interface';
@@ -38,7 +38,9 @@ export class NotificationService implements INotificationService {
         payload.inviterId,
       )
     ) {
-      throw new ConflictException('This invitation is already created');
+      throw new ConflictException({
+        message: NOTIFICATION_ERROR_CODES.INVITE_ALREADY_EXISTS,
+      });
     }
 
     await this.prismaService.projectInviteNotification.create({

@@ -1,7 +1,3 @@
-export type ApiResponse<T> =
-	| { data: T; error: null; status: number }
-	| { data: null; error: string; status: number };
-
 export type FetcherOptions<TBody> = {
 	method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
 	body?: TBody;
@@ -16,13 +12,46 @@ const API_URL =
 
 async function safeJsonParse(response: Response) {
 	const text = await response.text();
-
 	if (!text) return null;
 	try {
 		return JSON.parse(text);
 	} catch {
 		return null;
 	}
+}
+
+export type ApiError = {
+	codes: string[];
+	raw?: unknown;
+};
+
+export type ApiResponse<T> =
+	| { data: T; error: null; status: number }
+	| { data: null; error: ApiError; status: number };
+
+function isString(x: unknown): x is string {
+	return typeof x === "string";
+}
+
+function toStringArray(value: unknown): string[] {
+	if (!value) return [];
+	if (Array.isArray(value)) return value.filter(isString);
+	if (isString(value)) return [value];
+	return [];
+}
+
+function extractErrorCodes(result: any, response: Response): string[] {
+	const fromMessage = toStringArray(result?.message);
+	if (fromMessage.length) return fromMessage;
+
+	const nestedMessage = toStringArray(result?.message?.message);
+	if (nestedMessage.length) return nestedMessage;
+
+	const fromError = toStringArray(result?.error);
+	if (fromError.length) return fromError;
+
+	if (response.statusText) return [response.statusText];
+	return ["REQUEST_ERROR"];
 }
 
 export async function fetcher<TResponse, TBody = unknown>(
@@ -47,15 +76,12 @@ export async function fetcher<TResponse, TBody = unknown>(
 		const result = await safeJsonParse(response);
 
 		if (!response.ok) {
-			const message =
-				result?.message ||
-				result?.error ||
-				response.statusText ||
-				"Request error";
-
 			return {
 				data: null,
-				error: message,
+				error: {
+					codes: extractErrorCodes(result, response),
+					raw: result ?? undefined,
+				},
 				status: response.status,
 			};
 		}
@@ -63,7 +89,7 @@ export async function fetcher<TResponse, TBody = unknown>(
 		if (result === null) {
 			return {
 				data: null,
-				error: "Empty server response",
+				error: { codes: ["EMPTY_SERVER_RESPONSE"] },
 				status: response.status,
 			};
 		}
@@ -76,7 +102,9 @@ export async function fetcher<TResponse, TBody = unknown>(
 	} catch (err) {
 		return {
 			data: null,
-			error: err instanceof Error ? err.message : "Network error",
+			error: {
+				codes: [err instanceof Error ? err.message : "NETWORK_ERROR"],
+			},
 			status: 0,
 		};
 	}

@@ -15,6 +15,14 @@ import {
 	PaginationPrevious,
 } from "@/components/ui/pagination";
 
+import {
+	Select,
+	SelectContent,
+	SelectItem,
+	SelectTrigger,
+	SelectValue,
+} from "@/components/ui/select";
+
 import { EmptyPage } from "@/components/custom/empty";
 import { CustomDialog } from "@/components/custom/dialog";
 import { Progress } from "@/components/ui/progress";
@@ -24,7 +32,6 @@ import { usePaginatedView } from "@/hooks/usePaginatedView";
 import emptyImage from "@/public/images/empty-task.webp";
 import type { TaskEndpoint, ProjectMember, Task } from "@repo/types";
 
-import { fetcher } from "@/lib/api";
 import { TaskFormSchema, type TaskFormValues } from "@/lib/schemas";
 
 import { TaskCard, SkeletonCard } from "../components/task";
@@ -32,6 +39,10 @@ import { TaskForm } from "../components/taskForm";
 import { useTranslations } from "next-intl";
 
 import { StateEnum, PriorityEnum } from "@repo/types";
+import { useFetcherToast } from "@/hooks/useFetcherToast";
+
+type StateFilter = "ALL" | StateEnum;
+type AsignedUserFilter = "ALL" | string;
 
 export default function ProjectPage() {
 	const params = useParams();
@@ -66,11 +77,13 @@ export default function ProjectPage() {
 
 	const [isSavingTask, setIsSavingTask] = useState(false);
 
+	const fetcherToast = useFetcherToast();
 	const fetchTasks = useCallback(async () => {
 		if (!projectId) return;
 
 		setIsFetching(true);
-		const { data, error } = await fetcher<TaskEndpoint[]>(
+
+		const { data, error } = await fetcherToast<TaskEndpoint[]>(
 			`/task/${projectId}`,
 			{
 				method: "GET",
@@ -78,11 +91,10 @@ export default function ProjectPage() {
 			}
 		);
 
-		if (error) {
-			toast.error(error);
-		} else {
+		if (!error) {
 			setTasks(data ?? []);
 		}
+
 		setIsFetching(false);
 	}, [projectId]);
 
@@ -94,7 +106,8 @@ export default function ProjectPage() {
 		if (!projectId) return;
 
 		setIsFetching(true);
-		const { data, error } = await fetcher<ProjectMember[]>(
+
+		const { data, error } = await fetcherToast<ProjectMember[]>(
 			`/project/${projectId}/members`,
 			{
 				method: "GET",
@@ -102,11 +115,10 @@ export default function ProjectPage() {
 			}
 		);
 
-		if (error) {
-			toast.error(error);
-		} else {
+		if (!error) {
 			setUsers(data ?? []);
 		}
+
 		setIsFetching(false);
 	}, [projectId]);
 
@@ -137,6 +149,29 @@ export default function ProjectPage() {
 		{ label: t("page.breadcrumbHome"), href: "/dashboard" },
 	];
 
+	const [stateFilter, setStateFilter] = useState<StateFilter>("ALL");
+	const [asignedUserFilter, setAsignedUserFilter] =
+		useState<AsignedUserFilter>("ALL");
+
+	const stateOptions = useMemo(
+		() =>
+			Object.values(StateEnum).filter(
+				(v) => typeof v === "string"
+			) as StateEnum[],
+		[]
+	);
+
+	const filteredTasks = useMemo(() => {
+		return tasks.filter(
+			(p) =>
+				(stateFilter === "ALL" || p.state === stateFilter) &&
+				(asignedUserFilter === "ALL" ||
+					p.assignedUserId === asignedUserFilter)
+		);
+	}, [tasks, stateFilter, asignedUserFilter]);
+
+	const hasFilteredTasks = filteredTasks.length > 0;
+
 	const {
 		currentPage,
 		totalPages,
@@ -148,7 +183,7 @@ export default function ProjectPage() {
 		handlePrevious,
 		handleNext,
 		handlePageClick,
-	} = usePaginatedView(tasks, 6, 350);
+	} = usePaginatedView(filteredTasks, 6, 350);
 
 	const updateItemsPerPage = useCallback(() => {
 		if (!listContainerRef.current || !gridRef.current) return;
@@ -216,14 +251,13 @@ export default function ProjectPage() {
 			projectId,
 		};
 
-		const { error } = await fetcher<Task, typeof apiBody>("/task", {
+		const { error } = await fetcherToast<Task, typeof apiBody>("/task", {
 			method: "POST",
 			body: apiBody,
 			needsAuth: true,
 		});
 
 		if (error) {
-			toast.error(error);
 			setIsSavingTask(false);
 			return;
 		}
@@ -244,7 +278,6 @@ export default function ProjectPage() {
 		void fetchTasks();
 	};
 
-	// ✅ ACTUALIZADO: ahora acepta Date | null
 	const handleCreateChange = (
 		field: keyof TaskFormValues,
 		value: string | boolean | Date | null
@@ -314,7 +347,7 @@ export default function ProjectPage() {
 
 			{hasTasks && (
 				<div className="flex items-center justify-between gap-4 px-4 py-4 border-b">
-					<div className="shrink-0">
+					<div className="flex items-center gap-3 shrink-0">
 						<CustomDialog
 							buttonString={t("page.button")}
 							title={t("page.formTitle")}
@@ -335,6 +368,55 @@ export default function ProjectPage() {
 								onChange={handleCreateChange}
 							/>
 						</CustomDialog>
+
+						<Select
+							value={stateFilter}
+							onValueChange={(v) =>
+								setStateFilter(v as StateFilter)
+							}
+						>
+							<SelectTrigger>
+								<SelectValue
+									placeholder={t("filter.placeholder")}
+								/>
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="ALL">
+									{t("filter.all")}
+								</SelectItem>
+								{stateOptions.map((sta) => (
+									<SelectItem key={sta} value={sta}>
+										{t(`form.state.${sta}`)}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
+
+						<Select
+							value={asignedUserFilter}
+							onValueChange={(v) =>
+								setAsignedUserFilter(v as AsignedUserFilter)
+							}
+						>
+							<SelectTrigger>
+								<SelectValue
+									placeholder={t("filter.placeholder")}
+								/>
+							</SelectTrigger>
+							<SelectContent>
+								<SelectItem value="ALL">
+									{t("filter.all")}
+								</SelectItem>
+								{users.map((member) => (
+									<SelectItem
+										key={member.userId}
+										value={member.userId}
+									>
+										{member.user.alias}
+									</SelectItem>
+								))}
+							</SelectContent>
+						</Select>
 					</div>
 
 					<div className="flex-1 max-w-sm">
@@ -354,7 +436,7 @@ export default function ProjectPage() {
 				</div>
 			)}
 
-			{hasTasks ? (
+			{hasTasks || hasFilteredTasks ? (
 				<div className="flex flex-col gap-4 flex-1 min-h-0 px-4 py-6 overflow-hidden">
 					<div
 						ref={listContainerRef}
@@ -449,29 +531,44 @@ export default function ProjectPage() {
 				</div>
 			) : (
 				<div className="flex flex-1 items-center justify-center p-6 overflow-hidden">
-					<EmptyPage
-						title={t("emptyTasks.title")}
-						buttonString={t("emptyTasks.buttonString")}
-						imageSrc={emptyImage}
-						imageAlt={t("emptyTasks.alt")}
-						customDialog={{
-							title: t("page.formTitle"),
-							subtitle: t("page.formDesc"),
-							confirmIcon: isSavingTask ? (
-								<Loader2 className="h-4 w-4 animate-spin" />
-							) : (
-								<PlusIcon />
-							),
-							onSubmit: handleCreateSubmit,
-						}}
-					>
-						<TaskForm
-							values={createValues}
-							users={users}
-							loading={isSavingTask}
-							onChange={handleCreateChange}
+					{hasTasks && !hasFilteredTasks ? (
+						<EmptyPage
+							title={t("filter.emptyTitle")}
+							buttonString={t("filter.clearButton")}
+							imageSrc={emptyImage}
+							imageAlt="Empty"
+							customDialog={{
+								title: t("filter.clearTitle"),
+								subtitle: t("filter.clearSubtitle"),
+								confirmIcon: <PlusIcon />,
+								onSubmit: () => setStateFilter("ALL"),
+							}}
 						/>
-					</EmptyPage>
+					) : (
+						<EmptyPage
+							title={t("emptyTasks.title")}
+							buttonString={t("emptyTasks.buttonString")}
+							imageSrc={emptyImage}
+							imageAlt={t("emptyTasks.alt")}
+							customDialog={{
+								title: t("page.formTitle"),
+								subtitle: t("page.formDesc"),
+								confirmIcon: isSavingTask ? (
+									<Loader2 className="h-4 w-4 animate-spin" />
+								) : (
+									<PlusIcon />
+								),
+								onSubmit: handleCreateSubmit,
+							}}
+						>
+							<TaskForm
+								values={createValues}
+								users={users}
+								loading={isSavingTask}
+								onChange={handleCreateChange}
+							/>
+						</EmptyPage>
+					)}
 				</div>
 			)}
 		</>

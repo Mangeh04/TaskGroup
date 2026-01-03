@@ -231,6 +231,14 @@
 			"title": "No tienes ninguna Tarea aún",
 			"buttonString": "Crear Tarea",
 			"alt": "Imagen de Tarea Vacia"
+		},
+		"filter": {
+			"placeholder": "Filtrar",
+			"all": "Todas",
+			"emptyTitle": "No hay tareas para este filtro",
+			"clearButton": "Ver todas",
+			"clearTitle": "Quitar filtro",
+			"clearSubtitle": "Vuelve a ver todas las tareas"
 		}
 	},
 	"members": {
@@ -395,5 +403,88 @@
 		"authErrorToast": "Error de autenticación en WebSocket",
 		"assignedYouToTaskToast": "te ha asignado a la tarea \"{taskTitle}\"",
 		"newTaskAssignedToast": "Nueva tarea asignada"
+	},
+
+	"errors": {
+		"USER_ALREADY_EXISTS": "Ya existe una cuenta con ese correo.",
+		"UNAUTHORIZED": "No tienes permiso para realizar esta acción.",
+		"INTERNAL_SERVER_ERROR": "Ha ocurrido un error inesperado. Inténtalo de nuevo.",
+		"INVALID_CATEGORY": "Categoría inválida.",
+		"INVALID_ROLE": "Rol inválido.",
+		"INVALID_STATUS": "Estado inválido.",
+		"MISSING_AUTH_TOKEN": "Falta el token de autenticación.",
+		"INVALID_OR_EXPIRED_TOKEN": "La sesión ha caducado o el token no es válido.",
+		"INCORRECT_PASSWORD": "La contraseña actual no es correcta.",
+		"NEW_PASSWORD_NOT_DIFFERENT": "La nueva contraseña debe ser distinta a la actual.",
+		"NEW_PASSWORDS_DIFFERENT": "Las nuevas contraseñas no coinciden.",
+
+		"STATUS_ENUM": "Estado inválido.",
+		"THEME_ENUM": "Tema inválido.",
+		"IS_BOOLEAN": "Valor inválido.",
+		"IS_STRING": "Valor inválido.",
+		"IS_NOT_EMPTY": "Este campo es obligatorio.",
+		"ALIAS_TOO_LONG": "El alias es demasiado largo.",
+		"IS_EMAIL": "El correo electrónico no es válido.",
+		"EMAIL_TOO_LONG": "El correo electrónico es demasiado largo.",
+		"PASSWORD_TOO_SHORT": "La contraseña es demasiado corta.",
+		"PASSWORD_TOO_LONG": "La contraseña es demasiado larga.",
+
+		"REQUIRED_ID": "Falta el identificador.",
+		"INVALID_ID": "El identificador no es válido.",
+		"ID_TOO_LONG": "El identificador es demasiado largo.",
+
+		"INVALID_STATE": "El estado de la tarea no es válido.",
+		"INVALID_PRIORITY": "La prioridad de la tarea no es válida.",
+
+		"REQUIRED_TITLE": "El título es obligatorio.",
+		"INVALID_TITLE": "El título no es válido.",
+		"TITLE_TOO_LONG": "El título es demasiado largo.",
+
+		"INVALID_DESCRIPTION": "La descripción no es válida.",
+		"DESCRIPTION_TOO_LONG": "La descripción es demasiado larga.",
+
+		"REQUIRED_INITIAL_DATE": "La fecha de inicio es obligatoria.",
+		"INVALID_INITIAL_DATE": "La fecha de inicio no es válida.",
+
+		"REQUIRED_DUE_DATE": "La fecha límite es obligatoria.",
+		"INVALID_DUE_DATE": "La fecha límite no es válida.",
+		"DUE_DATE_BEFORE_INITIAL_DATE": "La fecha límite no puede ser anterior a la fecha de inicio.",
+
+		"REQUIRED_PROJECT_ID": "El proyecto es obligatorio.",
+		"INVALID_PROJECT_ID": "El identificador del proyecto no es válido.",
+		"PROJECT_ID_TOO_LONG": "El identificador del proyecto es demasiado largo.",
+
+		"INVALID_ASSIGNED_USER_ID": "El usuario asignado no es válido.",
+		"ASSIGNED_USER_ID_TOO_LONG": "El identificador del usuario asignado es demasiado largo.",
+
+		"REQUIRED_NAME": "El nombre del proyecto es obligatorio.",
+		"INVALID_NAME": "El nombre del proyecto no es válido.",
+		"NAME_TOO_LONG": "El nombre del proyecto es demasiado largo.",
+
+		"REQUIRED_CATEGORY": "La categoría es obligatoria.",
+		"OWNER_CANNOT_REMOVE_SELF": "Un propietario no puede eliminarse a sí mismo del proyecto. Si quieres salir, elimina el proyecto.",
+
+		"MISSING_PROJECT_ID": "Falta el identificador del proyecto.",
+		"NOT_A_MEMBER": "No eres miembro de este proyecto.",
+		"INSUFFICIENT_ROLE": "No tienes permisos suficientes para realizar esta acción.",
+
+		"REQUIRED_ROLE": "El rol es obligatorio.",
+		"INVITE_ALREADY_EXISTS": "La invitación ya existe.",
+
+		"USER_NOT_IN_REQUEST": "No se ha podido identificar al usuario.",
+		"MEMBERSHIP_NOT_FOUND": "No se ha encontrado tu membresía en este proyecto.",
+
+		"USER_NOT_FOUND_BY_EMAIL": "No existe ningún usuario con ese correo.",
+		"PROJECT_NOT_FOUND": "El proyecto no existe.",
+		"USER_ALREADY_INVITED": "Este usuario ya ha sido invitado.",
+		"USER_ALREADY_MEMBER": "Este usuario ya es miembro del proyecto.",
+
+		"MISSING_PROJECT_ID_PARAM": "Falta el identificador del proyecto en la URL.",
+
+		"TASK_ID_MISSING": "Falta el identificador de la tarea.",
+		"TASK_NOT_FOUND": "La tarea no existe.",
+		"FORBIDDEN": "No tienes permiso para modificar esta tarea.",
+
+		"INVALID_CREDENTIALS": "Correo o contraseña incorrectos."
 	}
 }

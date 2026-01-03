@@ -31,7 +31,6 @@ import {
 	useSidebar,
 } from "@/components/ui/sidebar";
 import { cn } from "@/lib/utils";
-import { fetcher } from "@/lib/api";
 import { type ProfileEndpoint, StatusEnum } from "@repo/types";
 
 import { toast } from "sonner";
@@ -40,6 +39,8 @@ import Link from "next/link";
 import { statusStyles } from "./status";
 import { useUser } from "@/context/UserContext";
 import { useTranslations } from "next-intl";
+import { useFetcherToast } from "@/hooks/useFetcherToast";
+import { fetcher } from "@/lib/api";
 
 type NavUserProps = {
 	user: Omit<
@@ -76,6 +77,9 @@ function NavUserInner({ user }: NavUserProps) {
 
 	const { refetchUser } = useUser();
 
+	const tErrors = useTranslations("errors");
+	const fetcherToast = useFetcherToast();
+
 	async function handleStatusChange(newStatus: StatusEnum) {
 		setStatus(newStatus);
 
@@ -86,7 +90,13 @@ function NavUserInner({ user }: NavUserProps) {
 		});
 
 		if (error) {
-			toast.error(tNavUser("statusUpdateErrorToast", { error }));
+			const errorText = error.codes?.length
+				? error.codes.map((c) => tErrors(c)).join("\n")
+				: tErrors("INTERNAL_SERVER_ERROR");
+
+			toast.error(
+				tNavUser("statusUpdateErrorToast", { error: errorText })
+			);
 			setStatus(user.status);
 		} else {
 			toast.success(tNavUser("statusUpdateSuccessToast"));
@@ -96,18 +106,17 @@ function NavUserInner({ user }: NavUserProps) {
 	}
 
 	async function handleLogout() {
-		const { error } = await fetcher<{ message?: string }>("/auth/log-out", {
-			method: "POST",
-			needsAuth: true,
-		});
+		const { error } = await fetcherToast<{ message?: string }>(
+			"/auth/log-out",
+			{
+				method: "POST",
+				needsAuth: true,
+			}
+		);
 
-		if (error) {
-			toast.error(error);
-			return;
-		}
+		if (error) return;
 
 		toast.success(tAuth("loggedOutToast"));
-
 		router.push("/login");
 	}
 

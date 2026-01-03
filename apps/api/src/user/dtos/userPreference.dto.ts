@@ -1,24 +1,30 @@
-import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
 import { Theme, Status } from '@repo/database';
+import { IsBoolean, IsEnum, IsOptional, IsString } from 'class-validator';
+
+import { USER_DTO_ERROR_CODES } from '../../utils/constants';
 
 export class UpdatePreferenceDto {
   @IsOptional()
   @IsEnum(Theme, {
-    message: `Theme must be one of the following values: ${Object.values(Theme).join(', ')}`,
+    message: USER_DTO_ERROR_CODES.THEME_ENUM,
   })
   theme?: Theme;
 
   @IsOptional()
   @IsEnum(Status, {
-    message: `Status must be one of the following values: ${Object.values(Status).join(', ')}`,
+    message: USER_DTO_ERROR_CODES.STATUS_ENUM,
   })
   status?: Status;
 
   @IsOptional()
-  @IsBoolean()
+  @IsBoolean({
+    message: USER_DTO_ERROR_CODES.IS_BOOLEAN,
+  })
   notifications?: Boolean;
 
-  @IsString()
   @IsOptional()
+  @IsString({
+    message: USER_DTO_ERROR_CODES.IS_STRING,
+  })
   language?: String;
 }

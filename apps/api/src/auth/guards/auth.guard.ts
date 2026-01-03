@@ -8,6 +8,8 @@ import { JwtService } from '@nestjs/jwt';
 import { Reflector } from '@nestjs/core';
 import { Request } from 'express';
 
+import { ERROR_CODES } from 'src/utils/constants';
+
 import { IS_PUBLIC_KEY } from '../decorators/public.decorator';
 import type { JwtPayload } from '../types/jwt-payload.type';
 
@@ -35,14 +37,18 @@ export class AuthGuard implements CanActivate {
     const token = this.extractTokenFromCookie(request);
 
     if (!token) {
-      throw new UnauthorizedException('Missing authentication token');
+      throw new UnauthorizedException({
+        message: ERROR_CODES.MISSING_AUTH_TOKEN,
+      });
     }
 
     try {
       const payload: JwtPayload = await this.jwtService.verifyAsync(token);
       (request as any).user = payload;
     } catch {
-      throw new UnauthorizedException('Invalid or expired token');
+      throw new UnauthorizedException({
+        message: ERROR_CODES.INVALID_OR_EXPIRED_TOKEN,
+      });
     }
 
     return true;

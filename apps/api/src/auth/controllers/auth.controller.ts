@@ -13,7 +13,7 @@ import type { Response } from 'express';
 
 import { SignInDto } from 'src/user/dtos/signIn';
 import { PasswordChangeDto } from 'src/user/dtos/password.dto';
-import { SERVICES } from 'src/utils/constants';
+import { RESPONSES, SERVICES } from 'src/utils/constants';
 import { SignUpDto } from 'src/user/dtos/signUp';
 
 import { Public } from '../decorators/public.decorator';
@@ -45,7 +45,7 @@ export class AuthController {
     this.mutateCookie(res, accessToken);
 
     return {
-      message: 'Logged in successfully',
+      message: RESPONSES.REGISTER_SUCCESS,
     };
   }
 
@@ -66,7 +66,7 @@ export class AuthController {
     this.mutateCookie(res, accessToken);
 
     return {
-      message: 'Account created successfully',
+      message: RESPONSES.REGISTER_SUCCESS,
     };
   }
 
@@ -95,7 +95,7 @@ export class AuthController {
       sameSite: 'lax',
     });
 
-    return { message: 'Logged out successfully' };
+    return { message: RESPONSES.LOGGED_OUT };
   }
 
   private mutateCookie(res: Response, accesToken: string) {

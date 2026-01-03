@@ -6,7 +6,7 @@ import {
   ForbiddenException,
   BadRequestException,
 } from '@nestjs/common';
-import { SERVICES } from 'src/utils/constants';
+import { SERVICES, PROJECT_GUARD_ERROR_CODES } from 'src/utils/constants';
 import type { IProjectService } from '../interfaces/project.interface';
 import type { JwtPayload } from 'src/auth/types/jwt-payload.type';
 import type { ProjectDtoUpdate } from '../dtos/projectDtoUpdate.dto';
@@ -22,11 +22,13 @@ export class ProjectGuard implements CanActivate {
     const user = request.user as JwtPayload;
     const body = request.body as ProjectDtoUpdate;
 
-    const projectId = body.id;
+    const projectId = body?.id;
     const userId = user.sub;
 
     if (!projectId) {
-      throw new BadRequestException('Project ID is required in the body');
+      throw new BadRequestException({
+        message: PROJECT_GUARD_ERROR_CODES.MISSING_PROJECT_ID,
+      });
     }
 
     const membership = await this.projectService.getMembership(
@@ -35,17 +37,19 @@ export class ProjectGuard implements CanActivate {
     );
 
     if (!membership) {
-      throw new ForbiddenException('You are not a member of this project');
+      throw new ForbiddenException({
+        message: PROJECT_GUARD_ERROR_CODES.NOT_A_MEMBER,
+      });
     }
 
     const allowedRoles = ['OWNER', 'ADMIN'];
 
-    if (allowedRoles.includes(membership.role)) {
+    if (allowedRoles.includes(membership.role as any)) {
       return true;
     }
 
-    throw new ForbiddenException(
-      'You do not have permission to modify this project (requires OWNER or ADMIN role)',
-    );
+    throw new ForbiddenException({
+      message: PROJECT_GUARD_ERROR_CODES.INSUFFICIENT_ROLE,
+    });
   }
 }

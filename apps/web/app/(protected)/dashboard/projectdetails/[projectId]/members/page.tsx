@@ -3,10 +3,8 @@
 import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 
-import { toast } from "sonner";
 import { useTranslations } from "next-intl";
 
-import { fetcher } from "@/lib/api";
 import type { ProjectMember } from "@repo/types";
 
 import { SidebarTrigger } from "@/components/ui/sidebar";
@@ -16,6 +14,7 @@ import { ScrollArea } from "@/components/ui/scroll-area";
 
 import { InviteMember } from "@/components/custom/inviteMember";
 import { MemberCard } from "./components/member";
+import { useFetcherToast } from "@/hooks/useFetcherToast";
 
 const DEFAULT_AVATAR =
 	"https://raw.githubusercontent.com/Mangeh04/Storage/main/binchilling.png";
@@ -29,11 +28,13 @@ export default function MembersPage() {
 	const [users, setUsers] = useState<ProjectMember[]>([]);
 	const [isFetching, setIsFetching] = useState(false);
 
+	const fetcherToast = useFetcherToast();
 	const fetchMembers = useCallback(async () => {
 		if (!projectId) return;
 
 		setIsFetching(true);
-		const { data, error } = await fetcher<ProjectMember[]>(
+
+		const { data, error } = await fetcherToast<ProjectMember[]>(
 			`/project/${projectId}/members`,
 			{
 				method: "GET",
@@ -41,11 +42,10 @@ export default function MembersPage() {
 			}
 		);
 
-		if (error) {
-			toast.error(error);
-		} else {
+		if (!error) {
 			setUsers(data ?? []);
 		}
+
 		setIsFetching(false);
 	}, [projectId]);
 

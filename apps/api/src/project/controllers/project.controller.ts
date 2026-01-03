@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import type { Project } from '@repo/database';
 
-import { SERVICES } from 'src/utils/constants';
+import { PROJECT_ERROR_CODES, SERVICES } from 'src/utils/constants';
 import { User } from 'src/auth/decorators/user.decorator';
 import type { JwtPayload } from 'src/auth/types/jwt-payload.type';
 
@@ -73,7 +73,7 @@ export class ProjectController {
   ): Promise<boolean> {
     if (user.sub === userIdToKick) {
       throw new BadRequestException(
-        'An owner cannot remove themselves from the project. Please delete the project instead.',
+        PROJECT_ERROR_CODES.OWNER_CANNOT_REMOVE_SELF,
       );
     }
     return this.projectService.removeMember(projectId, userIdToKick);

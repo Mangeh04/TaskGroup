@@ -10,8 +10,9 @@ import {
 } from "react";
 import { toast } from "sonner";
 
-import { fetcher } from "@/lib/api";
 import type { ProfileEndpoint } from "@repo/types";
+import { fetcher } from "@/lib/api";
+
 import { useTranslations } from "next-intl";
 
 type UserContextType = {

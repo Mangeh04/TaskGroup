@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { Role } from '@repo/database';
 
-import { SERVICES } from 'src/utils/constants';
+import { PROJECT_ADMIN_GUARD_ERROR_CODES, SERVICES } from 'src/utils/constants';
 import type { JwtPayload } from 'src/auth/types/jwt-payload.type';
 
 import type { IProjectService } from '../interfaces/project.interface';
@@ -28,9 +28,9 @@ export class ProjectAdminGuard implements CanActivate {
     const userId = user.sub;
 
     if (!projectId) {
-      throw new BadRequestException(
-        'Project ID is required in the URL parameter',
-      );
+      throw new BadRequestException({
+        message: PROJECT_ADMIN_GUARD_ERROR_CODES.MISSING_PROJECT_ID_PARAM,
+      });
     }
 
     const membership = await this.projectService.getMembership(
@@ -39,13 +39,15 @@ export class ProjectAdminGuard implements CanActivate {
     );
 
     if (!membership) {
-      throw new NotFoundException();
+      throw new NotFoundException({
+        message: PROJECT_ADMIN_GUARD_ERROR_CODES.MEMBERSHIP_NOT_FOUND,
+      });
     }
 
     if (membership.role === Role.MEMBER) {
-      throw new ForbiddenException(
-        'You do not have permission to do this action(requires ADMIN role)',
-      );
+      throw new ForbiddenException({
+        message: PROJECT_ADMIN_GUARD_ERROR_CODES.INSUFFICIENT_ROLE,
+      });
     }
 
     return true;

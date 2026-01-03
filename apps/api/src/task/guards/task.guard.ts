@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { PrismaClient, Role } from '@repo/database';
 import type { JwtPayload } from 'src/auth/types/jwt-payload.type';
-import { SERVICES } from 'src/utils/constants';
+import { SERVICES, TASK_GUARD_ERROR_CODES } from 'src/utils/constants';
 
 @Injectable()
 export class TaskGuard implements CanActivate {
@@ -22,13 +22,17 @@ export class TaskGuard implements CanActivate {
 
     const user = request.user as JwtPayload;
     if (!user || !user.sub) {
-      throw new UnauthorizedException('User not found in request.');
+      throw new UnauthorizedException({
+        message: TASK_GUARD_ERROR_CODES.USER_NOT_IN_REQUEST,
+      });
     }
     const userId = user.sub;
 
     const taskId = request.params.id;
     if (!taskId) {
-      throw new NotFoundException('Task ID not found in request params.');
+      throw new NotFoundException({
+        message: TASK_GUARD_ERROR_CODES.TASK_ID_MISSING,
+      });
     }
 
     const task = await this.prismaService.task.findUnique({
@@ -37,7 +41,9 @@ export class TaskGuard implements CanActivate {
     });
 
     if (!task) {
-      throw new NotFoundException('Task not found.');
+      throw new NotFoundException({
+        message: TASK_GUARD_ERROR_CODES.TASK_NOT_FOUND,
+      });
     }
     const projectId = task.projectId;
 
@@ -66,8 +72,8 @@ export class TaskGuard implements CanActivate {
       return true;
     }
 
-    throw new ForbiddenException(
-      'You do not have permission to modify this task.',
-    );
+    throw new ForbiddenException({
+      message: TASK_GUARD_ERROR_CODES.FORBIDDEN,
+    });
   }
 }

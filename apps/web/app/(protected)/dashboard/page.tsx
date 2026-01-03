@@ -25,7 +25,6 @@ import {
 } from "@/components/ui/select";
 
 import emptyImage from "@/public/images/empty-folder.webp";
-import { fetcher } from "@/lib/api";
 import { usePaginatedView } from "@/hooks/usePaginatedView";
 import { type Project, ProjectCategoryEnum } from "@repo/types";
 
@@ -35,6 +34,7 @@ import { toast } from "sonner";
 
 import { ProjectForm } from "./components/projectForm";
 import { useTranslations } from "next-intl";
+import { useFetcherToast } from "@/hooks/useFetcherToast";
 
 export type ProjectResponse = Project & {
 	membersCount: number;
@@ -61,21 +61,22 @@ export default function DashboardPage() {
 
 	const [categoryFilter, setCategoryFilter] = useState<CategoryFilter>("ALL");
 
+	const fetcherToast = useFetcherToast();
 	const fetchData = useCallback(async () => {
 		setIsFetching(true);
 
-		const { data, error } = await fetcher<ProjectResponse[]>("/project/", {
-			method: "GET",
-			needsAuth: true,
-		});
+		const { data, error } = await fetcherToast<ProjectResponse[]>(
+			"/project/",
+			{
+				method: "GET",
+				needsAuth: true,
+			}
+		);
 
-		if (error) {
-			toast.error(error);
-			setIsFetching(false);
-			return;
+		if (!error) {
+			setProjects(data ?? []);
 		}
 
-		setProjects(data ?? []);
 		setIsFetching(false);
 	}, []);
 
@@ -86,6 +87,7 @@ export default function DashboardPage() {
 	const t = useTranslations("dashboard");
 	const f = useTranslations("projectForm");
 	const genericT = useTranslations("generic");
+
 	const categoryOptions = useMemo(
 		() =>
 			Object.values(ProjectCategoryEnum).filter(
@@ -153,14 +155,13 @@ export default function DashboardPage() {
 		if (isCreating) return;
 		setIsCreating(true);
 
-		const { error } = await fetcher("/project/", {
+		const { error } = await fetcherToast("/project/", {
 			method: "POST",
 			body: formValues,
 			needsAuth: true,
 		});
 
 		if (error) {
-			toast.error(error);
 			setIsCreating(false);
 			return;
 		}

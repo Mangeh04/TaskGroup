@@ -8,7 +8,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { Role } from '@repo/database';
-import { SERVICES } from 'src/utils/constants';
+import { PROJECT_OWNER_GUARD_ERROR_CODES, SERVICES } from 'src/utils/constants';
 import type { IProjectService } from '../interfaces/project.interface';
 import type { JwtPayload } from 'src/auth/types/jwt-payload.type';
 
@@ -26,9 +26,9 @@ export class ProjectOwnerGuard implements CanActivate {
     const userId = user.sub;
 
     if (!projectId) {
-      throw new BadRequestException(
-        'Project ID is required in the URL parameter',
-      );
+      throw new BadRequestException({
+        message: PROJECT_OWNER_GUARD_ERROR_CODES.MISSING_PROJECT_ID_PARAM,
+      });
     }
 
     const membership = await this.projectService.getMembership(
@@ -37,13 +37,15 @@ export class ProjectOwnerGuard implements CanActivate {
     );
 
     if (!membership) {
-      throw new NotFoundException();
+      throw new NotFoundException({
+        message: PROJECT_OWNER_GUARD_ERROR_CODES.MEMBERSHIP_NOT_FOUND,
+      });
     }
 
     if (membership.role !== Role.OWNER) {
-      throw new ForbiddenException(
-        'You do not have permission to do this action (requires OWNER role)',
-      );
+      throw new ForbiddenException({
+        message: PROJECT_OWNER_GUARD_ERROR_CODES.INSUFFICIENT_ROLE,
+      });
     }
 
     return true;

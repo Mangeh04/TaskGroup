@@ -5,9 +5,9 @@ import { useRouter } from "next/navigation";
 
 import { Card, CardContent } from "@/components/ui/card";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
-import { fetcher } from "@/lib/api";
 
 import { useTranslations, useLocale } from "next-intl";
+import { useFetcherToast } from "@/hooks/useFetcherToast";
 
 const LANGUAGES = [
 	{ id: "en", label: "English" },
@@ -22,8 +22,10 @@ export function LanguageSection() {
 	const [value, setValue] = useState(locale);
 	const [isPending, startTransition] = useTransition();
 
+	const fetcherToast = useFetcherToast();
+
 	async function updateLanguagePreference(lang: string) {
-		await fetcher("/user/preference", {
+		await fetcherToast("/user/preference", {
 			method: "PATCH",
 			needsAuth: true,
 			body: { language: lang },

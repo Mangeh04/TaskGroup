@@ -12,6 +12,7 @@ import { SERVICES } from 'src/utils/constants';
 import { IAuthService, type Payload } from '../interfaces/auth.interface';
 import type { ICryptoService } from 'src/crypto/interfaces/crypto.interface';
 
+import { ERROR_CODES } from '../../utils/constants';
 import type { JwtPayload } from '../types/jwt-payload.type';
 
 @Injectable()
@@ -25,11 +26,15 @@ export class AuthService implements IAuthService {
   public async signIn(email: string, pass: string): Promise<Payload> {
     const user = await this.getUser(email);
     if (!user) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException({
+        message: ERROR_CODES.UNAUTHORIZED,
+      });
     }
 
     if (!(await this.cryptoService.compareHash(pass, user.password))) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException({
+        message: ERROR_CODES.UNAUTHORIZED,
+      });
     }
 
     const payload: JwtPayload = { sub: user.id, alias: user.alias, email };
@@ -45,7 +50,9 @@ export class AuthService implements IAuthService {
   ): Promise<Payload> {
     const user = await this.getUser(email);
     if (user) {
-      throw new ConflictException();
+      throw new ConflictException({
+        message: ERROR_CODES.USER_ALREADY_EXISTS,
+      });
     }
 
     const createdUser = await this.usersService.createUser({
@@ -72,7 +79,9 @@ export class AuthService implements IAuthService {
   ) {
     const user = await this.getUserById(id);
     if (!user) {
-      throw new UnauthorizedException();
+      throw new UnauthorizedException({
+        message: ERROR_CODES.UNAUTHORIZED,
+      });
     }
 
     const hashedOldPassword = await this.cryptoService.hash(oldPassword);
@@ -80,17 +89,21 @@ export class AuthService implements IAuthService {
     if (
       await this.cryptoService.compareHash(user.password, hashedOldPassword)
     ) {
-      throw new UnauthorizedException('Current password is incorrect');
+      throw new UnauthorizedException({
+        message: ERROR_CODES.INCORRECT_PASSWORD,
+      });
     }
 
     if (oldPassword === newPassword1) {
-      throw new ConflictException(
-        'New password must be different from the current password',
-      );
+      throw new ConflictException({
+        message: ERROR_CODES.NEW_PASSWORD_NOT_DIFFERENT,
+      });
     }
 
     if (newPassword1 !== newPassword2) {
-      throw new ConflictException('New passwords do not match');
+      throw new ConflictException({
+        message: ERROR_CODES.NEW_PASSWORDS_DIFFERENT,
+      });
     }
 
     await this.usersService.updateUserPassword(id, newPassword1);

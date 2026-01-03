@@ -5,12 +5,12 @@ import { Input } from "@/components/ui/input";
 
 import Image from "next/image";
 import { useCallback, useState } from "react";
-import { fetcher } from "@/lib/api";
 import { toast } from "sonner";
 import { useParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 
 import buttonIcon from "@/public/images/add-member.webp";
+import { fetcher } from "@/lib/api";
 
 export function InviteMember() {
 	const params = useParams();

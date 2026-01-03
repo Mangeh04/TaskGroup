@@ -26,12 +26,12 @@ import {
 	SelectValue,
 } from "@/components/ui/select";
 
-import { fetcher } from "@/lib/api";
 import { TaskFormSchema, type TaskFormValues } from "@/lib/schemas";
 import type { ProjectMember, TaskEndpoint } from "@repo/types";
 
 import { TaskForm } from "./taskForm";
 import { useFormatter, useTranslations } from "next-intl";
+import { useFetcherToast } from "@/hooks/useFetcherToast";
 
 export type TaskCardProps = {
 	task: TaskEndpoint;
@@ -161,6 +161,8 @@ export function TaskCard({ task, projectMembers, onUpdate }: TaskCardProps) {
 		);
 	};
 
+	const fetcherToast = useFetcherToast();
+
 	async function handleStateChange(nextState: StateValue) {
 		if (isChangingState || isSaving) return;
 
@@ -178,7 +180,7 @@ export function TaskCard({ task, projectMembers, onUpdate }: TaskCardProps) {
 			assignedUserId: assignedUserId ?? null,
 		};
 
-		const { error } = await fetcher<TaskEndpoint, typeof apiBody>(
+		const { error } = await fetcherToast<TaskEndpoint, typeof apiBody>(
 			`/task/${id}`,
 			{
 				method: "PATCH",
@@ -187,9 +189,7 @@ export function TaskCard({ task, projectMembers, onUpdate }: TaskCardProps) {
 			}
 		);
 
-		if (error) {
-			toast.error(error);
-		} else {
+		if (!error) {
 			toast.success(t("toastStateUpdated"));
 			onUpdate();
 		}
@@ -220,7 +220,7 @@ export function TaskCard({ task, projectMembers, onUpdate }: TaskCardProps) {
 			assignedUserId: parsed.data.userId || null,
 		};
 
-		const { error } = await fetcher<TaskEndpoint, typeof apiBody>(
+		const { error } = await fetcherToast<TaskEndpoint, typeof apiBody>(
 			`/task/${id}`,
 			{
 				method: "PATCH",
@@ -230,7 +230,6 @@ export function TaskCard({ task, projectMembers, onUpdate }: TaskCardProps) {
 		);
 
 		if (error) {
-			toast.error(error);
 			setIsSaving(false);
 			return;
 		}
@@ -241,14 +240,12 @@ export function TaskCard({ task, projectMembers, onUpdate }: TaskCardProps) {
 	}
 
 	async function handleDelete() {
-		const { error } = await fetcher(`/task/${id}`, {
+		const { error } = await fetcherToast(`/task/${id}`, {
 			method: "DELETE",
 			needsAuth: true,
 		});
 
-		if (error) {
-			toast.error(error);
-		} else {
+		if (!error) {
 			toast.success(t("toastDeleted"));
 			onUpdate();
 		}

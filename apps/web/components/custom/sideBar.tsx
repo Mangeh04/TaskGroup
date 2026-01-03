@@ -23,9 +23,8 @@ import { NavConfiguration } from "@/components/nav/nav-configuration";
 import { type Status, StatusEnum } from "@repo/types";
 import { useUser } from "@/context/UserContext";
 import { useTranslations } from "next-intl";
-import { fetcher } from "@/lib/api";
 import { ProjectMember } from "@repo/types";
-import { toast } from "sonner";
+import { useFetcherToast } from "@/hooks/useFetcherToast";
 
 export type SidebarProps = React.ComponentProps<typeof Sidebar>;
 
@@ -44,12 +43,15 @@ export default function AppSidebar(props: SidebarProps) {
 	const [users, setUsers] = useState<ProjectMember[]>([]);
 	const [isFetchingMembers, setIsFetchingMembers] = useState(true);
 
+	const fetcherToast = useFetcherToast();
+
 	const fetchMembers = useCallback(async () => {
 		if (!isProject) return;
 		if (!projectId) return;
 
 		setIsFetchingMembers(true);
-		const { data, error } = await fetcher<ProjectMember[]>(
+
+		const { data, error } = await fetcherToast<ProjectMember[]>(
 			`/project/${projectId}/members`,
 			{
 				method: "GET",
@@ -57,11 +59,10 @@ export default function AppSidebar(props: SidebarProps) {
 			}
 		);
 
-		if (error) {
-			toast.error(error);
-		} else {
+		if (!error) {
 			setUsers(data ?? []);
 		}
+
 		setIsFetchingMembers(false);
 	}, [projectId, isProject]);
 

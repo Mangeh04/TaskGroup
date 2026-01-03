@@ -20,7 +20,6 @@ import {
 	SkeletonNotificationCard,
 } from "./components/notification";
 import { useTranslations } from "next-intl";
-import { fetcher } from "@/lib/api";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 import type {
@@ -28,6 +27,7 @@ import type {
 	ProjectInviteDTO,
 	TaskAssignedDTO,
 } from "@repo/types";
+import { useFetcherToast } from "@/hooks/useFetcherToast";
 
 export default function InboxPage() {
 	const [isLoading, setIsLoading] = useState(true);
@@ -35,10 +35,12 @@ export default function InboxPage() {
 	const [notifications, setNotis] = useState<NotificationsEndpoint[]>([]);
 	const [isFetching, setIsFetching] = useState(false);
 
+	const fetcherToast = useFetcherToast();
+
 	const fetchData = useCallback(async () => {
 		setIsFetching(true);
 
-		const { data, error } = await fetcher<NotificationsEndpoint[]>(
+		const { data, error } = await fetcherToast<NotificationsEndpoint[]>(
 			`/notification/`,
 			{
 				method: "GET",
@@ -46,17 +48,14 @@ export default function InboxPage() {
 			}
 		);
 
-		if (error) {
-			toast.error(error);
+		if (!error) {
+			setNotis(data ?? []);
+		} else {
 			setNotis([]);
-			setIsFetching(false);
-			return;
 		}
 
-		setNotis(data!);
 		setIsFetching(false);
 	}, []);
-
 	useEffect(() => {
 		void fetchData();
 	}, [fetchData]);
@@ -84,19 +83,13 @@ export default function InboxPage() {
 		userId: string,
 		projectName: string
 	) {
-		const { error } = await fetcher(`/project/${projectId}/accept`, {
+		const { error } = await fetcherToast(`/project/${projectId}/accept`, {
 			method: "POST",
-			body: {
-				projectId,
-				userId,
-			},
+			body: { projectId, userId },
 			needsAuth: true,
 		});
 
-		if (error) {
-			toast.error(error);
-			return;
-		}
+		if (error) return;
 
 		toast.success(t("invitationAcceptedToast", { project: projectName }));
 		router.push(`/dashboard/projectdetails/${projectId}`);
@@ -107,38 +100,26 @@ export default function InboxPage() {
 		userId: string,
 		projectName: string
 	) {
-		const { error } = await fetcher(`/project/${projectId}/decline`, {
+		const { error } = await fetcherToast(`/project/${projectId}/decline`, {
 			method: "POST",
-			body: {
-				projectId,
-				userId,
-			},
+			body: { projectId, userId },
 			needsAuth: true,
 		});
 
-		if (error) {
-			toast.error(error);
-			return;
-		}
+		if (error) return;
 
 		toast.success(t("invitationRejectedToast", { project: projectName }));
 		await fetchData();
 	}
 
 	async function handleClearNotification(taskId: string, userId: string) {
-		const { error } = await fetcher(`/project/${taskId}/clear`, {
+		const { error } = await fetcherToast(`/project/${taskId}/clear`, {
 			method: "POST",
-			body: {
-				taskId,
-				userId,
-			},
+			body: { taskId, userId },
 			needsAuth: true,
 		});
 
-		if (error) {
-			toast.error(error);
-			return;
-		}
+		if (error) return;
 
 		toast.success(t("notificationClearedToast"));
 		await fetchData();

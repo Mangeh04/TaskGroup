@@ -7,7 +7,7 @@ import {
 import { PrismaClient, type Project, type Prisma, Role } from '@repo/database';
 import { ProjectMembership } from '@repo/database';
 
-import { SERVICES } from 'src/utils/constants';
+import { PROJECT_SERVICE_ERROR_CODES, SERVICES } from 'src/utils/constants';
 import type { ICryptoService } from 'src/crypto/interfaces/crypto.interface';
 import { EventEmitter2 } from '@nestjs/event-emitter';
 import { EVENTS, ProjectMember } from '@repo/types';
@@ -87,7 +87,7 @@ export class ProjectService implements IProjectService {
   }
 
   public async updateProject(projectDto: ProjectDtoUpdate) {
-    const data = await this.mapDtoToUpdateInput(projectDto);
+    const data = await this.mapDtoToUpdateInput(projectDto as ProjectDto);
     await this.prismaService.project.update({
       where: { id: projectDto.id },
       data,
@@ -186,14 +186,18 @@ export class ProjectService implements IProjectService {
     const userToInvite =
       await this.userService.findUserByEmail(userEmailToInvite);
     if (!userToInvite) {
-      throw new NotFoundException('User with this email does not exist');
+      throw new NotFoundException({
+        message: PROJECT_SERVICE_ERROR_CODES.USER_NOT_FOUND_BY_EMAIL,
+      });
     }
 
     const inviter = await this.userService.findUser(inviterId);
     const project = await this.findProject(projectId);
 
     if (!project) {
-      throw new NotFoundException('Project does not exist');
+      throw new NotFoundException({
+        message: PROJECT_SERVICE_ERROR_CODES.PROJECT_NOT_FOUND,
+      });
     }
 
     const existingMembership =
@@ -206,13 +210,15 @@ export class ProjectService implements IProjectService {
       });
 
     if (existingMembership != null) {
-      throw new ConflictException('This user is already invited');
+      throw new ConflictException({
+        message: PROJECT_SERVICE_ERROR_CODES.USER_ALREADY_INVITED,
+      });
     }
 
     if (await this.isUserInProject(userToInvite.id, projectId)) {
-      throw new ConflictException(
-        'This user is already a member of this project',
-      );
+      throw new ConflictException({
+        message: PROJECT_SERVICE_ERROR_CODES.USER_ALREADY_MEMBER,
+      });
     }
 
     this.eventEmitter.emit(EVENTS.PROJECT_INVITED, {

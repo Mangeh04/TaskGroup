@@ -1,10 +1,9 @@
 import { Role } from '@repo/database';
-import { IsEnum, IsNotEmpty, IsString } from 'class-validator';
+import { IsEnum, IsNotEmpty } from 'class-validator';
+import { MEMBER_DTO_ERROR_CODES } from 'src/utils/constants';
 
 export class MemberDto {
-  @IsNotEmpty()
-  @IsEnum(Role, {
-    message: `Role must be one of the following values: ${Object.values(Role).join(', ')}`,
-  })
+  @IsNotEmpty({ message: MEMBER_DTO_ERROR_CODES.REQUIRED_ROLE })
+  @IsEnum(Role, { message: MEMBER_DTO_ERROR_CODES.INVALID_ROLE })
   role: Role;
 }

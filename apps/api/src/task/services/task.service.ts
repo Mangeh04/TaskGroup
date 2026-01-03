@@ -5,14 +5,18 @@ import {
   EVENTS,
   type TaskEndpoint,
 } from '@repo/types';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
-import { SERVICES } from 'src/utils/constants';
+import {
+  ERROR_CODES,
+  SERVICES,
+  TASK_GUARD_ERROR_CODES,
+} from 'src/utils/constants';
 import { CryptoService } from 'src/crypto/services/crypto.service';
 
 import { TaskDto } from '../dtos/taskDto.dto';
 import type { ITaskService } from '../interfaces/task.interface';
 import { TaskDtoUpdate } from '../dtos/taskDtoUpdate.dto';
-import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable()
 export class TaskService implements ITaskService {
@@ -81,23 +85,16 @@ export class TaskService implements ITaskService {
     const current = await this.prismaService.task.findUnique({
       where: { id: taskDto.id },
       select: {
-        id: true,
-        title: true,
-        titleIv: true,
-        description: true,
-        descriptionIv: true,
-        state: true,
-        priority: true,
-        initialDate: true,
-        dueDate: true,
         assignedUserId: true,
         projectId: true,
+        title: true,
       },
     });
 
-    if (!current) {
-      throw new BadRequestException('Task not found');
-    }
+    if (!current)
+      throw new BadRequestException({
+        message: TASK_GUARD_ERROR_CODES.TASK_NOT_FOUND,
+      });
 
     if (taskDto.title !== undefined) {
       const encryptedName = await this.cryptoService.encrypt(taskDto.title);
@@ -118,13 +115,9 @@ export class TaskService implements ITaskService {
       }
     }
 
-    if (taskDto.state !== undefined) {
-      dataToUpdate.state = taskDto.state;
-    }
-
-    if (taskDto.priority !== undefined) {
+    if (taskDto.state !== undefined) dataToUpdate.state = taskDto.state;
+    if (taskDto.priority !== undefined)
       dataToUpdate.priority = taskDto.priority;
-    }
 
     const nextAssignedUserId =
       taskDto.assignedUserId !== undefined
@@ -137,46 +130,14 @@ export class TaskService implements ITaskService {
         : { disconnect: true };
     }
 
-    const nextInitialRaw =
-      taskDto.initialDate !== undefined
-        ? taskDto.initialDate
-        : current.initialDate;
-    const nextDueRaw =
-      taskDto.dueDate !== undefined ? taskDto.dueDate : current.dueDate;
-
-    const nextInitial =
-      nextInitialRaw == null
-        ? null
-        : nextInitialRaw instanceof Date
-          ? nextInitialRaw
-          : new Date(String(nextInitialRaw));
-
-    const nextDue =
-      nextDueRaw == null
-        ? null
-        : nextDueRaw instanceof Date
-          ? nextDueRaw
-          : new Date(String(nextDueRaw));
-
-    if (nextInitial && isNaN(nextInitial.getTime())) {
-      throw new BadRequestException('initialDate is not a valid date');
-    }
-
-    if (nextDue && isNaN(nextDue.getTime())) {
-      throw new BadRequestException('dueDate is not a valid date');
-    }
-
-    if (nextInitial && nextDue && nextDue.getTime() < nextInitial.getTime()) {
-      throw new BadRequestException(
-        'dueDate must be greater than or equal to initialDate',
-      );
-    }
-
     if (taskDto.initialDate !== undefined) {
-      dataToUpdate.initialDate = nextInitial;
+      dataToUpdate.initialDate = taskDto.initialDate
+        ? new Date(taskDto.initialDate)
+        : null;
     }
+
     if (taskDto.dueDate !== undefined) {
-      dataToUpdate.dueDate = nextDue;
+      dataToUpdate.dueDate = taskDto.dueDate ? new Date(taskDto.dueDate) : null;
     }
 
     const updated = await this.prismaService.task.update({
@@ -193,16 +154,14 @@ export class TaskService implements ITaskService {
       nextAssignedUserId &&
       nextAssignedUserId !== updatedByUserId
     ) {
-      const taskAssignedPayload: AssignNotificationPayload = {
+      this.eventEmitter.emit(EVENTS.TASK_ASSIGNED, {
         assignedUserId: nextAssignedUserId,
         taskId: taskDto.id,
         taskName: updated.title,
         assignerUserId: updatedByUserId,
         assignerName: '',
         projectId: updated.projectId,
-      };
-
-      this.eventEmitter.emit(EVENTS.TASK_ASSIGNED, taskAssignedPayload);
+      } satisfies AssignNotificationPayload);
     }
 
     return true;

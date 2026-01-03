@@ -5,48 +5,50 @@ import {
   MaxLength,
   IsEnum,
   IsDateString,
+  Validate,
 } from 'class-validator';
 
 import { State, Priority } from '@repo/database';
+import { IsDueDateAfterInitialDate } from './validators/is-due-date-after-initial-date.validator';
+import { TASK_DTO_ERROR_CODES } from 'src/utils/constants';
 
 export class TaskDtoUpdate {
-  @IsNotEmpty()
-  @IsString()
-  @MaxLength(36)
+  @IsNotEmpty({ message: TASK_DTO_ERROR_CODES.REQUIRED_ID })
+  @IsString({ message: TASK_DTO_ERROR_CODES.INVALID_ID })
+  @MaxLength(36, { message: TASK_DTO_ERROR_CODES.ID_TOO_LONG })
   id: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(30)
+  @IsString({ message: TASK_DTO_ERROR_CODES.INVALID_TITLE })
+  @MaxLength(30, { message: TASK_DTO_ERROR_CODES.TITLE_TOO_LONG })
   title?: string;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(120)
-  description?: string;
+  @IsString({ message: TASK_DTO_ERROR_CODES.INVALID_DESCRIPTION })
+  @MaxLength(120, { message: TASK_DTO_ERROR_CODES.DESCRIPTION_TOO_LONG })
+  description?: string | null;
 
   @IsOptional()
-  @IsString()
-  @MaxLength(36)
-  assignedUserId?: string;
+  @IsString({ message: TASK_DTO_ERROR_CODES.INVALID_ASSIGNED_USER_ID })
+  @MaxLength(36, { message: TASK_DTO_ERROR_CODES.ASSIGNED_USER_ID_TOO_LONG })
+  assignedUserId?: string | null;
 
-  @IsNotEmpty()
-  @IsEnum(State, {
-    message: `state must be one of the following values: ${Object.values(State).join(', ')}`,
+  @IsOptional()
+  @IsEnum(State, { message: TASK_DTO_ERROR_CODES.INVALID_STATE })
+  state?: State;
+
+  @IsOptional()
+  @IsEnum(Priority, { message: TASK_DTO_ERROR_CODES.INVALID_PRIORITY })
+  priority?: Priority;
+
+  @IsOptional()
+  @IsDateString({}, { message: TASK_DTO_ERROR_CODES.INVALID_INITIAL_DATE })
+  initialDate?: string;
+
+  @IsOptional()
+  @IsDateString({}, { message: TASK_DTO_ERROR_CODES.INVALID_DUE_DATE })
+  @Validate(IsDueDateAfterInitialDate, {
+    message: TASK_DTO_ERROR_CODES.DUE_DATE_BEFORE_INITIAL_DATE,
   })
-  state: State;
-
-  @IsNotEmpty()
-  @IsEnum(Priority, {
-    message: `priority must be one of the following values: ${Object.values(Priority).join(', ')}`,
-  })
-  priority: Priority;
-
-  @IsNotEmpty()
-  @IsDateString()
-  dueDate: Date;
-
-  @IsNotEmpty()
-  @IsDateString()
-  initialDate: Date;
+  dueDate?: string;
 }

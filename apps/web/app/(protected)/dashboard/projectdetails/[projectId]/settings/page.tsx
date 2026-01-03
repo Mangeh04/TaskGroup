@@ -16,8 +16,8 @@ import { Badge } from "@/components/ui/badge";
 
 import { RoleEnum } from "@repo/types";
 import type { Project, ProjectMember } from "@repo/types";
-import { fetcher } from "@/lib/api";
 import { useTranslations } from "next-intl";
+import { useFetcherToast } from "@/hooks/useFetcherToast";
 
 export default function ProjectSettingsPage() {
 	const router = useRouter();
@@ -25,61 +25,51 @@ export default function ProjectSettingsPage() {
 	const projectId = params.projectId as string;
 
 	const t = useTranslations("projectSettings.page");
+	const fetcherToast = useFetcherToast();
 
 	async function handleDelete() {
-		const { error } = await fetcher(`/project/${projectId}`, {
+		const { error } = await fetcherToast(`/project/${projectId}`, {
 			method: "DELETE",
 			needsAuth: true,
 		});
 
-		if (error) {
-			toast.error(error);
-			return;
-		}
+		if (error) return;
 
 		toast.success(t("toastDeleted"));
 		router.push("/dashboard");
 	}
 
 	async function handleUpdateProject(updatedProject: Project) {
-		const { error } = await fetcher(`/project/update`, {
+		const { error } = await fetcherToast(`/project/update`, {
 			method: "PATCH",
 			body: updatedProject,
 			needsAuth: true,
 		});
 
-		if (error) {
-			toast.error(error);
-			return;
-		}
+		if (error) return;
 
 		toast.success(t("toastUpdated"));
 		router.push("/dashboard");
 	}
 
 	async function handleUpdateRole(memberId: string, newRole: RoleEnum) {
-		const { error } = await fetcher(
+		const { error } = await fetcherToast(
 			`/project/${projectId}/update/member/${memberId}`,
 			{
 				method: "PATCH",
-				body: {
-					role: newRole,
-				},
+				body: { role: newRole },
 				needsAuth: true,
 			}
 		);
 
-		if (error) {
-			toast.error(error);
-			return;
-		}
+		if (error) return;
 
 		toast.success(t("toastRoleUpdated"));
 		router.refresh();
 	}
 
 	async function handleRemoveMember(memberId: string) {
-		const { error } = await fetcher(
+		const { error } = await fetcherToast(
 			`/project/${projectId}/member/${memberId}`,
 			{
 				method: "DELETE",
@@ -87,11 +77,10 @@ export default function ProjectSettingsPage() {
 			}
 		);
 
-		if (error) {
-			toast.error(error);
-			return;
-		}
+		if (error) return;
 
+		// si tienes traducción, mejor:
+		// toast.success(t("toastMemberRemoved"));
 		toast.success("Member removed from project");
 		router.refresh();
 	}
@@ -104,7 +93,8 @@ export default function ProjectSettingsPage() {
 		if (!projectId) return;
 
 		setIsFetching(true);
-		const { data, error } = await fetcher<Project>(
+
+		const { data, error } = await fetcherToast<Project>(
 			`/project/${projectId}`,
 			{
 				method: "GET",
@@ -112,13 +102,10 @@ export default function ProjectSettingsPage() {
 			}
 		);
 
-		if (error) {
-			toast.error(error);
-			setIsFetching(false);
-			return;
+		if (!error) {
+			setProject(data ?? null);
 		}
 
-		setProject(data ?? null);
 		setIsFetching(false);
 	}, [projectId]);
 
@@ -130,7 +117,8 @@ export default function ProjectSettingsPage() {
 		if (!projectId) return;
 
 		setIsFetching(true);
-		const { data, error } = await fetcher<ProjectMember[]>(
+
+		const { data, error } = await fetcherToast<ProjectMember[]>(
 			`/project/${projectId}/members`,
 			{
 				method: "GET",
@@ -138,11 +126,10 @@ export default function ProjectSettingsPage() {
 			}
 		);
 
-		if (error) {
-			toast.error(error);
-		} else {
+		if (!error) {
 			setUsers(data ?? []);
 		}
+
 		setIsFetching(false);
 	}, [projectId]);
 

@@ -233,6 +233,14 @@
 			"title": "You don't have any tasks yet",
 			"buttonString": "Create Task",
 			"alt": "Empty Task Ilustration"
+		},
+		"filter": {
+			"placeholder": "Filter",
+			"all": "All",
+			"emptyTitle": "There are no tasks for this filter",
+			"clearButton": "See all",
+			"clearTitle": "Clear filter",
+			"clearSubtitle": "See all tasks again"
 		}
 	},
 	"members": {
@@ -397,5 +405,87 @@
 		"authErrorToast": "WebSocket authentication error",
 		"assignedYouToTaskToast": "assigned you to the task \"{taskTitle}\"",
 		"newTaskAssignedToast": "New Task Assigned"
+	},
+	"errors": {
+		"USER_ALREADY_EXISTS": "An account with this email already exists.",
+		"UNAUTHORIZED": "You do not have permission to perform this action.",
+		"INTERNAL_SERVER_ERROR": "An unexpected error occurred. Please try again.",
+		"INVALID_CATEGORY": "Invalid category.",
+		"INVALID_ROLE": "Invalid role.",
+		"INVALID_STATUS": "Invalid status.",
+		"MISSING_AUTH_TOKEN": "Authentication token is missing.",
+		"INVALID_OR_EXPIRED_TOKEN": "Session expired or invalid token.",
+		"INCORRECT_PASSWORD": "Current password is incorrect.",
+		"NEW_PASSWORD_NOT_DIFFERENT": "New password must be different from the current one.",
+		"NEW_PASSWORDS_DIFFERENT": "New passwords do not match.",
+
+		"STATUS_ENUM": "Invalid status.",
+		"THEME_ENUM": "Invalid theme.",
+		"IS_BOOLEAN": "Invalid value.",
+		"IS_STRING": "Invalid value.",
+		"IS_NOT_EMPTY": "This field is required.",
+		"ALIAS_TOO_LONG": "Alias is too long.",
+		"IS_EMAIL": "Email is invalid.",
+		"EMAIL_TOO_LONG": "Email is too long.",
+		"PASSWORD_TOO_SHORT": "Password is too short.",
+		"PASSWORD_TOO_LONG": "Password is too long.",
+
+		"REQUIRED_ID": "ID is missing.",
+		"INVALID_ID": "ID is invalid.",
+		"ID_TOO_LONG": "ID is too long.",
+
+		"INVALID_STATE": "Task state is invalid.",
+		"INVALID_PRIORITY": "Task priority is invalid.",
+
+		"REQUIRED_TITLE": "Title is required.",
+		"INVALID_TITLE": "Title is invalid.",
+		"TITLE_TOO_LONG": "Title is too long.",
+
+		"INVALID_DESCRIPTION": "Description is invalid.",
+		"DESCRIPTION_TOO_LONG": "Description is too long.",
+
+		"REQUIRED_INITIAL_DATE": "Start date is required.",
+		"INVALID_INITIAL_DATE": "Start date is invalid.",
+
+		"REQUIRED_DUE_DATE": "Due date is required.",
+		"INVALID_DUE_DATE": "Due date is invalid.",
+		"DUE_DATE_BEFORE_INITIAL_DATE": "Due date cannot be before the start date.",
+
+		"REQUIRED_PROJECT_ID": "Project is required.",
+		"INVALID_PROJECT_ID": "Project ID is invalid.",
+		"PROJECT_ID_TOO_LONG": "Project ID is too long.",
+
+		"INVALID_ASSIGNED_USER_ID": "Assigned user is invalid.",
+		"ASSIGNED_USER_ID_TOO_LONG": "Assigned user ID is too long.",
+
+		"REQUIRED_NAME": "Project name is required.",
+		"INVALID_NAME": "Project name is invalid.",
+		"NAME_TOO_LONG": "Project name is too long.",
+
+		"REQUIRED_CATEGORY": "Category is required.",
+		"OWNER_CANNOT_REMOVE_SELF": "An owner cannot remove themselves from the project. If you want to leave, delete the project.",
+
+		"MISSING_PROJECT_ID": "Project ID is missing.",
+		"NOT_A_MEMBER": "You are not a member of this project.",
+		"INSUFFICIENT_ROLE": "You do not have sufficient permissions to perform this action.",
+
+		"REQUIRED_ROLE": "Role is required.",
+		"INVITE_ALREADY_EXISTS": "Invitation already exists.",
+
+		"USER_NOT_IN_REQUEST": "Could not identify the user.",
+		"MEMBERSHIP_NOT_FOUND": "Membership not found in this project.",
+
+		"USER_NOT_FOUND_BY_EMAIL": "No user found with that email.",
+		"PROJECT_NOT_FOUND": "Project does not exist.",
+		"USER_ALREADY_INVITED": "This user has already been invited.",
+		"USER_ALREADY_MEMBER": "This user is already a member of the project.",
+
+		"MISSING_PROJECT_ID_PARAM": "Project ID is missing in the URL.",
+
+		"TASK_ID_MISSING": "Task ID is missing.",
+		"TASK_NOT_FOUND": "Task does not exist.",
+		"FORBIDDEN": "You do not have permission to modify this task.",
+
+		"INVALID_CREDENTIALS": "Incorrect email or password."
 	}
 }
