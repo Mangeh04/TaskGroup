@@ -11,6 +11,7 @@ import {
 	CardFooter,
 } from "@/components/ui/card";
 import { useTranslations } from "next-intl";
+import { PublicLanguageSwitcher } from "@/components/custom/publicLanguajeSwitcher";
 
 export default function MainPage() {
 	const t = useTranslations("landing");
@@ -27,6 +28,7 @@ export default function MainPage() {
 								{t("header.brand")}
 							</span>
 						</div>
+						<PublicLanguageSwitcher />
 					</header>
 
 					<section className="flex flex-1 flex-col items-center justify-center gap-10 md:flex-row">
