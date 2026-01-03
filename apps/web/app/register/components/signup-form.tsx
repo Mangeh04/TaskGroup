@@ -22,7 +22,7 @@ import placeholder from "@/public/images/sneaky.jpg";
 
 import { UserRegisterSchema } from "@/lib/schemas";
 import { handleFormValidation } from "@/lib/formHandler";
-import { useFetcherToast } from "@/hooks/useFetcherToast";
+import { fetcher } from "@/lib/api";
 
 export function SignupForm({
 	className,
@@ -31,8 +31,7 @@ export function SignupForm({
 	const [loading, setLoading] = useState(false);
 	const router = useRouter();
 	const t = useTranslations("auth.register");
-
-	const fetcherToast = useFetcherToast();
+	const tErrors = useTranslations("errors");
 
 	async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
 		e.preventDefault();
@@ -51,7 +50,7 @@ export function SignupForm({
 			return;
 		}
 
-		const { data, error } = await fetcherToast<
+		const { error } = await fetcher<
 			{ message?: string },
 			typeof parsed.data
 		>("/auth/sign-up", {
@@ -61,11 +60,13 @@ export function SignupForm({
 		});
 
 		if (error) {
+			toast.error(tErrors(error.raw as string));
+
 			setLoading(false);
 			return;
 		}
 
-		toast.success(data?.message ?? t("successToast"));
+		toast.success(t("successToast"));
 		setLoading(false);
 		router.push("/dashboard");
 	}

@@ -22,7 +22,7 @@ import { Input } from "@/components/ui/input";
 import placeholder from "@/public/images/binchillin.jpeg";
 import { toast } from "sonner";
 import { useTranslations } from "next-intl";
-import { useFetcherToast } from "@/hooks/useFetcherToast";
+import { fetcher } from "@/lib/api";
 
 export function LoginForm({
 	className,
@@ -31,8 +31,7 @@ export function LoginForm({
 	const [loading, setLoading] = useState(false);
 	const router = useRouter();
 	const t = useTranslations("auth.login");
-
-	const fetcherToast = useFetcherToast();
+	const tErrors = useTranslations("errors");
 
 	async function handleSubmit(e: FormEvent<HTMLFormElement>) {
 		e.preventDefault();
@@ -51,7 +50,7 @@ export function LoginForm({
 			return;
 		}
 
-		const { data, error } = await fetcherToast<
+		const { error } = await fetcher<
 			{ message?: string },
 			typeof parsed.data
 		>("/auth/sign-in", {
@@ -61,11 +60,13 @@ export function LoginForm({
 		});
 
 		if (error) {
+			toast.error(tErrors(error.raw as string));
+
 			setLoading(false);
 			return;
 		}
 
-		toast.success(data?.message ?? t("successToast"));
+		toast.success(t("successToast"));
 		setLoading(false);
 		router.push("/dashboard");
 	}

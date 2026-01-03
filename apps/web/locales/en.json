@@ -486,8 +486,6 @@
 		"TASK_NOT_FOUND": "Task does not exist.",
 		"FORBIDDEN": "You do not have permission to modify this task.",
 
-		"INVALID_CREDENTIALS": "Incorrect email or password.",
-		"REGISTER_SUCCESS": "Successful registration.",
-		"LOGGED_IN": "Logged in successfully!"
+		"INVALID_CREDENTIALS": "Incorrect email or password."
 	}
 }
