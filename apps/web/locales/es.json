@@ -485,6 +485,8 @@
 		"TASK_NOT_FOUND": "La tarea no existe.",
 		"FORBIDDEN": "No tienes permiso para modificar esta tarea.",
 
-		"INVALID_CREDENTIALS": "Correo o contraseña incorrectos."
+		"INVALID_CREDENTIALS": "Correo o contraseña incorrectos.",
+		"REGISTER_SUCCESS": "Registro exitoso.",
+		"LOGGED_IN": "¡Has iniciado sesión con éxito!"
 	}
 }

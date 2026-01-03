@@ -45,7 +45,7 @@ export class AuthController {
     this.mutateCookie(res, accessToken);
 
     return {
-      message: RESPONSES.REGISTER_SUCCESS,
+      message: RESPONSES.LOGGED_IN,
     };
   }
 
