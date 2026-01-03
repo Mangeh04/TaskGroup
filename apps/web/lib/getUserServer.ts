@@ -22,10 +22,6 @@ export const getUserServer = async (): Promise<ProfileEndpoint | null> => {
 	});
 
 	if (error) {
-		console.error("Error fetching user on server", {
-			codes: error.codes,
-			raw: error.raw,
-		});
 		return null;
 	}
 

@@ -75,7 +75,7 @@ function NavUserInner({ user }: NavUserProps) {
 		user.email.trim()[0]?.toLocaleUpperCase() ||
 		"?";
 
-	const { refetchUser } = useUser();
+	const { refetchUser, user: fullUser } = useUser();
 
 	const tErrors = useTranslations("errors");
 	const fetcherToast = useFetcherToast();
@@ -106,6 +106,12 @@ function NavUserInner({ user }: NavUserProps) {
 	}
 
 	async function handleLogout() {
+		const lang = fullUser?.language;
+		const maxAge = 60 * 60 * 24 * 365;
+		if (lang) {
+			document.cookie = `locale=${encodeURIComponent(lang)}; path=/; max-age=${maxAge}`;
+		}
+
 		const { error } = await fetcherToast<{ message?: string }>(
 			"/auth/log-out",
 			{
